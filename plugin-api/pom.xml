@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>au.edu.usq.fascinator</groupId>
+  <artifactId>fascinator-plugin-api</artifactId>
+  <version>1.0.2-SNAPSHOT</version>
+  <name>The Fascinator - Plugin API</name>
+  <description>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugin-api</description>
+  <parent>
+    <groupId>au.edu.usq.fascinator</groupId>
+    <artifactId>the-fascinator</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+ 

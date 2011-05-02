@@ -1,0 +1,28 @@
+#macro(displayField $metadata $key)
+    #set($valueList = $metadata.getList($key))
+    #if($valueList && $valueList.size() > 0)
+        <tr><th>$parent.getFriendlyName($key)</th></tr>
+        <tr>
+            <td>
+                #if($valueList.size() > 1)
+                    #foreach($value in $valueList)
+                        <span class="meta-value condense">$value</span>
+                        <br />
+                    #end
+                #else
+                    <span class="meta-value condense">$valueList.get(0)</span>
+                #end
+            </td>
+        </tr>
+    #end
+#end
+#set($menuClass = "metadata")
+#set($menuTitle = "Metadata")
+#parseTemplate("wrapping/menu-open.vm")
+<table class="meta">
+    #displayField($metadata, "dc_title")
+    #displayField($metadata, "dc_creator")
+    #displayField($metadata, "dc_description")
+</table>
+#parseDisplayTemplate("detail/navigation/custom-metadata.vm")
+#parseTemplate("wrapping/menu-close.vm")

@@ -1,0 +1,22 @@
+{
+    "harvester": {
+        "type": "file-system",
+        "file-system": {
+            "targets": [ {
+                "baseDir": "c:/Users/dickinso.USQ/Desktop/zotero",
+                "recursive": false
+            } ]
+        }
+    },
+    
+    "indexer": {
+        "script": {
+            "type": "python",
+            "rules": "zotero.py"
+        },
+        "params": {
+            "repository.name": "Zotero",
+            "repository.type": "Zotero"
+        }
+    }
+}

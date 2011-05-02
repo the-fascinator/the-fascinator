@@ -1,0 +1,1656 @@
+{
+    "response": {
+        "start": 0,
+        "docs": [
+            {
+                "score": 1.0,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "e7c0b28bab8ae46ced186e4701cb685d",
+                "dc_format": [
+                    "video/x-ms-asf"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "e7c0b28bab8ae46ced186e4701cb685d",
+                "last_modified": "2010-10-05T15:18:24Z",
+                "altpreview": [
+                    "ffmpegPreview.mp4"
+                ],
+                "dc_size": [
+                    "320 x 240"
+                ],
+                "audio_codec_label": [
+                    "Windows Media Audio 2"
+                ],
+                "dc_title": [
+                    "niceday.wmv"
+                ],
+                "dc_duration": [
+                    "34 second(s)"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "audio_codec_simple": [
+                    "wmav2"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "video_codec_label": [
+                    "Windows Media Video 9"
+                ],
+                "meta_audio_details": [
+                    "44.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "wmv3"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.flv",
+                "dc_media_format": [
+                    "ASF format"
+                ],
+                "preview_type": "video",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "Windows Media Audio 2 (wmav2)"
+                ],
+                "display_type": "video",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "Windows Media Video 9 (wmv3)"
+                ]
+            },
+            {
+                "score": 1.0,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "e14da3ae387bfc8507368cc9593d4951",
+                "dc_format": [
+                    "video/mp4"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "e14da3ae387bfc8507368cc9593d4951",
+                "last_modified": "2010-10-05T15:26:17Z",
+                "dc_size": [
+                    "380 x 214"
+                ],
+                "dc_title": [
+                    "MER-BErebusPanorama.mp4"
+                ],
+                "workflow_id": "workflow1",
+                "dc_duration": [
+                    "1m 49s"
+                ],
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "MPEG-4 part 2"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "mpeg4"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.flv",
+                "dc_media_format": [
+                    "QuickTime/MPEG-4/Motion JPEG 2000 format"
+                ],
+                "preview_type": "video",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "video",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "MPEG-4 part 2 (mpeg4)"
+                ]
+            },
+            {
+                "score": 0.89,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "f83e4ab49b6d4e37d6be1e2894aa89a2",
+                "dc_format": [
+                    "video/x-flv"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "f83e4ab49b6d4e37d6be1e2894aa89a2",
+                "last_modified": "2010-10-06T10:12:06Z",
+                "altpreview": [
+                    "ffmpegIphone.mp4",
+                    "nullFile.mp4"
+                ],
+                "dc_size": [
+                    "320 x 176"
+                ],
+                "audio_codec_label": [
+                    "MP3 (MPEG audio layer 3)"
+                ],
+                "dc_title": [
+                    "bodyimage.flv"
+                ],
+                "workflow_id": "workflow1",
+                "dc_duration": [
+                    "2m 27s"
+                ],
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "audio_codec_simple": [
+                    "mp3"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "video_codec_label": [
+                    "On2 VP6 (Flash version)"
+                ],
+                "meta_audio_details": [
+                    "22.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "vp6f"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.flv",
+                "dc_media_format": [
+                    "FLV format"
+                ],
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "MP3 (MPEG audio layer 3) (mp3)"
+                ],
+                "display_type": "video",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "On2 VP6 (Flash version) (vp6f)"
+                ]
+            },
+            {
+                "score": 0.89,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "2f64a26e31965a360b008232d9402add",
+                "dc_format": [
+                    "image/jpeg"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "2f64a26e31965a360b008232d9402add",
+                "last_modified": "2010-10-12T16:12:03Z",
+                "dc_size": [
+                    "500 x 643"
+                ],
+                "dc_title": [
+                    "A whale"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Basic Metadata Check"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "MJPEG (Motion JPEG)"
+                ],
+                "workflow_step": [
+                    "metadata"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "mjpeg"
+                ],
+                "dc_description": [
+                    "Having a whale of a time"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "yuvj420p"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "MJPEG (Motion JPEG) (mjpeg)"
+                ]
+            },
+            {
+                "score": 0.89,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "ba2d017af61a78cad3f8a3ad21a578a0",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "ba2d017af61a78cad3f8a3ad21a578a0",
+                "last_modified": "2010-10-15T14:37:40Z",
+                "dc_size": [
+                    "504 x 144"
+                ],
+                "dc_title": [
+                    "attach-debugger.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.75,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "1d59d48bc89f0653e8a3fb6b8aa3ca09",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "1d59d48bc89f0653e8a3fb6b8aa3ca09",
+                "last_modified": "2010-10-15T14:44:00Z",
+                "dc_size": [
+                    "524 x 167"
+                ],
+                "dc_title": [
+                    "attach-process.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "1014af11b0b354081188357fa8bb9df2",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "1014af11b0b354081188357fa8bb9df2",
+                "last_modified": "2010-10-15T15:07:19Z",
+                "dc_size": [
+                    "608 x 474"
+                ],
+                "dc_title": [
+                    "attach-profiler.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "88771d54ec664095a2f2542d686138d0",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "88771d54ec664095a2f2542d686138d0",
+                "last_modified": "2010-10-15T15:19:08Z",
+                "dc_size": [
+                    "595 x 608"
+                ],
+                "dc_title": [
+                    "CPU_Profile_Display.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "6ecfc03f2a8bc859e7075496c8f80092",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "6ecfc03f2a8bc859e7075496c8f80092",
+                "last_modified": "2010-10-18T08:31:59Z",
+                "dc_size": [
+                    "871 x 327"
+                ],
+                "dc_title": [
+                    "FF-Timer.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "f3b9ec4e03e9e398c19eb36ff096ce21",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "f3b9ec4e03e9e398c19eb36ff096ce21",
+                "last_modified": "2010-10-18T08:35:28Z",
+                "dc_size": [
+                    "667 x 302"
+                ],
+                "dc_title": [
+                    "display-full.png"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "93367632411efa43dc420309f8aa9080",
+                "dc_format": [
+                    "image/png"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "93367632411efa43dc420309f8aa9080",
+                "last_modified": "2010-10-18T08:39:09Z",
+                "dc_size": [
+                    "671 x 299"
+                ],
+                "dc_title": [
+                    "Test Title"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Basic Metadata Check"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "PNG image"
+                ],
+                "workflow_step": [
+                    "metadata"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "png"
+                ],
+                "dc_description": [
+                    "Test Description"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "preview_type": "image",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "rgb24"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "PNG image (png)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "b802698e5f8f8f75ed5aff565fd40998",
+                "dc_format": [
+                    "video/mp4"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "b802698e5f8f8f75ed5aff565fd40998",
+                "last_modified": "2010-10-20T14:42:31Z",
+                "altpreview": [
+                    "ffmpegIphone.mp4",
+                    "ffmpegPreview.mp4",
+                    "nullFile.mp4"
+                ],
+                "dc_size": [
+                    "320 x 240"
+                ],
+                "audio_codec_label": [
+                    "Advanced Audio Coding"
+                ],
+                "dc_title": [
+                    "Sample FLV to MP4"
+                ],
+                "dc_duration": [
+                    "1m 25s"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "aac"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"
+                ],
+                "meta_audio_details": [
+                    "44.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "h264"
+                ],
+                "dc_description": [
+                    "Sample FLV to MP4"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.flv",
+                "dc_media_format": [
+                    "QuickTime/MPEG-4/Motion JPEG 2000 format"
+                ],
+                "preview_type": "video",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "Advanced Audio Coding (aac)"
+                ],
+                "display_type": "video",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (h264)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "ed2e00749b4a2f5f364f452f1da97605",
+                "dc_format": [
+                    "image/jpeg"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "ed2e00749b4a2f5f364f452f1da97605",
+                "last_modified": "2010-10-21T10:43:04Z",
+                "altpreview": [
+                    "turtle_preview.jpg"
+                ],
+                "dc_size": [
+                    "492 x 452"
+                ],
+                "dc_title": [
+                    "turtle.jpg"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "video_codec_label": [
+                    "MJPEG (Motion JPEG)"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "mjpeg"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "ffmpegPreview.jpg",
+                "dc_media_format": [
+                    "image2 sequence"
+                ],
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "image",
+                "meta_video_pixel_format": [
+                    "yuvj420p"
+                ],
+                "meta_video_codec": [
+                    "MJPEG (Motion JPEG) (mjpeg)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "admin",
+                    "editor",
+                    "metadata"
+                ],
+                "storage_id": "50d6a71e5fba143ec89fad03b9f65ebf",
+                "dc_format": [
+                    "video/x-ms-asf"
+                ],
+                "workflow_security": [
+                    "metadata",
+                    "admin"
+                ],
+                "id": "50d6a71e5fba143ec89fad03b9f65ebf",
+                "last_modified": "2010-10-21T13:34:30Z",
+                "altpreview": [
+                    "hiRes.mp4"
+                ],
+                "dc_size": [
+                    "1440 x 1080"
+                ],
+                "audio_codec_label": [
+                    "Windows Media Audio 9 Professional"
+                ],
+                "dc_title": [
+                    "Robotica_1080.wmv"
+                ],
+                "workflow_id": "workflow1",
+                "dc_duration": [
+                    "20 second(s)"
+                ],
+                "workflow_step_label": [
+                    "Pending"
+                ],
+                "audio_codec_simple": [
+                    "wmapro"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "pending"
+                ],
+                "video_codec_label": [
+                    "Windows Media Video 9"
+                ],
+                "meta_audio_details": [
+                    "48.0 KHz, 6 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "wmv3"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "dc_media_format": [
+                    "ASF format"
+                ],
+                "preview_type": "video",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "Windows Media Audio 9 Professional (wmapro)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "Windows Media Video 9 (wmv3)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "ab630fa735ce7c6a3d0ef389ad79b019",
+                "dc_format": [
+                    "audio/x-aiff"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "ab630fa735ce7c6a3d0ef389ad79b019",
+                "last_modified": "2010-10-21T16:23:10Z",
+                "audio_codec_label": [
+                    "PCM signed 24-bit big-endian"
+                ],
+                "dc_title": [
+                    "Sample Audio"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s24be"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "meta_audio_details": [
+                    "44.0 KHz, 1 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "dc_description": [
+                    "A sample audio file passed through FFmpeg"
+                ],
+                "preview": "ffmpegPreview.mp3",
+                "dc_media_format": [
+                    "Audio IFF"
+                ],
+                "preview_type": "audio",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "display_type": "audio",
+                "meta_audio_codec": [
+                    "PCM signed 24-bit big-endian (pcm_s24be)"
+                ],
+                "repository_type": [
+                    "Uploaded Files"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "fa8a7ea54b48e1d1dda85a285c6a3b1e",
+                "dc_format": [
+                    "video/x-msvideo"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "fa8a7ea54b48e1d1dda85a285c6a3b1e",
+                "last_modified": "2010-10-22T16:02:25Z",
+                "altpreview": [
+                    "preview.mp4",
+                    "hiRes.mp4",
+                    "hiRes.flv"
+                ],
+                "dc_size": [
+                    "1680 x 1050"
+                ],
+                "audio_codec_label": [
+                    "PCM signed 16-bit little-endian"
+                ],
+                "dc_title": [
+                    "Relay Sample"
+                ],
+                "dc_duration": [
+                    "2m 26s"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s16le"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "TechSmith Screen Capture Codec"
+                ],
+                "meta_audio_details": [
+                    "22.0 KHz, 1 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "camtasia"
+                ],
+                "dc_description": [
+                    "A sample relay file with multiple transcoded output targets"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "preview.flv",
+                "dc_media_format": [
+                    "AVI format"
+                ],
+                "preview_type": "ffmpeg",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "bgr24"
+                ],
+                "meta_audio_codec": [
+                    "PCM signed 16-bit little-endian (pcm_s16le)"
+                ],
+                "display_type": "ffmpeg",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "TechSmith Screen Capture Codec (camtasia)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "907419efd86374a44f2f034d682b9c4d",
+                "dc_format": [
+                    "video/quicktime"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "907419efd86374a44f2f034d682b9c4d",
+                "last_modified": "2010-10-24T15:33:41Z",
+                "altpreview": [
+                    "preview.mp4",
+                    "hiRes.mp4",
+                    "hiRes.flv"
+                ],
+                "dc_size": [
+                    "1024 x 576"
+                ],
+                "audio_codec_label": [
+                    "PCM signed 16-bit little-endian"
+                ],
+                "dc_title": [
+                    "NUR3010 Opening Recording"
+                ],
+                "dc_duration": [
+                    "2m 48s"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s16le"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"
+                ],
+                "meta_audio_details": [
+                    "44.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "h264"
+                ],
+                "dc_description": [
+                    "NUR3010 Opening Recording"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "preview.flv",
+                "dc_media_format": [
+                    "QuickTime/MPEG-4/Motion JPEG 2000 format"
+                ],
+                "preview_type": "ffmpeg",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "PCM signed 16-bit little-endian (pcm_s16le)"
+                ],
+                "display_type": "ffmpeg",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (h264)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "9617e1d3b0f1476a3ec35e420e008eb1",
+                "dc_format": [
+                    "video/quicktime"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "9617e1d3b0f1476a3ec35e420e008eb1",
+                "last_modified": "2010-10-24T15:53:57Z",
+                "altpreview": [
+                    "preview.mp4",
+                    "hiRes.mp4",
+                    "hiRes.flv"
+                ],
+                "dc_size": [
+                    "1024 x 576"
+                ],
+                "audio_codec_label": [
+                    "PCM signed 16-bit little-endian"
+                ],
+                "dc_title": [
+                    "NUR3010 Reconnection"
+                ],
+                "dc_duration": [
+                    "1m 40s"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s16le"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"
+                ],
+                "meta_audio_details": [
+                    "44.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "h264"
+                ],
+                "dc_description": [
+                    "NUR3010 Reconnection"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "preview.flv",
+                "dc_media_format": [
+                    "QuickTime/MPEG-4/Motion JPEG 2000 format"
+                ],
+                "preview_type": "ffmpeg",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuv420p"
+                ],
+                "meta_audio_codec": [
+                    "PCM signed 16-bit little-endian (pcm_s16le)"
+                ],
+                "display_type": "ffmpeg",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (h264)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "b872e26975b5f395fa5e1b8fc1656ffe",
+                "dc_format": [
+                    "video/quicktime"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "b872e26975b5f395fa5e1b8fc1656ffe",
+                "last_modified": "2010-10-24T16:18:24Z",
+                "altpreview": [
+                    "hiRes.mp4",
+                    "hiRes.flv"
+                ],
+                "dc_size": [
+                    "720 x 592"
+                ],
+                "audio_codec_label": [
+                    "PCM signed 16-bit big-endian"
+                ],
+                "dc_title": [
+                    "NUR3010 Reconnection AVID"
+                ],
+                "dc_duration": [
+                    "1m 40s"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s16be"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "MJPEG (Motion JPEG)"
+                ],
+                "meta_audio_details": [
+                    "48.0 KHz, 2 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "mjpeg"
+                ],
+                "dc_description": [
+                    "NUR3010 Reconnection AVID"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "preview.flv",
+                "dc_media_format": [
+                    "QuickTime/MPEG-4/Motion JPEG 2000 format"
+                ],
+                "preview_type": "ffmpeg",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "yuvj422p"
+                ],
+                "meta_audio_codec": [
+                    "PCM signed 16-bit big-endian (pcm_s16be)"
+                ],
+                "display_type": "ffmpeg",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "MJPEG (Motion JPEG) (mjpeg)"
+                ]
+            },
+            {
+                "score": 0.59,
+                "security_filter": [
+                    "guest"
+                ],
+                "storage_id": "487637775914a6bb2cc43fb1c716a7d9",
+                "dc_format": [
+                    "video/x-msvideo"
+                ],
+                "workflow_security": [
+                    "editor",
+                    "admin"
+                ],
+                "id": "487637775914a6bb2cc43fb1c716a7d9",
+                "last_modified": "2010-10-24T16:52:23Z",
+                "altpreview": [
+                    "preview.mp4",
+                    "hiRes.mp4",
+                    "hiRes.flv"
+                ],
+                "dc_size": [
+                    "1280 x 1024"
+                ],
+                "audio_codec_label": [
+                    "PCM signed 16-bit little-endian"
+                ],
+                "dc_title": [
+                    "Small relay sample"
+                ],
+                "dc_duration": [
+                    "10 second(s)"
+                ],
+                "workflow_id": "workflow1",
+                "workflow_step_label": [
+                    "Live"
+                ],
+                "audio_codec_simple": [
+                    "pcm_s16le"
+                ],
+                "repository_name": [
+                    "Generic Workflow"
+                ],
+                "submit": [
+                    "Submit"
+                ],
+                "file_path": [
+                    "C:",
+                    "C:/Users",
+                    "C:/Users/pendlebu",
+                    "C:/Users/pendlebu/.fascinator",
+                    "C:/Users/pendlebu/.fascinator/uploads",
+                    "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester"
+                ],
+                "workflow_step": [
+                    "live"
+                ],
+                "video_codec_label": [
+                    "TechSmith Screen Capture Codec"
+                ],
+                "meta_audio_details": [
+                    "22.0 KHz, 1 Channel(s)"
+                ],
+                "harvest_config": "ea5dabb4e72e4e5215ad5d28dc409543",
+                "video_codec_simple": [
+                    "camtasia"
+                ],
+                "dc_description": [
+                    "A very small video from Relay"
+                ],
+                "thumbnail": "ffmpegThumbnail.jpg",
+                "preview": "preview.flv",
+                "dc_media_format": [
+                    "AVI format"
+                ],
+                "preview_type": "ffmpeg",
+                "owner": "admin",
+                "harvest_rules": "3449b17a310602d9782036b753ea97c0",
+                "meta_video_pixel_format": [
+                    "bgr24"
+                ],
+                "meta_audio_codec": [
+                    "PCM signed 16-bit little-endian (pcm_s16le)"
+                ],
+                "display_type": "ffmpeg",
+                "repository_type": [
+                    "Uploaded Files"
+                ],
+                "meta_video_codec": [
+                    "TechSmith Screen Capture Codec (camtasia)"
+                ]
+            }
+        ],
+        "numFound": 20
+    },
+    "responseHeader": {
+        "status": 0,
+        "QTime": 24,
+        "params": {
+            "facet": "true",
+            "sort": "score desc",
+            "facet.sort": "true",
+            "start": "0",
+            "q": "*:*",
+            "facet.limit": "100",
+            "facet.field": [
+                "repository_name",
+                "f_dc_creator",
+                "file_path",
+                "tag",
+                "f_dc_subject",
+                "f_dc_format",
+                "workflow_step_label",
+                "repository_type",
+                "f_dc_type"
+            ],
+            "wt": "json",
+            "fq": "item_type:\"object\"",
+            "rows": "25",
+            "fl": "score"
+        }
+    },
+    "facet_counts": {
+        "facet_queries": {
+
+        },
+        "facet_dates": {
+
+        },
+        "facet_fields": {
+            "repository_name": [
+                "Generic Workflow",
+                20
+            ],
+            "tag": [
+
+            ],
+            "file_path": [
+                "C:",
+                20,
+                "C:/Users",
+                20,
+                "C:/Users/pendlebu",
+                20,
+                "C:/Users/pendlebu/.fascinator",
+                20,
+                "C:/Users/pendlebu/.fascinator/uploads",
+                20,
+                "C:/Users/pendlebu/.fascinator/uploads/workflow-harvester",
+                20
+            ],
+            "f_dc_creator": [
+
+            ],
+            "f_dc_subject": [
+
+            ],
+            "f_dc_format": [
+                "image/png",
+                7,
+                "video/quicktime",
+                3,
+                "image/jpeg",
+                2,
+                "video/mp4",
+                2,
+                "video/x-ms-asf",
+                2,
+                "video/x-msvideo",
+                2,
+                "audio/x-aiff",
+                1,
+                "video/x-flv",
+                1
+            ],
+            "repository_type": [
+                "Uploaded Files",
+                20
+            ],
+            "workflow_step_label": [
+                "Pending",
+                11,
+                "Live",
+                7,
+                "Basic Metadata Check",
+                2
+            ],
+            "f_dc_type": [
+
+            ]
+        }
+    }
+}

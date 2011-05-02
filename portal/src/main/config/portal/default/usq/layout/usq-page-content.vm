@@ -1,0 +1,3 @@
+<div class="container_16">
+  #parse($page.getTemplate('layout/page-content.vm'))
+</div>

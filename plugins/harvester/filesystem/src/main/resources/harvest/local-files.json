@@ -1,0 +1,61 @@
+{
+    "harvester": {
+        "type": "file-system",
+        "file-system": {
+            "targets": [
+                {
+                    "baseDir": "${user.home}/Documents/public/",
+                    "facetDir": "${user.home}/Documents/public/",
+                    "ignoreFilter": ".svn|.ice|.*|~*|Thumbs.db|.DS_Store",
+                    "recursive": true,
+                    "force": false,
+                    "link": true
+                }
+            ],
+            "caching": "basic",
+            "cacheId": "default"
+        }
+    },
+
+    "renderTypes": {
+        "media": {
+            "fileTypes": ["mp3","mp4","m4a","wav","wma","wmv","mpg","mpeg",
+                          "mov","wav","aiff","png","jpg","jpeg","gif","bmp"],
+            "harvestQueue": ["aperture"],
+            "indexOnHarvest": ["true"],
+            "renderQueue": ["ffmpeg", "ice2"]
+        },
+        "documents": {
+            "fileTypes": ["mp3","mp4","m4a","wav","wma","wmv","mpg","mpeg",
+                          "mov","wav","aiff","odp","ppt","pptx","pdf","tex",
+                          "svg","ods","xls","xlsx","odt","doc","docx","png",
+                          "jpg","jpeg","gif","bmp","cml"],
+            "harvestQueue": ["aperture"],
+            "indexOnHarvest": ["true"],
+            "renderQueue": ["ice2"]
+        },
+        "speed": {
+            "fileTypes": [],
+            "harvestQueue": [],
+            "indexOnHarvest": ["false"],
+            "renderQueue": ["aperture"]
+        }
+    },
+
+    "transformer": {
+        "harvestQueue": ["aperture"],
+        "indexOnHarvest": "true",
+        "renderQueue": ["ffmpeg", "ice2", "ims"]
+    },
+
+    "indexer": {
+        "script": {
+            "type": "python",
+            "rules": "local-files.py"
+        },
+        "params": {
+            "repository.name": "Local Files",
+            "repository.type": "Local File System"
+        }
+    }
+}

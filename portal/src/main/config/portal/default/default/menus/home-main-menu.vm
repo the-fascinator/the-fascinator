@@ -1,0 +1,18 @@
+<div class="grid_4">
+    #set($menuTitle = "Actions")
+    #parseTemplate("wrapping/main-menu-open.vm")
+    <ul class="menu">
+        <li><a href="$portalPath/search">Browse</a></li>
+        #if($page.authentication.is_admin())
+        <li><a id="reharvest-view" href="#" rel="$portalId">Reharvest view...</a></li>
+        #end
+        ## TODO views may need to have ownership as well so a user can only delete views they created
+        #if($page.authentication.is_logged_in() && $portalId != $defaultPortal)
+        <li><a id="delete-view" href="#" rel="$portalId">Delete view...</a></li>
+        #end
+        <li><a href="$portalPath/upload">Upload</a></li>
+        <li><a href="$portalPath/workflows">Upload with metadata</a></li>
+        <li><a href="$portalPath/about">About</a></li>
+    </ul>
+    #parseTemplate("wrapping/main-menu-close.vm")
+</div>

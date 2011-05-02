@@ -1,0 +1,7 @@
+#set($title = $metadata.getFirst("dc_title"))
+#if($title)
+    #set($pageTitle = $title)
+#else
+    #set($pageTitle = "Detail")
+#end
+<h2 id="page-heading"><span>#if($title)$title#{else}Detail#end</span></h2>

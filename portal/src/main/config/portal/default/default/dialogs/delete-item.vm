@@ -1,0 +1,76 @@
+<div class="box hidden" id="delete-dialog">
+  <form id="delete" method="post">
+    <fieldset class="search">
+      <legend><span class="legend">Delete : '<span id="delete-legend"></span>'</span></legend>
+      <div class="stop-error hidden" id="delete-error">
+        <span id="delete-message"></span>
+      </div>
+      <p>Are you really certain you want to delete this object (including annotations)?</p>
+      <p><strong>This operation cannot be undone</strong></p>
+      <input id="delete-submit" type="button" value="Yes, Delete" />
+      <input id="delete-cancel" type="button" value="Cancel" />
+    </fieldset>
+  </form>
+</div>
+
+<script type="text/javascript">
+<!--
+    $(function() {
+        var dialogOpts = {
+            autoOpen: false,
+            hide: "blind",
+            width: 330,
+            modal: true
+        }
+
+        var recordId = "";
+        var refresh_link;
+        var me = null;
+        $(".admin-delete-link").click(function() {
+            recordId = $(this).attr("rel");
+            title = $(this).attr("title");
+            me = $(this);
+            $("#delete-message").empty();
+            $("#delete-error").hide();
+            $("#delete-dialog").dialog(dialogOpts);
+            $("#delete-dialog").dialog('option', 'title', 'Delete Object');
+            $("#delete-dialog").dialog('open');
+            $("#delete-legend").html(title);
+            return false;
+        });
+
+        $("#delete-cancel").click(function() {
+            $("#delete-message").empty();
+            $("#delete-error").hide();
+            $("#delete-dialog").dialog('close');
+            return false;
+        });
+
+        $("#delete-submit").click(function() {
+            $("#delete-message").empty();
+            $("#delete-error").hide();
+            $("#delete-dialog").dialog('open');
+
+            jQuery.ajax({
+                type : "POST",
+                url : "$portalPath/actions/delete.ajax",
+                success:
+                    function (data, status) {
+                        me.parent().parent().hide();
+                        $("#delete-dialog").dialog('close');
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#delete-error").show();
+                        $("#delete-message").html(req.responseText);
+                    },
+                data: {
+                    record: recordId
+                }
+            });
+
+            return false;
+        });
+    });
+-->
+</script>

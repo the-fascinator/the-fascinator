@@ -1,0 +1,153 @@
+<script type="text/javascript">
+<!--
+    $(function() {
+        // packaging
+        function getSelectedItems() {
+            var titles = [];
+            var added = [];
+            var removed = [];
+            $(".package-select:checked").each(function(count, item) {
+                titles.push($(item).attr("rel"));
+                added.push($(item).attr("value"));
+            });
+            $(".package-select:not(:checked)").each(function(count, item) {
+                removed.push($(item).attr("value"));
+            });
+            return { titles: titles, added: added, removed: removed };
+        }
+
+        function updatePackage() {
+            var selected = getSelectedItems();
+            jQuery.extend(selected, { func: "update" });
+            jQuery.ajax({
+                type: "POST",
+                url: "$portalPath/actions/packaging.ajax",
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                data: selected,
+                error: function(xhr, status, e) {
+                    $("#package-selected-items").html("ERROR");
+                },
+                success: function(data, status) {
+                    var count = data.count;
+                    var msg = (count > 0 ? count : "0");
+                    $("#package-selected-items").attr("rel", count);
+                    $("#package-selected-items").html(msg);
+                },
+                dataType: "json"
+            });
+        }
+
+        function deselectPackage() {
+            $(".package-select").removeAttr("checked");
+            var selectedItems = $("#package-selected-items");
+            jQuery.post("$portalPath/actions/packaging.ajax",
+                { func: "deselect" },
+                function(data, status) {
+                    selectedItems.attr("rel", 0).html("Package deselected!");
+                    setTimeout(function() {
+                        selectedItems.html("No items selected");
+                    }, 3000);
+                },
+                "json");
+        }
+
+        function clearPackage() {
+            $(".package-select").removeAttr("checked");
+            var selectedItems = $("#package-selected-items");
+            if (selectedItems.attr("rel") > 0) {
+                jQuery.post("$portalPath/actions/packaging.ajax",
+                    { func: "clear" },
+                    function(data, status) {
+                        selectedItems.attr("rel", 0).html("Package cleared!");
+                        setTimeout(function() {
+                            selectedItems.html("No items selected");
+                        }, 3000);
+                    },
+                    "json");
+            } else {
+                selectedItems.html("Package is already empty!");
+                setTimeout(function() {
+                    selectedItems.html("No items selected");
+                }, 3000);
+            }
+        }
+
+        $("#deselect-package").click(function() {
+            deselectPackage();
+            $("#deselect-package").hide();
+            $("#package-create-selected").html("Package selected items...");
+            return false;
+        });
+
+        $("#package-create-new").click(function() {
+            clearPackage();
+            ##$("#package-create-new").hide();
+            ##$("#package-create-selected").html("Package selected items...");
+            ##return false;
+        });
+
+        $("#package-create-selected").click(function() {
+            var selectedItems = $("#package-selected-items");
+            if (selectedItems.attr("rel") == 0) {
+                var lastMsg = selectedItems.html();
+                selectedItems.html("Package is empty!");
+                setTimeout(function() {
+                    selectedItems.html(lastMsg);
+                }, 3000);
+            } else {
+                $("#package-selected-loading").show();
+                var selected = getSelectedItems();
+                jQuery.extend(selected, { func: "create-from-selected" });
+                jQuery.ajax({
+                    type: "POST",
+                    url: "$portalPath/actions/packaging.ajax",
+                    data: selected,
+                    error: function(xhr, status, e) {
+                        alert("Failed to create package!");
+                    },
+                    success: function(data, status) {
+                        if (data.status == "ok") {
+                            window.location.href = data.url;
+                        } else {
+                            alert("Failed to create/update package!");
+                        }
+                    },
+                    dataType: "json"
+                });
+            }
+            return false;
+        });
+
+        $("#package-select-page").click(function() {
+            $(".package-select").attr("checked", "checked");
+            updatePackage();
+            return false;
+        });
+
+        $("#package-deselect-page").click(function() {
+            $(".package-select").removeAttr("checked");
+            updatePackage();
+            return false;
+        });
+
+        $("#package-clear-all").click(function() {
+            clearPackage();
+            return false;
+        });
+
+        $(".package-select").click(function() {
+            updatePackage();
+        });
+
+        var packageTypeDialog = $("#package-type-dialog");
+        packageTypeDialog.dialog({title: "PackageType", autoOpen: false,
+                 hide: "blind", modal: true });
+        $("#package-type-dialog-cancel").click(function(){packageTypeDialog.dialog("close");});
+        $("#package-type-dialog-ok").click(function(){
+            var packageType = $("#package-type-select").val();
+            packageTypeDialog.dialog("close");
+            createPackage(packageType);
+        });
+    });
+-->
+</script>

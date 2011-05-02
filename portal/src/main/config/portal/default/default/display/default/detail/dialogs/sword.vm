@@ -1,0 +1,92 @@
+#if($isPackage)
+  <div class="box hidden" id="sword-form">
+    <h2>SWORD Deposit</h2>
+    <form id="sword" method="post">
+      <fieldset class="login">
+        <legend>Service information</legend>
+        <p>
+          <label for="sword_url">Service URL</label>
+          <input type="text" id="sword_url" name="sword_url" />
+        </p>
+        <p>
+          <label for="sword_username">Username</label>
+          <input type="text" id="sword_username" name="sword_username" />
+        </p>
+        <p>
+          <label for="sword_password">Password</label>
+          <input type="password" id="sword_password" name="sword_password" />
+        </p>
+        <p id="sword-collections" class="hidden">
+          <label for="sword_collections">Collections</label>
+          <select id="sword_collections"></select>
+        </p>
+        <p class="message">
+          <img class="hidden" id="sword-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+          <span id="sword-message"></span>
+        </p>
+        <input class="button" id="sword-start" type="button" value="Get collections" />
+        <input disabled="disabled" id="sword-accept" type="button" value="Deposit" />
+        <input id="sword-cancel" type="button" value="Close" />
+      </fieldset>
+    </form>
+  </div>
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#sword-view, #sword-cancel").click(function() {
+            $("#sword-view").toggleClass("selected");
+            $("#sword-collections").hide();
+            $("#sword_collections").empty();
+            $("#sword-accept").attr("disabled", "disabled");
+            $("#sword-message").empty();
+            $("#sword-form").toggle("blind");
+            return false;
+        });
+        $("#sword-start").click(function() {
+            $("#sword-message").empty();
+            $("#sword-loading").show();
+            jQuery.post("' + $portalPath + '/actions/sword.ajax?func=collections",
+                {
+                    url: $("#sword_url").val(),
+                    username: $("#sword_username").val(),
+                    password: $("#sword_password").val()
+                },
+                function(data, status) {
+                    $("#sword-loading").hide();
+                    $("#sword_collections").empty();
+                    if (data.error) {
+                        $("#sword-message").html(data.error);
+                    } else {
+                        jQuery.each(data.collections, function(i, val) {
+                            $("#sword_collections")
+                                .append('<option value="' + val.location + '>' + val.title + '</option>');
+                            $("#sword-collections").show();
+                            $("#sword-accept").removeAttr("disabled");
+                        });
+                    }
+                    $("#sword-collections-form").show();
+                },
+                "json"
+            );
+        });
+        $("#sword-accept").click(function() {
+            $("#sword-message").empty();
+            $("#sword-loading").show();
+            $("#sword-start, #sword-accept").attr("disabled", "disabled");
+            jQuery.post("$portalPath/actions/sword.ajax?func=post&oid=$oid",
+                {
+                    url: $("#sword_collections").val(),
+                    username: $("#sword_username").val(),
+                    password: $("#sword_password").val()
+                },
+                function(data, status) {
+                    $("#sword-loading").hide();
+                    $("#sword-message").html("<p>Successful</p>");
+                    $("#sword-start, #sword-accept").removeAttr("disabled");
+                }
+            );
+        });
+    });
+-->
+</script>
+#end

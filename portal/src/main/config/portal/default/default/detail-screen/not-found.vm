@@ -1,0 +1,42 @@
+#set($pageTitle = "Object not available")
+<h2 id="page-heading">$pageTitle</h2>
+
+#if($page.authentication.is_admin())
+
+#set($oid = $self.getOid())
+
+<div class="grid_4">
+    #renderObject($metadata "detail/navigation/actions")
+</div>
+
+<div class="grid_12">
+    <div id="pending" class="box articles notice">
+        <h2>Administrator</h2>
+        <div class="warning">
+            <b>NOTE</b> As an administrator, you have an 'Actions' menu to the left, even for objects which have not been found. This is for the purpose of debugging only, and may not always function. However, in some circumstances this may be useful, such as an object crashing during index.
+        </div>
+    </div>
+#else
+<div class="grid_16">
+#end
+
+    <div class="box">
+        <h2>Object not found</h2>
+        <p>The object with identifier <strong>$self.getOid()</strong> was not found.
+           It may not exist or is not available in the current view.
+        </p>
+        <ul>
+            <li>Change your <a href="$portalPath/search">search</a> request</li>
+            <li>
+                Change the current <strong>view</strong>:
+                <ul>
+                    #foreach($portal in $page.portals)
+                        #if($portal.name != $portalId)
+                            <li><a href="$urlBase$portal.name/$page.getRelativePath()">$portal.description</a></li>
+                        #end
+                    #end
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

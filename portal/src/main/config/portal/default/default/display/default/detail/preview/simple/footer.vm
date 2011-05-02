@@ -1,0 +1,4 @@
+        </div>
+    </div>
+</div>
+#parseDisplayTemplate("detail/preview/simple/custom-footer.vm")

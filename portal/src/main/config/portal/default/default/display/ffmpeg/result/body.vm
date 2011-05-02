@@ -1,0 +1,14 @@
+#set($thumbnail = $self.getFirst("thumbnail"))
+#if($thumbnail)
+    <a class="image" href="$portalPath/detail/$id/">
+        <img src="$portalPath/download/$id/$thumbnail" title="Thumbnail of $title" alt="Thumbnail" />
+    </a>
+    #if("$!description" != "")
+        <div>
+            <strong>Description</strong>
+            <p class="item-description condense">$description</p>
+        </div>
+    #end
+    $self.getVideoSummary()
+    <div class="clear"></div>
+#end

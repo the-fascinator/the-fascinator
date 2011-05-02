@@ -1,0 +1,5 @@
+#parseDisplayTemplate("detail/common.vm")
+#if($page.authentication.is_admin())
+    #parseDisplayTemplate("detail/dialogs/reharvest.vm")
+#end
+#parseDisplayTemplate("detail/dialogs/custom.vm")

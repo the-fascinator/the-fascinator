@@ -1,0 +1,22 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:j.0="http://commontag.org/ns#" >
+  <rdf:Description rdf:about="file://pictures/lolcats/1.jpg">
+    <j.0:tagged rdf:resource="urn:2"/>
+    <j.0:tagged rdf:resource="urn:1"/>
+    <rdf:type rdf:resource="http://commontag.org/ns#TaggedContent"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="urn:1">
+    <j.0:label>lolcat</j.0:label>
+    <j.0:means rdf:resource="http://fascinator.usq.edu.au/tags/lolcat"/>
+    <rdf:type rdf:resource="http://commontag.org/ns#Tag"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="urn:2">
+    <j.0:label>other</j.0:label>
+    <j.0:means rdf:resource="http://fascinator.usq.edu.au/tags/other"/>
+    <rdf:type rdf:resource="http://commontag.org/ns#Tag"/>
+  </rdf:Description>
+</rdf:RDF>

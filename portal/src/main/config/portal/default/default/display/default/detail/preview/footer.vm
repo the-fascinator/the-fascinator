@@ -1,0 +1,3 @@
+    #parseDisplayTemplate("detail/preview/content-footer.vm")
+</div>
+#parseTemplate("wrapping/content-block-close.vm")

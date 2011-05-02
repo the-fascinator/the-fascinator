@@ -1,0 +1,5 @@
+#set($oid = $metadata.get("id"))
+#set($title = $metadata.getFirst("dc_title"))
+#set($creator = $page.authentication.get_name())
+
+#parseDisplayTemplate("detail/custom-common.vm")

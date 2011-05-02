@@ -1,0 +1,18 @@
+#parse($page.getTemplate('layout/header-right.vm'))
+
+<div class="header">
+  <div class="linetop">
+    <div class="linetopright">
+    </div>
+  </div>
+  <div class="header_logo">
+    <a href="/">
+      <img alt="USQ Logo" src="http://www.usq.edu.au/Migration.Standard.Website/images/usqlogo_line.gif" />
+    </a>
+#parse($page.getTemplate('layout/page-title.vm'))
+  </div>
+</div>
+
+<div class="navbar">
+#parse($page.getTemplate('layout/breadcrumbs.vm'))
+</div>

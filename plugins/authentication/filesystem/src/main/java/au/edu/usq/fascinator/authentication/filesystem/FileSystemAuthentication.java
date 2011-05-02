@@ -1,0 +1,445 @@
+/*
+ * The Fascinator - File System Authentication Plugin
+ * Copyright (C) 2008-2010 University of Southern Queensland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+package au.edu.usq.fascinator.authentication.filesystem;
+
+import au.edu.usq.fascinator.api.PluginDescription;
+import au.edu.usq.fascinator.api.authentication.Authentication;
+import au.edu.usq.fascinator.api.authentication.AuthenticationException;
+import au.edu.usq.fascinator.api.authentication.User;
+import au.edu.usq.fascinator.common.JsonSimpleConfig;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+/**
+ * <p>
+ * This plugin is a sample plugin on how to manage authentication
+ * against basic files on the filesystem.
+ * </p>
+ * <p>
+ * <b>Note:</b> Since the 
+ * <a href="http://build.adfi.usq.edu.au/hudson/the-fascinator-full/apidocs/au/edu/usq/fascinator/authentication/internal/InternalAuthentication.html">internal authentication user plugin</a> 
+ * is essentially the same thing this plugin has no real purpose at this time and is just a copy. 
+ * When the internal plugin evolves to be more sophisticated this plugin is 
+ * expected to remain as an example to users of a basic filesystem implementation. 
+ * </p>
+ * 
+ * <h3>Configuration</h3> 
+ * <p>Standard configuration table:</p>
+ * <table border="1">
+ * <tr>
+ * <th>Option</th>
+ * <th>Description</th>
+ * <th>Required</th>
+ * <th>Default</th>
+ * </tr>
+ * 
+ * <tr>
+ * <td>internal/path</td>
+ * <td>File path in wich the userbase information is stored</td>
+ * <td><b>Yes</b></td>
+ * <td>${user.home}/.fascinator/users.properties</td>
+ * </tr>
+ * 
+ * </table>
+ * 
+ * <h3>Examples</h3>
+ * <ol>
+ * <li>
+ * Using Internal authentication plugin in The Fascinator
+ * 
+ * <pre>
+ *      "authentication": {
+ *         "type": "filesystem",
+ *         "internal": {
+ *            "path": "${user.home}/.fascinator/users.properties"
+ *         }
+ *      }
+ * </pre>
+ * 
+ * </li>
+ * </ol>
+ * 
+ * <h3>Wiki Link</h3>
+ * <p>
+ * None
+ * </p>
+ *
+ * @author Greg Pendlebury
+ */
+
+public class FileSystemAuthentication implements Authentication {
+
+	/** Default file name for storing user properties*/
+    private static String DEFAULT_FILE_NAME = "users.properties";
+    
+    /** Logging **/
+    private final Logger log = LoggerFactory.getLogger(FileSystemAuthentication.class);
+    
+    /** User object */
+    private FileSystemUser user_object;
+    
+    /** File path where user properties is stored*/
+    private String file_path;
+    
+    /** Property file for user properties */
+    private Properties file_store;
+
+    @Override
+    public String getId() {
+        return "file-system";
+    }
+
+    @Override
+    public String getName() {
+        return "Filesystem Authentication";
+    }
+
+    /**
+     * Gets a PluginDescription object relating to this plugin.
+     *
+     * @return a PluginDescription
+     */
+    @Override
+    public PluginDescription getPluginDetails() {
+        return new PluginDescription(this);
+    }
+
+    /**
+     * Initialisation of Filesystem Authentication plugin
+     * 
+     * @throws AuthenticationException if fails to initialise
+     */
+    @Override
+    public void init(String jsonString) throws AuthenticationException {
+        try {
+            setConfig(new JsonSimpleConfig(jsonString));
+        } catch (UnsupportedEncodingException e) {
+            throw new AuthenticationException(e);
+        } catch (IOException e) {
+            throw new AuthenticationException(e);
+        }
+    }
+
+    @Override
+    public void init(File jsonFile) throws AuthenticationException {
+        try {
+            setConfig(new JsonSimpleConfig(jsonFile));
+        } catch (IOException ioe) {
+            throw new AuthenticationException(ioe);
+        }
+    }
+
+    /**
+     * Set default configuration
+     * 
+     * @param config JSON configuration
+     * @throws IOException if fails to initialise
+     */
+    private void setConfig(JsonSimpleConfig config) throws IOException {
+        user_object = new FileSystemUser();
+        file_path = config.getString(null, "authentication", "file-system",
+                "path");
+        loadUsers();
+    }
+
+    /**
+     * Load users from the file
+     * 
+     * @throws IOException if fail to load from file
+     */
+    private void loadUsers() throws IOException {
+        file_store  = new Properties();
+
+        // Load our userbase from disk
+        try {
+            file_store.load(new FileInputStream(file_path));
+        } catch (Exception e) {
+            throw new IOException (e);
+        }
+    }
+
+    /**
+     * Save user lists to the file on the disk
+     * 
+     * @throws IOException if fail to save to file
+     */
+    private void saveUsers() throws IOException {
+        if (file_store != null) {
+            try {
+                file_store.store(new FileOutputStream(file_path), "");
+            } catch (Exception e) {
+                throw new IOException (e);
+            }
+        }
+    }
+
+    /**
+     * Password encryption method
+     * 
+     * @param password Password to be encrypted
+     * @return encrypted password
+     * @throws AuthenticationException if fail to encrypt
+     */
+    private String encryptPassword(String password) throws AuthenticationException {
+        byte[] passwordBytes = password.getBytes();
+
+        try {
+            MessageDigest algorithm = MessageDigest.getInstance("MD5");
+            algorithm.reset();
+            algorithm.update(passwordBytes);
+
+            byte messageDigest[] = algorithm.digest();
+            BigInteger number = new BigInteger(1, messageDigest);
+
+            password = number.toString(16);
+            if (password.length() == 31) {
+                password = "0" + password;
+            }
+        } catch (Exception e) {
+            throw new AuthenticationException("Internal password encryption failure: " + e.getMessage());
+        }
+        return password;
+    }
+
+    @Override
+    public void shutdown() throws AuthenticationException {
+        // Don't need to do anything
+    }
+
+    /**
+     * Tests the user's username/password validity.
+     *
+     * @param username The username of the user logging in.
+     * @param password The password of the user logging in.
+     * @return A user object for the newly logged in user.
+     * @throws AuthenticationException if there was an error logging in.
+     */
+    @Override
+    public User logIn(String username, String password)
+            throws AuthenticationException {
+        // Find our user
+        String uPwd = file_store.getProperty(username);
+        if (uPwd == null) {
+            throw new AuthenticationException("User '" + username + "' not found.");
+        }
+        // Encrypt the password given by the user
+        String ePwd = encryptPassword(password);
+        // Compare them
+        if (ePwd.equals(uPwd)) {
+            return getUser(username);
+        } else {
+            throw new AuthenticationException("Invalid password.");
+        }
+    }
+
+    /**
+     * Optional logout method if the implementing class wants
+     * to do any post-processing.
+     *
+     * @param username The username of the logging out user.
+     * @throws AuthenticationException if there was an error logging out.
+     */
+    @Override
+    public void logOut(User user) throws AuthenticationException {
+        // Do nothing
+    }
+
+    /**
+     * Method for testing if the implementing plugin allows
+     * the creation, deletion and modification of users.
+     *
+     * @return true/false reponse.
+     */
+    @Override
+    public boolean supportsUserManagement() {
+        return true;
+    }
+
+    /**
+     * Describe the metadata the implementing class
+     * needs/allows for a user.
+     *
+     * TODO: This is a placeholder of possible later SQUIRE integration.
+     *
+     * @return TODO: possibly a JSON string.
+     */
+    @Override
+    public String describeUser() {
+        return user_object.describeMetadata();
+    }
+
+    /**
+     * Create a user.
+     *
+     * @param username The username of the new user.
+     * @param password The password of the new user.
+     * @return A user object for the newly created in user.
+     * @throws AuthenticationException if there was an error creating the user.
+     */
+    @Override
+    public User createUser(String username, String password)
+            throws AuthenticationException {
+        String user = file_store.getProperty(username);
+        if (user != null) {
+            throw new AuthenticationException("User '" + username + "' already exists.");
+        }
+        // Encrypt the new password
+        String ePwd = encryptPassword(password);
+        file_store.put(username, ePwd);
+        try {
+            saveUsers();
+        } catch(IOException e) {
+            throw new AuthenticationException("Error changing password: ", e);
+        }
+
+        return getUser(username);
+    }
+
+    /**
+     * Delete a user.
+     *
+     * @param username The username of the user to delete.
+     * @throws AuthenticationException if there was an error during deletion.
+     */
+    @Override
+    public void deleteUser(String username) throws AuthenticationException {
+        String user = file_store.getProperty(username);
+        if (user == null) {
+            throw new AuthenticationException("User '" + username + "' not found.");
+        }
+        file_store.remove(username);
+        try {
+            saveUsers();
+        } catch(IOException e) {
+            throw new AuthenticationException("Error deleting user: ", e);
+        }
+    }
+
+    /**
+     * A simplified method alternative to modifyUser() if the implementing
+     * class wants to just allow password changes.
+     *
+     * @param username The user changing their password.
+     * @param password The new password for the user.
+     * @throws AuthenticationException if there was an error changing the password.
+     */
+    @Override
+    public void changePassword(String username, String password)
+            throws AuthenticationException {
+        String user = file_store.getProperty(username);
+        if (user == null) {
+            throw new AuthenticationException("User '" + username + "' not found.");
+        }
+        // Encrypt the new password
+        String ePwd = encryptPassword(password);
+        file_store.put(username, ePwd);
+        try {
+            saveUsers();
+        } catch(IOException e) {
+            throw new AuthenticationException("Error changing password: ", e);
+        }
+    }
+
+    /**
+     * Modify one of the user's properties. Available properties should match
+     * up with the return value of describeUser().
+     *
+     * @param username The user being modified.
+     * @param property The user property being modified.
+     * @param newValue The new value to be assigned to the property.
+     * @return An updated user object for the modifed user.
+     * @throws AuthenticationException if there was an error during modification.
+     */
+    @Override
+    public User modifyUser(String username, String property, String newValue)
+            throws AuthenticationException {
+        throw new AuthenticationException("This class does not support user modification.");
+    }
+    @Override
+    public User modifyUser(String username, String property, int newValue)
+            throws AuthenticationException {
+        throw new AuthenticationException("This class does not support user modification.");
+    }
+    @Override
+    public User modifyUser(String username, String property, boolean newValue)
+            throws AuthenticationException {
+        throw new AuthenticationException("This class does not support user modification.");
+    }
+
+    /**
+     * Returns a User object if the implementing class supports
+     * user queries without authentication.
+     *
+     * @param username The username of the user required.
+     * @return An user object of the requested user.
+     * @throws AuthenticationException if there was an error retrieving the object.
+     */
+    @Override
+    public User getUser(String username) throws AuthenticationException {
+        // Find our user
+        String user = file_store.getProperty(username);
+        if (user == null) {
+            throw new AuthenticationException("User '" + username + "' not found.");
+        }
+        // Purge any old data and init()
+        user_object = new FileSystemUser();
+        user_object.init(username);
+        // before returning
+        return user_object;
+    }
+
+    /**
+     * Returns a list of users matching the search.
+     *
+     * @param search The search string to execute.
+     * @return A list of usernames (String) that match the search.
+     * @throws AuthenticationException if there was an error searching.
+     */
+    @Override
+    public List<User> searchUsers(String search)
+            throws AuthenticationException {
+        // Complete list of users
+        String[] users = file_store.keySet().toArray(new String[file_store.size()]);
+        List<User> found = new ArrayList();
+
+        // Look through the list for anyone who matches
+        for (int i = 0; i < users.length; i++) {
+            if (users[i].toLowerCase().contains(search.toLowerCase())) {
+                found.add(getUser(users[i]));
+            }
+        }
+
+        // Return the list
+        return found;
+    }
+
+}

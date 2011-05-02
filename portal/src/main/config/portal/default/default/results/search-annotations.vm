@@ -1,0 +1,122 @@
+#define($pageHeader)
+<link rel="stylesheet" type="text/css" href="$portalPath/css/anotar/anotar.css" />
+#end
+<script type="text/javascript" src="$portalPath/js/anotar/anotar-0.2.min.js"></script>
+<script type="text/javascript">
+<!--
+    $(function(){
+        // Tags annotation
+        tagConfig = {
+            docRoot: "#result-list",
+            tagList: ".tags",
+            contentInput: "#object-tag-input",
+            uriAttr: "rel",
+            outputInChild: ".tags-here",
+            annotationType: "tag",
+            stylePrefix: "tags-",
+            displayCustom: "tag_display",
+            #if("$!creator" != "")creator: "$creator",#end
+            #if("$!creatorUri" != "")creatorUri: "$creatorUri",#end
+            #if ($page.authentication.is_logged_in())
+                interfaceLabel: " <img src='$portalPath/images/icons/add.png' alt='Add' />",
+            #else
+                interfaceLabel: " <span/>",
+            #end
+            interfaceVisible: true,
+            formCustom: "object_tag_form",
+            formCancel: ".myTag-cancel",
+            formSubmit: ".myTag-submit",
+            disableReply: true,
+            loadAnnotations: function() {
+                var config = this;
+                var rootUriList = [];
+                jQuery.each(jQuery(config.tagList), function(count, item) {
+                    rootUriList.push(jQuery(item).attr("rel"));
+                });
+                jQuery.post("$portalPath/actions/anotar.ajax",
+                    {   "action": "getList",
+                        "rootUriList": rootUriList,
+                        "type": config.annoType
+                    },
+                    function(data, status) {
+                        if(data){
+                            jQuery.each(data, function(count, item) {
+                                try {
+                                    config.loadAnnotation(item);
+                                } catch(e) {
+                                    if (window.console) {
+                                        console.log("error:'" + e +
+                                                "' rootUri:'" + item.annotates.rootUri +
+                                                "' content:'" + item.content.literal + "'");
+                                        console.log(item);
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    "json");
+            },
+            submitAnnotation: function(data, annotateDiv) {
+                var config = this;
+                jQuery.post("$portalPath/actions/anotar.ajax",
+                    {   "action": "put",
+                        "rootUri": data.annotates.uri,
+                        "json": JSON.stringify(data)
+                    },
+                    function(data, status) {
+                        try {
+                            config.loadAnnotation(data);
+                        } catch(e) {
+                            if (window.console) {
+                                console.log("error:'" + e +
+                                        "' rootUri:'" + data.annotates.rootUri +
+                                        "' content:'" + data.content.literal + "'");
+                            }
+                        }
+                    },
+                    "json");
+            }
+        }
+
+        anotarFactory(jQuery, tagConfig);
+    });
+-->
+</script>
+
+<script type="text/html" id="tag_display">
+    <% if (contentUri != null) { %>
+        <% if (contentUri.indexOf("http://") == 0 || contentUri.indexOf("https://") == 0) { %>
+            <span class="<%=style%>tag"id="<%=id%>">
+                <a href="<%=contentUri%>" target="_blank"><%=content%></a>
+                #if($page.authentication.is_admin())
+                <img class="anno-delete-tag"
+                     onclick="deleteTag(this)"
+                     src="$portalPath/images/icons/delete.png"
+                     title="Delete this tag" alt="Delete" />
+                #end
+            </span>
+        <% }%>
+    <% } else { %>
+        <span class="<%=style%>tag" id="<%=id%>">
+            <%=content%><% if(tagCount > 1){ %> (<%=tagCount%>)<% } %>
+            #if($page.authentication.is_admin())
+            <img class="anno-delete-tag"
+                 onclick="deleteTag(this)"
+                 src="$portalPath/images/icons/delete.png"
+                 title="Delete this tag" alt="Delete" />
+            #end
+        </span>
+    <% }%>
+</script>
+
+<script type="text/html" id="object_tag_form">
+  <div class='myTags float-right'>Tag this:
+    <input id="object-tag-input" type="text" />
+    <img src='$portalPath/images/icons/tick.png' class='myTag-submit' alt='Submit' />&#160;
+    <img src='$portalPath/images/icons/cross.png' class='myTag-cancel' alt='Cancel' />
+  </div>
+</script>
+
+#if($page.authentication.is_admin())
+  #parse($page.getTemplate('dialogs/delete-annotation.vm'))
+#end

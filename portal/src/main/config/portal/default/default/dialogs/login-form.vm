@@ -1,0 +1,31 @@
+<div class="box hidden" id="login-form">
+  #set($providers = $page.getSsoProviders())
+  #foreach($ssoId in $providers.keySet())
+  <form class="ssoLogin" method="post" action="#">
+    <fieldset class="search">
+      <legend>$providers.get($ssoId).get("label")</legend>
+      $providers.get($ssoId).get("interface")
+    </fieldset>
+  </form>
+  <div class="or">OR</div>
+  #end
+  <form id="login" method="post" action="#">
+    <fieldset class="search">
+      <legend>Login details</legend>
+      <div class="login-error hidden" id="login-error">
+        <img class="hidden" id="login-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+        <span id="login-message"></span>
+      </div>
+      <p>
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" />
+      </p>
+      <p>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" />
+      </p>
+      <input id="login-submit" type="button" value="Login" />
+      <input id="login-cancel" type="button" value="Close" />
+    </fieldset>
+  </form>
+</div>

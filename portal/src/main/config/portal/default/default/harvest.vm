@@ -1,0 +1,322 @@
+#macro(createParamRow $id $name $value $extraClass)
+  <tr id="$id" class="indexer-param-row $extraClass">
+    <td>
+      <span class="indexer-param-name-text visible">$name</span>
+      <form class="indexer-param-name-form hidden" id="${id}-name">
+        <input class="indexer-param-name-input" name="${id}-name" type="text" value="$name" />
+        <a class="indexer-param-name-accept" href="#"><img alt="Accept" src="$portalPath/images/icons/tick.png" /></a>
+        <a class="indexer-param-name-cancel" href="#"><img alt="Cancel" src="$portalPath/images/icons/cross.png" /></a>
+      </form>
+    </td>
+    <td>
+      <span class="indexer-param-value-text visible">$value</span>
+      <form class="indexer-param-value-form hidden" id="${id}-value">
+        <input class="indexer-param-value-input" name="${id}-value" type="text" value="$value" />
+        <a class="indexer-param-value-accept" href="#"><img alt="Accept" src="$portalPath/images/icons/tick.png" /></a>
+        <a class="indexer-param-value-cancel" href="#"><img alt="Cancel" src="$portalPath/images/icons/cross.png" /></a>
+      </form>
+    </td>
+    <td>
+      <input class="indexer-param-delete" name="indexer-param-delete" type="checkbox" value="${id}" />
+    </td>
+  </tr>
+#end
+#set($pageTitle = 'Harvest')
+<h2 id="page-heading">Harvest</h2>
+<div class="grid_4">
+  <div class="box menu">
+    <h2>Sources</h2>
+    <ul class="menu">
+      <li><a id="source-new" href="#">New source</a></li>
+      <li>
+        <select name="content-id">
+        #foreach($contentKey in $self.getContents().keySet())
+          #set($content = $self.getContents().get($contentKey))
+          <option value="$contentKey">$contentKey</option>
+        #end
+        </select>
+      </li>
+    </ul>
+  </div>
+  <div class="box menu">
+    <h2>Category</h2>
+    <ul class="menu">
+      <li><a id="harvester-category" class="category" href="#" rel="harvester">Harvester</a></li>
+      <li><a id="transformer-category" class="category" href="#" rel="transformer">Transformer</a></li>
+      <li><a id="indexer-category" class="category" href="#" rel="indexer">Indexer</a></li>
+    </ul>
+  </div>
+</div>
+<div id="form-section" class="grid_12">
+  <div id="general" class="box">
+    <h2>General</h2>
+  </div>
+  <div id="harvester-section" class="section box hidden">
+    #set($harvesterType = $self.content.get("harvester/type"))
+    #set($harvester = $self.getHarvester($harvesterType))
+    <h2>Harvester</h2>
+    <div class="block">
+      <ul class="nav main">
+        <li class="label">Type</li>
+        <li>
+          <a href="#">$!harvester.getName() </a>
+          <ul>
+            #foreach($hkey in $self.getHarvesters().keySet())
+              #set($h = $self.getHarvester($hkey))
+              <li><a href="#" rel="$hkey">$h.getName()</a></li>
+            #end
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div class="block" id="harvester-config-form">
+      $harvester.getConfig()
+    </div>
+  </div>
+  <div id="transformer-section" class="section box hidden">
+    <h2>Transformer</h2>
+  </div>
+  <div id="indexer-section" class="section box hidden">
+    <h2>Indexer</h2>
+    <div class="block">
+      <fieldset>
+        <p>
+          <label for="indexer-rules">Rules script</label>
+          <input type="text" value="rules.py" />
+        </p>
+        <label for="indexer-params">Parameters</label>
+        <table>
+          <thead>
+            <tr>
+              <th width="35%">Name</th>
+              <th width="60%">Value</th>
+              <th>Delete</th>
+            </tr>
+            #createParamRow("indexer-param-blank" "param.new" "New parameter" "hidden")
+          </thead>
+          <tbody id="indexer-params">
+          #set($params = $self.content.getMap("indexer/params"))
+          #foreach($name in $params.keySet())
+            #set($id = "indexer-param-$velocityCount")
+            #set($value = $params.get($name))
+            #createParamRow($id $name $value "")
+          #end
+          </tbody>
+        </table>
+        <button id="indexer-param-add">Add</button>
+        <button id="indexer-param-update">Update</button>
+        <button id="indexer-param-cancel">Cancel</button>
+        <img class="hidden" id="indexer-param-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+        <span id="indexer-param-message"></span>
+      </fieldset>
+    </div>
+  </div>
+  <div id="Debug" class="box">
+    <h2>Debug</h2>
+    <div class="block">
+      <ul>
+      #foreach($contentKey in $self.getContents().keySet())
+        #set($content = $self.getContents().get($contentKey))
+        <li>$contentKey = <pre>$content</pre></li>
+      #end
+      </ul>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#source-new").click(function() {
+
+        });
+
+        $(".category").click(function() {
+            if (!$(this).hasClass("selected")) {
+                $(".category").removeClass("selected");
+                $(this).addClass("selected");
+                $("#form-section > div.section").addClass("hidden")
+                var formId = $(this).attr("rel");
+                $("#" + formId + "-section").removeClass("hidden");
+                jQuery.post("$portalPath/actions/state.ajax",
+                    { func: "set", name: "harvest/category", value: formId });
+            }
+            return false;
+        });
+
+        var selected = "$sessionState.get('harvest/category')";
+        if (selected) {
+            $("#" + selected + "-category").click();
+        }
+
+        var config = $self.content;
+        console.log(config);
+    });
+-->
+</script>
+
+
+
+
+
+
+
+#*
+#set($harvesters = $self.harvesters)
+<script type="text/javascript">
+<!--
+    $(function() {
+        $('#selected').attr('value', $('#harvesters > div:first').attr('id'));
+
+        // prefix each field with its parent plugin
+        $('#harvestForm input').each(function() {
+          this.name = $(this).closest('div').attr('id') + ":" + this.name;
+        });
+
+        // populate harvester options
+        $('#addButton').click(function() {
+            $('#add-content-dialog').dialog({
+                autoOpen: false,
+                bgiframe: true,
+                draggable: false,
+                modal: true,
+                resizable: false,
+                width: 500,
+                buttons: {
+                    'Add': function() {
+                        // TODO checking
+                        $('#contents tbody:first').append('<tr>' +
+                        '<td>' + $('#id').val() + '</td>' +
+                        '<td>' + $('#description').val() + '</td>' +
+                        '<td>' + $('#harvester').val() + '</td>' +
+                        '<td>* * * * *</td>' +
+                        '</tr>');
+                        $(this).dialog('close');
+                    },
+                    'Cancel': function() {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function() {
+                }
+            });
+            $('#add-content-dialog').dialog('open');
+        })
+
+        $('button').hover(function() { $(this).addClass('ui-state-hover'); },
+                          function() { $(this).removeClass('ui-state-hover'); })
+
+        $('#contents tbody tr[id]').click(function() {
+          // show harvester config
+          $('#contents tbody tr[id]').removeClass('ui-state-highlight').attr('selected', 'false');
+          $(this).addClass('ui-state-highlight').attr('selected', 'true');
+          $('#harvesterConfig div:first').hide();
+          $('#' + this.id + '-config').toggle('blind');
+        });
+
+        $("#content-toolbar li").addClass("ui-state-default ui-corner-all");
+        $("#content-toolbar li").hover(
+                function() { $(this).addClass("ui-state-hover"); },
+                function() { $(this).removeClass("ui-state-hover"); });
+    });
+-->
+</script>
+<h2>Harvest</h2>
+<p>Get some Fascinating stuff!</p>
+#if($self.contents.isEmpty() == true)
+  <p><em>No content sources defined!</em></p>
+#else
+  <form>
+  <table id="contents" class="ui-widget ui-widget-content">
+    <thead>
+      <tr class="ui-widget-header">
+        <th>Id</th>
+        <th>Name</th>
+        <th>Harvester</th>
+        <th>Indexing</th>
+        <th>Schedule</th>
+      </tr>
+    </thead>
+    <tbody>
+    #foreach($entry in $self.contents)
+      #set($content = $entry.value)
+      #set($harvester = $content.harvester)
+      <tr id="$content.id">
+        <td>$content.id</td>
+        <td>$content.description</td>
+        <td>$harvester.name</td>
+        <td>$content.rulesFile.path</td>
+        <td>$content.get("content/schedule")</td>
+      </tr>
+    #end
+    </tbody>
+    <tfoot>
+    <tr><td colspan="4"></td></tr>
+    <tr><td colspan="4">
+<div id="harvesterConfig">
+#foreach($entry in $self.contents)
+  #set($content = $entry.value)
+  #set($harvester = $content.harvester)
+  <div class="ui-helper-hidden" id="${content.id}-config" title="$harvester.name">
+    <h3 class="ui-widget-header">$content.description</h3>
+    <h4>Harvester</h4>
+    ##$harvester.config
+    #parse("$portalId/plugin-harvester-${harvester.id}.vm")
+    <h4>Indexer</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+      #foreach($entry in $content.indexerParams)
+        <tr>
+          <td>$entry.key</td>
+          <td>$entry.value</td>
+        </tr>
+      #end
+      </tbody>
+    </table>
+  </div>
+#end
+</div>
+    </td></tr>
+    </tfoot>
+  </table>
+</form>
+#end
+<br />
+<button id="addButton">Add content</button>
+<button id="saveButton">Save changes</button>
+
+<div class="debug">
+  <pre>contents: $self.contents.toString()</pre>
+  <pre>harvesters: $self.harvesters.toString()</pre>
+</div>
+## dialog
+
+<div id="add-content-dialog" title="Add content">
+  <form id="add-content-form" method="post">
+    <input id="selected" type="hidden" name="selected" />
+    <fieldset>
+      <ol>
+        <li>
+          <label for="id">Identifier</label>
+          <input type="text" name="id" id="id" />
+        </li>
+        <li>
+          <label for="description">Description</label>
+          <input type="text" name="description" id="description" size="40" />
+        </li>
+        <li>
+          <label for="harvester">Harvester</label>
+          <select id="harvester">
+          #foreach($harvester in $harvesters)
+      <option value="$harvester.id">$harvester.name</option>
+    #end
+    </select>
+</fieldset>
+  </form>
+</div>
+*#

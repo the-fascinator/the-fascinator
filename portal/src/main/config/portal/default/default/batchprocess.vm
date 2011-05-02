@@ -1,0 +1,200 @@
+#macro(editableText $id $suffix $value)
+<span class="field-text visible">$value</span>
+<div class="field-form hidden" id="${id}-${suffix}">
+  <input class="field-input" name="${id}-${suffix}" type="text" value="$value" />
+  <a class="accept" href="#"><img alt="Accept" src="$portalPath/images/icons/tick.png" /></a>
+  <a class="cancel" href="#"><img alt="Cancel" src="$portalPath/images/icons/cross.png" /></a>
+</div>
+#end
+#macro(facetRow $id $field $label $display $extraClass)
+  <tr id="$id" class="facets-row $extraClass">
+    <td>
+      <img class="facets-grip" src="$portalPath/images/icons/grippy.png" />
+      #editableText($id "field" $field)
+    </td>
+    <td>#editableText($id "label" $label)</td>
+    <td>
+      #set($facetDisplays = $self.getFacetDisplays())
+      <span class="field-text visible">$facetDisplays.get($display)</span>
+      <div class="field-form hidden" id="${id}-display">
+        <select class="field-input" name="facets-display">
+          #foreach($facetDisplayKey in $facetDisplays.keySet())
+            #set($facetDisplay = $facetDisplays.get($facetDisplayKey))
+            <option name="$facetDisplayKey"#if($display==$facetDisplayKey) selected="selected"#end>$facetDisplay</option>
+          #end
+        </select>
+        <a class="accept" href="#"><img alt="Accept" src="$portalPath/images/icons/tick.png" /></a>
+        <a class="cancel" href="#"><img alt="Cancel" src="$portalPath/images/icons/cross.png" /></a>
+      </div>
+    </td>
+    <td>
+      <input class="facets-delete" name="facets-delete" type="checkbox" value="$id" />
+    </td>
+  </tr>
+#end
+#macro(watcherRow $id $stopped $path $fileFilter $dirFilter $extraClass)
+  <tr id="$id" class="watcher-row $extraClass">
+    <td>
+      <input class="watcher-active" name="watcher-active" type="checkbox" value="$id" #if($stopped=="false")checked="checked"#end />
+    </td>
+    <td>#editableText($id "path" $path)</td>
+    <td>#editableText($id "file" $fileFilter)</td>
+    <td>#editableText($id "dir" $dirFilter)</td>
+    <td>
+      <input class="watcher-delete" name="watcher-delete" type="checkbox" value="$id" />
+    </td>
+  </tr>
+#end
+#macro(category $id $label)
+  <li><a id="${id}-category" class="category" href="#" rel="$id">$label</a></li>
+#end
+
+#set($pageTitle = "Batch Process")
+<h2 id="page-heading">Batch Process</h2>
+#set($renderBatchProcessForms = true)
+
+#########################
+###  Admin login required
+
+#if (!$page.authentication.is_admin())
+#set($renderBatchProcessForms = false)
+  <div class="box">
+    <div class="block">
+      <div class="login-error">
+        Sorry, but you need to be logged in as an administrator to use this screen.
+      </div>
+    </div>
+  </div>
+#end
+
+#########################
+###  Render page
+
+#if ($renderBatchProcessForms)
+<div class="grid_4">
+  #set($menuTitle = "Batch Process")
+  #parse($page.getTemplate('wrapping/menu-open.vm'))
+  #set($menuTitle = $nullValue)
+    <ul class="menu">
+      #category("update" "Update")
+      #category("export" "Export")
+    </ul>
+  #parse($page.getTemplate('wrapping/menu-close.vm'))
+</div>
+<div id="form-section" class="grid_12">
+  <div id="update-section" class="box hidden">
+    <h2>Update</h2>
+    <div class="box" id="update-script-file-form">
+        $self.renderUpdateForm()
+        <img class="hidden" id="update-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+        <span id="update-message"></span>
+    </div>
+  </div>
+</div>
+<div id="form-section" class="grid_12">
+  <div id="export-section" class="box hidden">
+    <h2>export</h2>
+    <div class="box" id="export-script-file-form">
+        $self.renderExportForm()
+        <strong>Number of modified record: <span id="num-modified">$self.numberOfModifiedRecord()</span></strong>
+        <img class="hidden" id="export-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+        <span id="export-message"></span>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="$portalPath/js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="$portalPath/js/jquery.cookie.js"></script>
+<script type="text/javascript">
+<!--
+    $(function() {
+        // change category
+        $(".category").click(function() {
+            var category = $(this);
+            if (!category.hasClass("selected")) {
+                $(".category").removeClass("selected");
+                category.addClass("selected");
+                $("#form-section > div").addClass("hidden")
+                var formId = category.attr("rel");
+                $("#" + formId + "-section").removeClass("hidden");
+                jQuery.cookie("category", formId, { path: "$portalPath/settings" });
+            }
+            return false;
+        });
+
+        var selected = "update";
+        ##if($page.isConfigured())
+            // restore selected category
+        ##    selected = jQuery.cookie("category") || selected;
+        ##end
+        $("#" + selected + "-category").click();
+
+        // cancel form changes
+        $("input#update-cancel input#update-export").click(function() {
+            window.location.reload();
+            return false;
+        });
+
+        // batch update category
+        $("#update-section input#update-upload").removeAttr("disabled").click(function() {
+            $(this).attr("disabled", "disabled");
+            $("#update-loading").show();
+            var data = $("#update-form").serialize();
+            jQuery.ajax({
+                type : "POST",
+                url : "$portalPath/actions/batchprocess.ajax?" + data,
+                success:
+                    function(data, status) {
+                        $("#update-loading").hide();
+                        $("#update-message").text("Updated successfully");
+                        setTimeout(function() { $("#update-message").empty(); }, 3000);
+                        $("#update-section input#update-upload").removeAttr("disabled");
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#update-loading").hide();
+                        $("#update-message").text(req.responseText);
+                        setTimeout(function() { $("#update-message").empty(); }, 3000);
+                        $("#update-section input#update-upload").removeAttr("disabled");
+                    },
+                data: {
+                    func: "batch-update"
+                }
+            });
+        });
+
+        // batch export category
+        $("#export-section input#export-upload").removeAttr("disabled").click(function() {
+            $(this).attr("disabled", "disabled");
+            $("#export-loading").show();
+            var data = $("#export-form").serialize();
+            jQuery.ajax({
+                type : "POST",
+                url : "$portalPath/actions/batchprocess.ajax?" + data,
+                success:
+                    function(data, status) {
+                        $("#export-loading").hide();
+                        $("#export-message").text("Exported successfully");
+                        setTimeout(function() { $("#export-message").empty(); }, 3000);
+                        $("#export-section input#export-upload").removeAttr("disabled");
+                        $("#num-modified").text("0");
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#export-loading").hide();
+                        $("#export-message").text(req.responseText);
+                        setTimeout(function() { $("#export-message").empty(); }, 3000);
+                        $("#export-section input#export-upload").removeAttr("disabled");
+                    },
+                data: {
+                    func: "batch-export"
+                }
+            });
+        });
+        $("#export-category").click(function() {
+            $("#num-modified").load("$portalPath/batchprocess.ajax?func=num-modified");
+        });
+    });
+-->
+</script>
+
+#end

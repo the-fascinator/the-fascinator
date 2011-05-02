@@ -1,0 +1,23 @@
+#parseDisplayTemplate("detail/common.vm")
+
+#if($parent.isDetail())
+    #if($parent.isPending())
+        #set($menuId = "pending")
+        #set($menuClass = "articles notice")
+        #set($menuTitle = "Pending")
+        #parseTemplate("wrapping/info-box-open.vm")
+        <div class="warning">
+            <b>IMPORTANT</b>Please note that this object is currently in the render queue. There may be pending changes not visible below.
+        </div>
+        #parseTemplate("wrapping/info-box-close.vm")
+    #end
+    #parseDisplayTemplate("detail/dialogs.vm")
+    #parseDisplayTemplate("detail/preview/header.vm")
+    #parseDisplayTemplate("detail/preview/body.vm")
+    #parseDisplayTemplate("detail/preview/footer.vm")
+    #parseDisplayTemplate("detail/annotation.vm")
+#else
+    #parseDisplayTemplate("detail/preview/simple/header.vm")
+    #parseDisplayTemplate("detail/preview/body.vm")
+    #parseDisplayTemplate("detail/preview/simple/footer.vm")
+#end

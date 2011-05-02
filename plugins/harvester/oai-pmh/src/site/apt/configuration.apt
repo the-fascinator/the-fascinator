@@ -1,0 +1,62 @@
+    ---
+    Configuration
+    ---
+
+Configuration
+
+*------------+-----------------+--------------+-------------+
+| <<Option>> | <<Description>> | <<Required>> | <<Default>> |
+*-----+----------------------------------------------------+----------+--------+
+| url | The base URL of the OAI-PMH repository to harvest  | <<Yes>>  | <None> |
+*-------------+-----------------------------------------------------------------------------------------------------------+----+----+
+| maxRequests | Limit number of HTTP requests to make. Set this to -1 to configure the harvester to retrieve all records. | No | -1 |
+*------------+---------------------------------------------------------------------------------------------------------+----+----+
+| maxObjects | Limit number of records to harvest. Set this to -1 to configure the harvester to  retrieve all records. | No | -1 |
+*----------------+---------------------------------------------+----+--------+
+| metadataPrefix | Set the type of metadata records to harvest | No | oai_dc |
+*---------+--------------------------------+----+--------+
+| setSpec | Set the OAI-PMH set to harvest | No | <None> |
+*------+--------------------------------+----+--------+
+| from | Harvest records from this date | No | <None> |
+*-------+---------------------------------+----+--------+
+| until | Harvest records up to this date | No | <None> |
+*-------+---------------------------------+----+--------+
+
+Examples
+
+    [[1]] Get the first page of records from USQ EPrints
+
++---+
+"harvester": {
+    "type": "oai-pmh",
+    "oai-pmh": {
+        "url": "http://eprints.usq.edu.au/cgi/oai2",
+        "maxRequests": 1
+    }
+}
++---+
+    
+    [[2]] Get a specific record from USQ EPrints
+
++---+
+"harvester": {
+    "type": "oai-pmh",
+    "oai-pmh": {
+        "url": "http://eprints.usq.edu.au/cgi/oai2",
+        "recordID": "oai:eprints.usq.edu.au:5"
+    }
+}
++---+
+    
+    [[3]] Get only records from January 2009 from USQ EPrints
+
++---+
+"harvester": {
+    "type": "oai-pmh",
+    "oai-pmh": {
+        "url": "http://eprints.usq.edu.au/cgi/oai2",
+        "from": "2009-01-01T00:00:00Z",
+        "until": "2009-01-31T00:00:00Z"
+    }
+}
++---+

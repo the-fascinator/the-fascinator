@@ -1,0 +1,107 @@
+#set($menuId = "blog-form")
+#set($menuClass = "hidden")
+#set($menuTitle = "Blog")
+#parseTemplate("wrapping/info-box-open.vm")
+<form id="blog" method="post">
+        <fieldset class="login">
+            <legend>Blog information</legend>
+            <p>
+                <label for="blog_url">Blog APP URL*</label>
+                <input type="text" id="blog_url" name="blog_url" />
+            </p>
+            <p>
+                <label for="blog_username">Username</label>
+                <input type="text" id="blog_username" name="blog_username" />
+            </p>
+            <p>
+                <label for="blog_password">Password</label>
+                <input type="password" id="blog_password" name="blog_password" />
+            </p>
+            <p id="show-advanced"><a href="#">Show advanced options</a></p>
+            <p id="hide-advanced"><a href="#">Hide advanced options</a></p>
+            <p class="advanced-options">
+                <label for="blog_title">Blog Post Title</label>
+                <input type="text" id="blog_title" name="blog_title" value="$title"/>
+            </p>
+            <p class="advanced-options">
+                <label for="blog_separator">Content Separation</label>
+                <input type="text" id="blog_separator" name="blog_separator" value='<hr class="tf-content-separator"/>'/>
+            </p>
+            <p class="advanced-options">
+                <label for="blog_toc">Build TOC</label>
+                <input type="checkbox" id="blog_toc" name="blog_toc" checked="checked" style="width: 15px;" />
+                Table of Contents before my content
+            </p>
+            <p class="advanced-options">
+                <label for="blog_preamble">Content Preamble</label>
+                Text to appear before the object or package below:<br/>
+                <textarea id="blog_preamble" name="blog_preamble" cols="50" rows="4"></textarea>
+            </p>
+            <p class="message">
+                <img class="hidden" id="blog-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+                <span id="blog-message"></span>
+            </p>
+            <input class="button" id="blog-accept" type="button" value="Blog" />
+            <input id="blog-cancel" type="button" value="Close" />
+        </fieldset>
+    </form>
+    <p>* Note: To use this feature the target blog needs to support the <a href="http://en.wikipedia.org/wiki/Atom_%28standard%29">Atom Publishing Protocol (APP)</a>. Usually this feature must be specifically enabled, and some platforms might not support all content, such as images and attachments.</p>
+    <p>For more information on APP support on your blog, consult the documentation (e.g. <a href="http://codex.wordpress.org/AtomPub">WordPress</a>).
+#parseTemplate("wrapping/info-box-close.vm")
+<script type="text/javascript" src="$portalPath/js/autocomplete/lib/jquery.ajaxQueue.js"></script>
+<script type="text/javascript" src="$portalPath/js/autocomplete/lib/jquery.bgiframe.min.js"></script>
+<script type="text/javascript" src="$portalPath/js/autocomplete/jquery.autocomplete.pack.js"></script>
+<script type="text/javascript">
+<!--
+    $(function() {
+        ###########################
+        ## General form usage
+        ###########################
+        $("#blog-this, #blog-cancel").click(function() {
+            $("#blog-this").toggleClass("selected");
+            $("#blog-message").empty();
+            $("#blog-form").toggle("blind");
+            return false;
+        });
+        $("#blog-accept").click(function() {
+            $("#blog-message").empty();
+            $("#blog-loading").show();
+            jQuery.post("$portalPath/actions/blog.ajax",
+                {
+                    url: $("#blog_url").val(),
+                    username: $("#blog_username").val(),
+                    password: $("#blog_password").val(),
+                    title: $("#blog_title").val(),
+                    separator: $("#blog_separator").val(),
+                    toc: $("#blog_toc").is(":checked"),
+                    preamble: $("#blog_preamble").val(),
+                    oid: "$oid"
+                },
+                function(data, status) {
+                    $("#blog-loading").hide();
+                    $("#blog-message").html(data);
+                }
+            );
+        });
+        $("#blog_url").autocomplete("$portalPath/actions/blog.ajax?func=url-history");
+
+        ###########################
+        ## Advanced option toggling
+        ###########################
+        $("#hide-advanced").hide();
+        $(".advanced-options").hide();
+        $("#show-advanced").click(function() {
+            $("#show-advanced").hide();
+            $("#hide-advanced").show();
+            $(".advanced-options").show();
+            return false;
+        });
+        $("#hide-advanced").click(function() {
+            $("#show-advanced").show();
+            $("#hide-advanced").hide();
+            $(".advanced-options").hide();
+            return false;
+        });
+    });
+-->
+</script>

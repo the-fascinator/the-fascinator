@@ -1,0 +1,12 @@
+#parseTemplate("facets/facet-list-header.vm")
+#if($hasResult)
+    #set($facetFields = $self.result.getFacets())
+    #foreach($facetFieldKey in $facetFields.keySet())
+        #set($facetData = $facetFields.get($facetFieldKey).values())
+        #set($facetField = $self.getFacetField($facetFieldKey))
+        #set($facetDisplay = $facetField.getString($nullValue, "display"))
+        #parseTemplate("facets/display/${facetDisplay}.vm")
+    #end
+#end
+
+#parseTemplate("facets/facet-list-footer.vm")

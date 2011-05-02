@@ -1,0 +1,8 @@
+<p class="item-description"><strong>Description:</strong> $!description&nbsp;</p>
+#set($sample = $self.getSourceSample($id, 500))
+#if ($sample != "")
+<div class="sample-content">
+    <strong>Sample:</strong>
+    <blockquote class="plain-text">$sample</blockquote>
+</div>
+#end

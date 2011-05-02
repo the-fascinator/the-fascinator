@@ -1,0 +1,22 @@
+#if($parent.isDetail() || !$parent.inPackage())
+    <table>
+        <tbody>
+            <tr>
+                <td id="player-container">
+                    <div id="player"></div>
+                </td>
+
+                <td style="vertical-align: top">
+                    <button class="player_reset" disabled="disabled">Reset player</button>
+                    <div class="video-results-list">
+                        <div class="video-result-list" anotar-uri="$oid">
+                            <!-- Don't remove this comment, it fixes display order of annotations -->
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+#else
+    <div id="player-container"></div>
+#end

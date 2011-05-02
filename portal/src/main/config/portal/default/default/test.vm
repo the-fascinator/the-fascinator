@@ -1,0 +1,69 @@
+#set($pageTitle = 'Test Page')
+<h2>Jython Velocity Integration Testing</h2>
+
+#if($self.trueField or $self.getTrueMethod())<p>You should be able to see this</p>#end
+#if($self.falseField or $self.getFalseMethod())<p class="error-text">If you can see this... something is wrong</p>#end
+
+$!self.noSuchMethod()
+<p>The page should still load correctly after calling a non-existent method</p>
+
+#if($self.numberOneTwoThree == 123)
+<p>The equals operator worked correctly</p>
+#else
+<p class="error-text">The equals than operator failed</p>
+#end
+#if($self.numberOneTwoThree lt 123)
+<p class="error-text">The less than operator failed</p>
+#else
+<p>The less than operator worked correctly</p>
+#end
+#if($self.numberOneTwoThree gt 123)
+<p class="error-text">The greater than operator failed</p>
+#else
+<p>The greater than operator worked correctly</p>
+#end
+
+<h3>python list</h3>
+<ul>
+#foreach($entry in $self.pythonList)
+<li>$entry</li>
+#end
+</ul>
+
+<h3>java list</h3>
+<ul>
+#foreach($entry in $self.javaList)
+<li>$entry</li>
+#end
+</ul>
+
+<h3>python dict</h3>
+<ul>
+#foreach($entry in $self.pythonDict)
+<li>$entry</li>
+#end
+</ul>
+
+<h3>java map</h3>
+<ul>
+#foreach($key in $self.javaMap.keySet())
+#set($value = $self.javaMap.get($key))
+<li>$key = $value</li>
+#end
+</ul>
+
+#define($test)
+<p>set by define directive!</p>
+#end
+
+<h3>define</h3>
+$!test
+
+<h3>form data</h3>
+<form action="$portalPath/test" method="post">
+    <input type="text" name="text" value="$!self.getTextFromFormData()" />
+    <input type="submit" />
+</form>
+<p>Text from Request : [$!self.getTextFromRequest()]</p>
+<p>Text from FormData: [$!self.getTextFromFormData()]</p>
+

@@ -1,0 +1,16 @@
+{
+    "harvester": {
+        "type": "file-system",
+        "file-system": {
+            "targets": [ {
+                "baseDir": "${test.dir}",
+                "force": true
+            } ],
+            "caching": "basic",
+            "cacheId": "config-caching"
+        }
+    },
+    "database-service": {
+        "derbyHome" : "${test.cache.dir}"
+    }
+}

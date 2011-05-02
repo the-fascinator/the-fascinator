@@ -1,0 +1,20 @@
+<div class="whatsnew#if($menuClass) $!menuClass#end"#if($menuId) id="$!menuId"#end>
+  <div class="whatsnew-heading">
+    <div class="whatsnew-heading-bl">
+      <div class="whatsnew-heading-br">
+        <div class="whatsnew-heading-tl">
+          <div class="whatsnew-heading-tr">
+            <div class="whatsnew-headingtext">#if($menuTitle)$!menuTitle#{else}&nbsp;#end</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="whatsnew-body">
+    <div class="whatsnew-body-bl">
+      <div class="whatsnew-body-br">
+        <div class="whatsnew-bodytext">
+## Reset parameters
+#set($menuId = $NULL)
+#set($menuClass = $NULL)
+#set($menuTitle = $NULL)

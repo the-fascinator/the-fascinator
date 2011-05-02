@@ -1,0 +1,145 @@
+#macro(waitRender $oid)
+  <b>Rendering</b>:
+  <div class="box">
+      <img src="$portalPath/images/loading-progress.gif" />
+      <ul id="render-list"></ul>
+  </div>
+  ## ActiveMQ ajax based messaging - disabled for now due to instability
+  ##
+  ##<script type="text/javascript" src="$portalPath/js/amq/amq_jquery_adapter.js"></script>
+  ##<script type="text/javascript" src="$portalPath/js/amq/amq.js"></script>
+  ##<script type="text/javascript">
+  ##    var amq = org.activemq.Amq;
+  ##    var clientId = "workflow_$oid";
+  ##    var clientTopic = "topic://message";
+  ##    function waitRender(message) {
+  ##        var json = this.JSON.parse(message.nodeValue);
+  ##        if (json.id == "$oid") {
+  ##            $("#render-list").append("<li>" + json.message + "</li>");
+  ##            if (json.status == "renderComplete") {
+  ##                amq.removeListener(clientId, clientTopic);
+  ##                window.location = "$portalPath/workflow/$oid";
+  ##            }
+  ##        }
+  ##    }
+  ##    amq.init({ uri: "$urlBase/amq/", timeout: 10 });
+  ##    amq.addListener(clientId, clientTopic, waitRender);
+  ##</script>
+  ##
+  ## Poll the render-pending flag on the object
+  <script type="text/javascript">
+  <!--
+      var pollTimerId = 0;
+      function poll() {
+        jQuery.post("$portalPath/actions/objectMeta.ajax",
+          { "oid" : "$oid" },
+          function(data) {
+            if (data.error) {
+                $("#render-list").prev("img").hide();
+                $("#render-list").before('<img src="$portalPath/images/icons/exclamation.png" /><span>&nbsp;<b>Error</b>:&nbsp;' + data.error + '</span>');
+                return;
+            }
+            if (data.meta) {
+                var pending = data.meta["render-pending"];
+                if (pending == "false") {
+                    // redirect to continue workflow
+                    $("#render-list").prev("img").hide();
+                    $("#render-list").before('<img src="$portalPath/images/icons/information.png" /><span>&nbsp;The render process has completed!</span>');
+                    clearTimeout(pollTimerId);
+                    window.location = "$portalPath/workflow/$oid";
+                }
+            }
+          },
+          "json");
+      }
+      pollTimerId = setInterval("poll()", 2500);
+  -->
+  </script>
+#end
+
+#macro(showError $message)
+  <div class="box articles">
+    <h2>Error</h2>
+    <div class="box">
+      <p class="stop-error">$message</p>
+      #if ("$!self.getOid()" == "")
+      #else
+      ##### TODO Security check first
+      #####<p>You can view the current <a href="$portalPath/detail/$self.getOid()">detail screen</a> for the object however.</p>
+      #end
+    </div>
+  </div>
+#end
+#set($pageTitle = $self.getWorkflowMetadata().getString("Workflow", "pageTitle"))
+<h2 id="page-heading"><span>#if("$!pageTitle"!="")$!pageTitle#{else}Workflow#end</span></h2>
+<div id="form-section">
+
+  ### *********************
+  ###   Errors
+  ### *********************
+  #if ($self.hasError())
+  #showError($self.getError())
+  #else
+
+    ### *********************
+    ###   Render pending
+    ### *********************
+    #set ($pending = $self.isPending())
+    #if ($pending)
+    #set($menuClass = "articles notice")
+    #set($menuTitle = "Pending")
+    #parseTemplate("wrapping/info-box-open.vm")
+      <div class="warning">
+        <b>IMPORTANT</b>Please note that this object is currently in the render queue. There may be pending data/metadata changes not visible below.
+      </div>
+    #parseTemplate("wrapping/info-box-close.vm")
+    #end
+
+    ### *********************
+    ###   Fresh uploads
+    ### *********************
+    #if ($self.justUploaded() && $pending)
+    <h4>File Upload Complete</h4>
+    <div class="box">
+      <p><b>File Uploaded</b>: '$self.getFileName()' ($self.getFileSize())</p>
+      <p>Please wait. The object is currently being processed on the server. The workflow will begin progressing as soon as it has completed.</p>
+      <p>If you'd like to come back to this object later, you can visit <a href="$portalPath/detail/$self.getOid()">the detail screen</a>.</p>
+      #waitRender($self.getOid())
+    </div>
+
+    #else
+      ### *********************
+      ###   Invalid objects
+      ### *********************
+      #set ($oid = $self.getOid())
+      #if ("$!oid" == "")
+      <div class="box">
+        Sorry, but there's no data here regarding an uploaded file. Did you perhaps refresh the page after your upload?
+      </div>
+
+      ### *********************
+      ###   Normal workflow managements
+      ### *********************
+      #else
+
+        #if ($pending)
+        <p>Please wait. The object is currently being processed on the server. The workflow will progress as soon as it has completed.</p>
+        #waitRender($oid)
+        #else
+          #if ($self.redirectNeeded())
+        <script type="text/javascript">
+            window.location = "$portalPath/detail/$oid";
+        </script>
+          #else
+            #if($self.prepareTemplate())
+              $self.renderTemplate()
+            #else
+              #showError($self.getError())
+            #end
+          #end
+        #end
+
+      #end
+    #end
+  #end
+</div>

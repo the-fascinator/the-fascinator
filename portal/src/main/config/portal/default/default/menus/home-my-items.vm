@@ -1,0 +1,25 @@
+<div class="grid_6">
+  #set($menuTitle = "My Items")
+  #parse($page.getTemplate('wrapping/menu-open.vm'))
+  #set($menuTitle = $nullValue)
+  <div class="block">
+    #if($self.mine.isEmpty())
+      &nbsp;
+    #else
+      <ol>
+      #foreach($item in $self.mine)
+        #set($itemId = $item.getFirst('id'))
+        #set($itemTitle = $item.getFirst('dc_title'))
+        #set($wfStep = $item.getFirst('workflow_step'))
+        <li class='wf-${wfStep}'>
+          <a href="$portalPath/detail/$itemId">$itemTitle</a>
+          #if ($wfStep != "" && $wfStep != "live")
+          <img class="workflow" src="$portalPath/images/icons/wf_${wfStep}.png" alt="Workflow: $wfStep" title="Workflow: $wfStep"/>
+          #end
+        </li>
+      #end
+      </ol>
+    #end
+  </div>
+  #parse($page.getTemplate('wrapping/info-box-close.vm'))
+</div>

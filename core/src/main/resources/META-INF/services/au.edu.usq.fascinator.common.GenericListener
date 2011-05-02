@@ -1,0 +1,5 @@
+au.edu.usq.fascinator.HarvestQueueConsumer
+au.edu.usq.fascinator.RenderQueueConsumer
+au.edu.usq.fascinator.IngestQueueConsumer
+au.edu.usq.fascinator.SubscriberQueueConsumer
+au.edu.usq.fascinator.EmailNotificationConsumer

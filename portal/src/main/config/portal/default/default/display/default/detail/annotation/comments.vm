@@ -1,0 +1,43 @@
+<script type="text/javascript">
+<!--
+    function setupCommenting(pageUri, tagList, visible) {
+        var commentConfig = {
+            pageUri: pageUri,
+            tagList: tagList,
+            clientUri: "http://www.purl.org/anotar/client/0.2",
+            #if("$!creator" != "")creator: "$creator",#end
+            #if("$!creatorUri" != "")creatorUri: "$creatorUri",#end
+            #if ($page.authentication.is_logged_in())
+                interfaceLabel: " <img src='$portalPath/images/icons/comment_add.png' title='Add new comment' alt='Add' /> Comments:",
+                replyLabel: " <img src='$portalPath/images/icons/comments_add.png' title='Reply to this comment' alt='Reply' />",
+            #else
+                interfaceLabel: "<span/>",
+                replyLabel: "<span/>",
+            #end
+            interfaceVisible: visible,
+            displayCustom: "object_comment_display",
+            loadAnnotations: function() { loadAnnotations(this, pageUri) },
+            submitAnnotation: function(data, annotateDiv) { submitAnnotation(this, pageUri, data, annotateDiv) }
+        }
+        anotarFactory(jQuery, commentConfig);
+    }
+-->
+</script>
+<script type="text/html" id="object_comment_display">
+    <div class="<%=style%>inline-annotation <%=toggle%>" id="<%=id%>">
+        <input name="rootUri" value="<%=root%>" type="hidden"/>
+        <div class="<%=style%>orig-content" style="display:none;"><%=original%></div>
+        #if($page.authentication.is_admin())
+        <img class="anno-delete"
+             onclick="deleteComment(this, 'id')"
+             src="$portalPath/images/icons/comments_delete.png"
+             title="Delete this comment" alt="Delete" />
+        #end
+        <div class="<%=style%>anno-info">
+            Comment by: <span class="<%=style%>anno-creator"><%=creator%></span>
+            &nbsp; <span class="<%=style%>anno-date timeago" title="<%=date%>"><%=date%></span>
+        </div>
+        <div class="<%=style%>anno-content"><%=content%></div>
+        <div class="<%=style%>anno-children"><%=children%></div>
+    </div>
+</script>

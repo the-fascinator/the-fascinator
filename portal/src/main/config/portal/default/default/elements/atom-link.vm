@@ -1,0 +1,8 @@
+#set($query = $page.getQuery())
+#if("$!query" != "")
+  #set($atomLink = "$portalPath/feed/atom?query=$query")
+#else
+  #set($atomLink = "$portalPath/feed/atom")
+#end
+#set($pageHeader = "<link rel='alternate' type='application/atom+xml' href='$atomLink' title='$page.portalName'/>")
+#set($atomHtml = "<a class='feed' title='Atom feed' href='$atomLink'><img alt='Atom feed' src='$portalPath/images/icons/feed.png'/></a>")

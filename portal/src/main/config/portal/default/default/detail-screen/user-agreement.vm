@@ -1,0 +1,27 @@
+#set($pageTitle = $ua.getTitle())
+<h2 id="page-heading">$pageTitle</h2>
+<div class="grid_16">
+    <div class="box">
+        <h2>$pageTitle</h2>
+        <div class="user-agreement">
+            <p>$page.authentication.get_name()... access to this object requires acceptance of the following agreement:</p>
+            <pre>$ua.getText()</pre>
+            <p>Please indicate your acceptance of the above terms.</p>
+            <form method="post" action="$urlBase/$self.request.getAttribute("RequestURI")">
+                <input type="hidden" name="accept" value="true" />
+                <input type="submit" value="$ua.acceptButton()" />
+                <input type="button" id="agreement-cancel" value="$ua.cancelButton()" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#agreement-cancel").click(function() {
+            window.location.href = "$portalPath/home";
+        });
+    });
+-->
+</script>

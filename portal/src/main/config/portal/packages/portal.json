@@ -1,0 +1,13 @@
+{
+  "portal" : {
+    "name" : "packages",
+    "description" : "Packages",
+    "query" : "repository_type:\"Packages\"",
+    "facet-fields" : {
+      "workflow_step" : {
+        "label" : "State",
+        "display" : "list"
+      }
+    }
+  }
+}

@@ -1,0 +1,203 @@
+#set ($pageTitle = "Blogging")
+#set ($metadata = $self.metadata)
+
+<h2 id="page-heading"><span>$pageTitle</span></h2>
+
+<div class="grid_4">
+  #set($menuTitle = "Actions")
+  #parse($page.getTemplate('wrapping/main-menu-open.vm'))
+  #set($menuTitle = $nullValue)
+  <ul class="menu">
+    <li><a href="$portalPath/home">Home</a></li>
+    <li><a href="$portalPath/detail/$self.id">Back to Details</a></li>
+  </ul>
+  #parse($page.getTemplate('wrapping/main-menu-close.vm'))
+</div>
+
+<div class="grid_12">
+  <div class="box">
+    <h2>Blogging: '$self.id'</h2>
+#if ($page.authentication.is_logged_in())
+    <div class="block">
+        <form id="blog" method="post">
+            <fieldset class="login">
+                <legend>Blog information</legend>
+                <p>
+                    <label for="blog_url">Blog APP URL*</label>
+                    <input type="text" id="blog_url" name="blog_url" />
+                </p>
+                <p>
+                    <label for="blog_username">Username</label>
+                    <input type="text" id="blog_username" name="blog_username" />
+                </p>
+                <p>
+                    <label for="blog_password">Password</label>
+                    <input type="password" id="blog_password" name="blog_password" />
+                </p>
+                <p id="show-advanced"><a href="#">Show advanced options</a></p>
+                <p id="hide-advanced"><a href="#">Hide advanced options</a></p>
+                <p class="advanced-options">
+                    <label for="blog_title">Blog Post Title</label>
+                    <input type="text" id="blog_title" name="blog_title" value="$metadata.getFirst("dc_title")"/>
+                </p>
+                <p class="advanced-options">
+                    <label for="blog_separator">Content Separation</label>
+                    <input type="text" id="blog_separator" name="blog_separator" value='<hr class="tf-content-separator"/><!--more-->'/>
+                </p>
+                <p class="advanced-options">
+                    <label for="blog_toc">Build TOC</label>
+                    <input type="checkbox" id="blog_toc" name="blog_toc" checked="checked" style="width: 15px;" />
+                    Table of Contents before my content
+                </p>
+                <p class="advanced-options">
+                    <label for="blog_preamble">Content Preamble</label>
+                    <input type="checkbox" id="blog_pre_more" name="blog_pre_more" checked="checked" style="width: 15px;" />
+                    Insert '&lt;!--more--&gt;' shortcut between preamble and text<br/>
+                    <textarea id="blog_preamble" name="blog_preamble" cols="50" rows="4"></textarea>
+                </p>
+                <p class="message">
+                    <img class="hidden" id="blog-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+                    <span id="blog-message"></span>
+                </p>
+                <input class="button" id="blog-preview" type="button" value="Preview" />
+                <input class="button" id="blog-accept" type="button" value="Blog" />
+                ##<input class="button" id="blog-debug" type="button" value="DEBUG" />
+            </fieldset>
+        </form>
+        <p>* Note: To use this feature the target blog needs to support the <a href="http://en.wikipedia.org/wiki/Atom_%28standard%29">Atom Publishing Protocol (APP)</a>. Usually this feature must be specifically enabled, and some platforms might not support all content, such as images and attachments.</p>
+        <p>For more information on APP support on your blog, consult the documentation (e.g. <a href="http://codex.wordpress.org/AtomPub">WordPress</a>).
+    </div>
+  </div>
+
+  <div id="preview-panel" class="box hidden">
+    <div class="block">
+        <strong>PLEASE NOTE: This preview is a guide only</strong>:
+        <ul>
+            <li>When publishing to a blog your content will be presented inside the blog's skin or theme, most probably altering the presentation.</li>
+            <li>Images and other embedded resources must be posted to your blog's content area and the links resolved in the content.</li>
+            <li>Posting a draft entry to your blog is recommended to test both of the above points.</li>
+        </ul>
+    </div>
+
+    <h2>Preview</h2>
+    <div id="preview-content" class="block">
+    </div>
+#else
+    <p/>
+    <p>Sorry, but you need to be logged in to use this page. Please <a class="login-now" href="#">login now</a>.</p>
+#end
+  </div>
+</div>
+
+<div class="clear"></div>
+<!-- IE7 needs a blank div here, class="prefix_4" doesn't work -->
+<div class="grid_4">&nbsp;</div>
+
+#if ($page.authentication.is_logged_in())
+<script type="text/javascript" src="$portalPath/js/autocomplete/lib/jquery.ajaxQueue.js"></script>
+<script type="text/javascript" src="$portalPath/js/autocomplete/lib/jquery.bgiframe.min.js"></script>
+<script type="text/javascript" src="$portalPath/js/autocomplete/jquery.autocomplete.pack.js"></script>
+<script type="text/javascript">
+<!--
+    $(function() {
+    ###########################
+    ## URL History
+    ###########################
+        $("#blog_url").autocomplete("$portalPath/actions/blog.ajax?func=url-history");
+
+    ###########################
+    ## DEBUGGING
+    ###########################
+    ##    $("#blog-debug").click(function() {
+    ##        $("#blog-message").empty();
+    ##        $("#blog-loading").show();
+    ##        jQuery.post("$portalPath/actions/blog.ajax",
+    ##            {
+    ##                url: $("#blog_url").val(),
+    ##                username: $("#blog_username").val(),
+    ##                password: $("#blog_password").val(),
+    ##                func: "debug"
+    ##            },
+    ##            function(data, status) {
+    ##                $("#blog-loading").hide();
+    ##                $("#blog-message").html(data);
+    ##            }
+    ##        );
+    ##        return false;
+    ##    });
+
+    ###########################
+    ## Blog Button
+    ###########################
+        $("#blog-accept").click(function() {
+            $("#blog-message").empty();
+            $("#blog-loading").show();
+            jQuery.post("$portalPath/actions/blog.ajax",
+                {
+                    url: $("#blog_url").val(),
+                    username: $("#blog_username").val(),
+                    password: $("#blog_password").val(),
+                    title: $("#blog_title").val(),
+                    separator: $("#blog_separator").val(),
+                    toc: $("#blog_toc").is(":checked"),
+                    preamble: $("#blog_preamble").val(),
+                    premore: $("#blog_pre_more").is(":checked"),
+                    oid: "$self.id"
+                },
+                function(data, status) {
+                    $("#blog-loading").hide();
+                    $("#blog-message").html(data);
+                }
+            );
+            return false;
+        });
+
+    ###########################
+    ## Preview Button
+    ###########################
+        $("#blog-preview").click(function() {
+            $("#blog-message").empty();
+            $("#blog-loading").show();
+            jQuery.post("$portalPath/actions/blog.ajax",
+                {
+                    url: $("#blog_url").val(),
+                    username: $("#blog_username").val(),
+                    password: $("#blog_password").val(),
+                    title: $("#blog_title").val(),
+                    separator: $("#blog_separator").val(),
+                    toc: $("#blog_toc").is(":checked"),
+                    preamble: $("#blog_preamble").val(),
+                    premore: $("#blog_pre_more").is(":checked"),
+                    func: "preview-only",
+                    oid: "$self.id"
+                },
+                function(data, status) {
+                    $("#blog-loading").hide();
+                    $("#preview-panel").show();
+                    $("#preview-content").html(data);
+                }
+            );
+            return false;
+        });
+
+    ###########################
+    ## Advanced option toggling
+    ###########################
+        $("#hide-advanced").hide();
+        $(".advanced-options").hide();
+        $("#show-advanced").click(function() {
+            $("#show-advanced").hide();
+            $("#hide-advanced").show();
+            $(".advanced-options").show();
+            return false;
+        });
+        $("#hide-advanced").click(function() {
+            $("#show-advanced").show();
+            $("#hide-advanced").hide();
+            $(".advanced-options").hide();
+            return false;
+        });
+    });
+-->
+</script>
+#end
