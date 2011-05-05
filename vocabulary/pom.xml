@@ -3,13 +3,13 @@
     <parent>
         <artifactId>the-fascinator</artifactId>
         <groupId>au.edu.usq.fascinator</groupId>
-        <version>1.0.2</version>
+        <version>1.0.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>fascinator-vocabulary</artifactId>
     <name>The Fascinator - Vocabulary Library</name>
-    <version>1.0.2</version>
+    <version>1.0.2-SNAPSHOT</version>
     <properties>
         <aperture.version>1.4.0</aperture.version>
         <rdf2go.version>4.7.2</rdf2go.version>

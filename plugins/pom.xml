@@ -4,12 +4,12 @@
   <groupId>au.edu.usq.fascinator</groupId>
   <artifactId>fascinator-plugins</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.2</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>The Fascinator - Plugins</name>
   <parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>the-fascinator</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modules>

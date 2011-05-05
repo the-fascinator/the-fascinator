@@ -5,7 +5,7 @@
     <artifactId>the-fascinator</artifactId>
     <packaging>pom</packaging>
     <name>The Fascinator</name>
-    <version>1.0.2</version>
+    <version>1.0.2-SNAPSHOT</version>
     <parent>
         <groupId>au.edu.usq.fascinator</groupId>
         <artifactId>organisation</artifactId>
@@ -25,9 +25,9 @@
         <url>https://build.adfi.usq.edu.au/ci/job/The%20Fascinator/</url>
     </ciManagement>
     <scm>
-        <url>http://fascinator.usq.edu.au/svn/code/the-fascinator2/tags/the-fascinator-1.0.2</url> 
-        <connection>scm:svn:http://fascinator.usq.edu.au/svn/code/the-fascinator2/tags/the-fascinator-1.0.2</connection> 
-        <developerConnection>scm:svn:https://fascinator.usq.edu.au/svn-auth/code/the-fascinator2/tags/the-fascinator-1.0.2</developerConnection> 
+        <url>http://fascinator.usq.edu.au/svn/code/the-fascinator2</url> 
+        <connection>scm:svn:http://fascinator.usq.edu.au/svn/code/the-fascinator2/trunk</connection> 
+        <developerConnection>scm:svn:https://fascinator.usq.edu.au/svn-auth/code/the-fascinator2/trunk</developerConnection> 
     </scm>
     <modules>
         <module>common</module>
