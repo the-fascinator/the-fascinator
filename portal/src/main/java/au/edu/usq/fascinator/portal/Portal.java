@@ -169,4 +169,22 @@ public class Portal extends JsonSimple {
     public List<String> getSortFieldList() {
         return new ArrayList<String>(getSortFields().keySet());
     }
+
+    public String getSortFieldDefault() {
+        return getString("", "portal", "sort-field-default");
+    }
+
+    public void setSortFieldDefault(String sortFieldDefault) {
+        JsonObject portal = writeObject("portal");
+        portal.put("sort-field-default", sortFieldDefault);
+    }
+
+    public String getSortFieldDefaultOrder() {
+        return getString("", "portal", "sort-field-default-order");
+    }
+
+    public void setSortFieldDefaultOrder(String sortFieldDefaultOrder) {
+        JsonObject portal = writeObject("portal");
+        portal.put("sort-field-default-order", sortFieldDefaultOrder);
+    }
 }

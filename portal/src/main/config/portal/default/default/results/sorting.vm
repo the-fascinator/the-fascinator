@@ -4,7 +4,7 @@
         <form id="sort-form" action="$portalPath/search" method="post">
             <label for="sort-field">Sort by</label>
             <select id="sort-field" name="sort-field">
-                <option value="score">Best match</option>
+                <option value="score">Relevancy</option>
                 #foreach($key in $sortFields.keySet())
                     <option value="$key"#if($self.sortField==$key) selected="selected"#end>$sortFields.get($key)</option>
                 #end
@@ -13,6 +13,7 @@
                 <option value="desc"#if($self.sortOrder=="desc") selected="selected"#end>Descending</option>
                 <option value="asc"#if($self.sortOrder=="asc") selected="selected"#end>Ascending</option>
             </select>
+            <input type="hidden" name="query" value="$!sessionState.get('query')" />
         </form>
     </div>
     <script type="text/javascript">

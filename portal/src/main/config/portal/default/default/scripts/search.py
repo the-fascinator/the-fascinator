@@ -39,8 +39,11 @@ class SearchData:
         self.__sortOrder = self.formData.get("sort-order")
         if not (self.__sortField or self.__sortOrder):
             # use form data not specified, check session
-            self.__sortField = self.sessionState.get("sortField", "score")
-            self.__sortOrder = self.sessionState.get("sortOrder", "desc")
+            sortField = self.__portal.sortFieldDefault or "score"
+            sortOrder = self.__portal.sortFieldDefaultOrder or "desc"
+            print "f:%s,o:%s" % (sortField, sortOrder)
+            self.__sortField = self.sessionState.get("sortField", sortField)
+            self.__sortOrder = self.sessionState.get("sortOrder", sortOrder)
         self.sessionState.set("sortField", self.__sortField)
         self.sessionState.set("sortOrder", self.__sortOrder)
         self.__sortBy = "%s %s" % (self.__sortField, self.__sortOrder)

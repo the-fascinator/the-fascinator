@@ -36,8 +36,9 @@
 <tr id="$id" class="sort-row $extraClass">
     <td>
         <img class="sort-grip" src="$portalPath/images/icons/grippy.png" />
-        #editableText($id "field" $field)
+        <input class="sort-default" name="sort-default" type="radio" value="$field"#if($self.portal.sortFieldDefault==$field) checked="checked"#end />
     </td>
+    <td>#editableText($id "field" $field)</td>
     <td>#editableText($id "label" $label)</td>
     <td>
         <input class="sort-delete" name="sort-delete" type="checkbox" value="$id" />
@@ -201,6 +202,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Default</th>
                     <th width="45%">Field</th>
                     <th width="45%">Label</th>
                     <th>Delete</th>
@@ -215,6 +217,20 @@
                 #sortRow($id $field $label "")
             #end
             </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td>Default sort order:
+                        <select id="sort-order">
+                            <option value="asc"#if($self.portal.sortFieldDefaultOrder=="asc") selected="selected"#end>Ascending</option>
+                            <option value="desc"#if($self.portal.sortFieldDefaultOrder=="desc") selected="selected"#end>Descending</option>
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
         <button class="add" rel="sort">Add</button>
         <button class="update">Update</button>
@@ -460,6 +476,9 @@
                         "&label=" + fLabel +
                         "&delete=" + fDelete;
             }
+            var fDefault = $(".sort-default:checked").val();
+            data += "&default=" + fDefault;
+            data += "&order=" + $("#sort-order").val();
             jQuery.post("$portalPath/actions/settings.ajax?" + data,
                 { func: "sort-update" },
                 function(data, status) {

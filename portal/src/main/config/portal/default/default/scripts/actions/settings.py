@@ -80,6 +80,12 @@ class SettingsData:
 
         elif func == "sort-update":
             portal.getObject(["portal"]).remove("sort-fields")
+            default = self.vc("formData").get("default")
+            if default:
+                portal.setSortFieldDefault(default)
+            order = self.vc("formData").get("order")
+            if order:
+                portal.setSortFieldDefaultOrder(order)
             fields = self.vc("formData").getValues("field")
             labels = self.vc("formData").getValues("label")
             deletes = self.vc("formData").getValues("delete")

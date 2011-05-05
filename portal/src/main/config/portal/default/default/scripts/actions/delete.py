@@ -9,7 +9,7 @@ class DeleteData:
 
         self.writer = self.vc["response"].getPrintWriter("text/html; charset=UTF-8")
 
-        if self.vc["page"].authentication.is_logged_in() and self.vc["page"].authentication.is_admin():
+        if self.vc["page"].authentication.is_logged_in() or self.vc["page"].authentication.is_admin():
             self.process()
         else:
             self.throw_error("Only administrative users can access this feature")
