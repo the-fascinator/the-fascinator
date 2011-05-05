@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.edu.usq.fascinator</groupId>
   <artifactId>fascinator-core</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>The Fascinator - Core</name>
   <parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>the-fascinator</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <dependencies>

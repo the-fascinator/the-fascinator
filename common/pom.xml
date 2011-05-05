@@ -2,13 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>fascinator-common</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>The Fascinator - Common Library</name>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/common</url>
     <parent>
         <groupId>au.edu.usq.fascinator</groupId>
         <artifactId>the-fascinator</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
