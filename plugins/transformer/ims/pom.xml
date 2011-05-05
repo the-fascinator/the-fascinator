@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.edu.usq.fascinator.plugins</groupId>
   <artifactId>plugin-transformer-ims</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>The Fascinator - Plugin - Transformer - IMS Package</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/transformer/ims</url>
   <parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>

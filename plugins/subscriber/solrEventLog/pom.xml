@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.edu.usq.fascinator.plugins</groupId>
   <artifactId>plugin-subscriber-solrEventLog</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>The Fascinator - Plugin - Subscriber - Solr Event Logs</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/subscriber/solrEventLog</url>
   <parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>
