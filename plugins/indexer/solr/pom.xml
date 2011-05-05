@@ -4,12 +4,12 @@
   <groupId>au.edu.usq.fascinator.plugins</groupId>
   <artifactId>plugin-indexer-solr</artifactId>
   <name>The Fascinator - Plugin - Indexer - Solr</name>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/indexer/solr</url>
   <parent>
     <artifactId>fascinator-plugins</artifactId>
     <groupId>au.edu.usq.fascinator</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>

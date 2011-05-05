@@ -4,11 +4,11 @@
     <artifactId>fascinator-portal</artifactId>
     <packaging>war</packaging>
     <name>The Fascinator - Portal</name>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <parent>
         <groupId>au.edu.usq.fascinator</groupId>
         <artifactId>the-fascinator</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>

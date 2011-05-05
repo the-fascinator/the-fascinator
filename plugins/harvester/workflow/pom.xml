@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>au.edu.usq.fascinator.plugins</groupId>
   <artifactId>plugin-harvester-workflow</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>The Fascinator - Plugin - Harvester - Workflow</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/harvester/workflow</url>
   <parent>
     <groupId>au.edu.usq.fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>
