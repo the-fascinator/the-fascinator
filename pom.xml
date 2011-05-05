@@ -25,9 +25,9 @@
         <url>https://build.adfi.usq.edu.au/ci/job/The%20Fascinator/</url>
     </ciManagement>
     <scm>
-        <url>http://fascinator.usq.edu.au/svn/code/the-fascinator2/tags/the-fascinator-1.0.2</url> 
-        <connection>scm:svn:http://fascinator.usq.edu.au/svn/code/the-fascinator2/tags/the-fascinator-1.0.2</connection> 
-        <developerConnection>scm:svn:https://fascinator.usq.edu.au/svn-auth/code/the-fascinator2/tags/the-fascinator-1.0.2</developerConnection> 
+        <url>http://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.2</url> 
+        <connection>scm:svn:http://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.2</connection> 
+        <developerConnection>scm:svn:https://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.2</developerConnection> 
     </scm>
     <modules>
         <module>common</module>
