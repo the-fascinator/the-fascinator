@@ -1,6 +1,6 @@
 /* 
  * The Fascinator - Core
- * Copyright (C) 2010-2011 University of Southern Queensland
+ * Copyright (C) 2009-2011 University of Southern Queensland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,23 +16,26 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginException;
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.indexer.Indexer;
-import au.edu.usq.fascinator.api.indexer.IndexerException;
-import au.edu.usq.fascinator.api.storage.Storage;
-import au.edu.usq.fascinator.api.storage.StorageException;
-import au.edu.usq.fascinator.common.GenericListener;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
-import au.edu.usq.fascinator.common.MessagingServices;
-import au.edu.usq.fascinator.common.storage.StorageUtils;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.MessagingServices;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -49,24 +52,22 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Consumer for Ingest Queue. Jobs in this queue should be short running
- * processes as they are run at harvest time.
+ * Consumer for rendering transformers. Jobs in this queue are generally longer
+ * running running processes and are started after the initial harvest.
  * 
+ * @author Oliver Lucido
  * @author Linda Octalina
  */
-public class IngestQueueConsumer implements GenericListener {
+public class RenderQueueConsumer implements GenericListener {
 
-    /** Harvest Queue name */
-    public static final String INGEST_QUEUE = "ingest";
-
-    /** Logging */
-    private Logger log = LoggerFactory.getLogger(IngestQueueConsumer.class);
+    /** Service Loader will look for this */
+    public static final String LISTENER_ID = "render";
 
     /** Render queue string */
     private String QUEUE_ID;
 
-    /** Name identifier to be put in the queue */
-    private String name;
+    /** Logging */
+    private Logger log = LoggerFactory.getLogger(RenderQueueConsumer.class);
 
     /** JSON configuration */
     private JsonSimpleConfig globalConfig;
@@ -77,11 +78,8 @@ public class IngestQueueConsumer implements GenericListener {
     /** JMS Session */
     private Session session;
 
-    // /** Render Queues */
-    // private Map<String, Queue> renderers;
-
-    // /** Render Queue Names */
-    // private Map<String, String> rendererNames;
+    /** JMS Topic */
+    // private Topic broadcast;
 
     /** Indexer object */
     private Indexer indexer;
@@ -89,14 +87,26 @@ public class IngestQueueConsumer implements GenericListener {
     /** Storage */
     private Storage storage;
 
-    /** Messaging Consumer */
+    /** Message Consumer instance */
     private MessageConsumer consumer;
 
     /** Message Producer instance */
     private MessageProducer producer;
 
+    /** Name identifier to be put in the queue */
+    private String name;
+
     /** Thread reference */
     private Thread thread;
+
+    /** Object being processed */
+    private DigitalObject object;
+
+    /** Transformer conveyer belt */
+    private ConveyerBelt conveyer;
+
+    /** Auto commit flag on index */
+    private boolean autoCommit;
 
     /** Messaging services */
     private MessagingServices messaging;
@@ -105,8 +115,8 @@ public class IngestQueueConsumer implements GenericListener {
      * Constructor required by ServiceLoader. Be sure to use init()
      * 
      */
-    public IngestQueueConsumer() {
-        thread = new Thread(this, INGEST_QUEUE);
+    public RenderQueueConsumer() {
+        thread = new Thread(this, LISTENER_ID);
     }
 
     /**
@@ -116,7 +126,7 @@ public class IngestQueueConsumer implements GenericListener {
     @Override
     public void run() {
         try {
-            log.info("Starting {}", name);
+            log.info("Starting {}...", name);
 
             // Get a connection to the broker
             String brokerUrl = globalConfig.getString(
@@ -131,11 +141,7 @@ public class IngestQueueConsumer implements GenericListener {
             consumer = session.createConsumer(session.createQueue(QUEUE_ID));
             consumer.setMessageListener(this);
 
-            // renderers = new LinkedHashMap();
-            // for (String selector : rendererNames.keySet()) {
-            // renderers.put(selector, session.createQueue(rendererNames
-            // .get(selector)));
-            // }
+            // broadcast = session.createTopic(MessagingServices.MESSAGE_TOPIC);
             producer = session.createProducer(null);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
@@ -153,11 +159,18 @@ public class IngestQueueConsumer implements GenericListener {
      */
     @Override
     public void init(JsonSimpleConfig config) throws Exception {
-        try {
-            name = config.getString(null, "config", "name");
-            QUEUE_ID = name;
-            thread.setName(name);
+        name = config.getString(null, "config", "name");
+        QUEUE_ID = name;
+        thread.setName(name);
 
+        // Set autoCommit if we are the user priority queue
+        if (name.equals(ConveyerBelt.CRITICAL_USER_SELECTOR)) {
+            autoCommit = true;
+        } else {
+            autoCommit = false;
+        }
+
+        try {
             globalConfig = new JsonSimpleConfig();
             File sysFile = JsonSimpleConfig.getSystemFile();
             indexer = PluginManager.getIndexer(
@@ -167,22 +180,7 @@ public class IngestQueueConsumer implements GenericListener {
                     globalConfig.getString("file-system", "storage", "type"));
             storage.init(sysFile);
 
-            try {
-                messaging = MessagingServices.getInstance();
-            } catch (JMSException jmse) {
-                log.error("Failed to start connection: {}", jmse.getMessage());
-            }
-
-            // // Setup render queue logic
-            // rendererNames = new LinkedHashMap();
-            // String userQueue = config.get("config/user-renderer");
-            // rendererNames.put(ConveyerBelt.CRITICAL_USER_SELECTOR,
-            // userQueue);
-            // Map<String, Object> map =
-            // config.getMap("config/normal-renderers");
-            // for (String selector : map.keySet()) {
-            // rendererNames.put(selector, (String) map.get(selector));
-            // }
+            conveyer = new ConveyerBelt(ConveyerBelt.RENDER);
 
         } catch (IOException ioe) {
             log.error("Failed to read configuration: {}", ioe.getMessage());
@@ -190,6 +188,12 @@ public class IngestQueueConsumer implements GenericListener {
         } catch (PluginException pe) {
             log.error("Failed to initialise plugin: {}", pe.getMessage());
             throw pe;
+        }
+
+        try {
+            messaging = MessagingServices.getInstance();
+        } catch (JMSException jmse) {
+            log.error("Failed to start connection: {}", jmse.getMessage());
         }
     }
 
@@ -199,11 +203,11 @@ public class IngestQueueConsumer implements GenericListener {
      */
     @Override
     public String getId() {
-        return INGEST_QUEUE;
+        return LISTENER_ID;
     }
 
     /**
-     * Start the ingest queue consumer
+     * Start the queue based on the name identifier
      * 
      * @throws JMSException if an error occurred starting the JMS connections
      */
@@ -213,7 +217,8 @@ public class IngestQueueConsumer implements GenericListener {
     }
 
     /**
-     * Stop the Ingest Queue consumer. Including: indexer and storage
+     * Stop the Render Queue Consumer. Including stopping the storage and
+     * indexer
      */
     @Override
     public void stop() throws Exception {
@@ -274,54 +279,74 @@ public class IngestQueueConsumer implements GenericListener {
     public void onMessage(Message message) {
         MDC.put("name", name);
         try {
-            // Incoming message
+            // Make sure thread priority is correct
+            if (!Thread.currentThread().getName().equals(thread.getName())) {
+                Thread.currentThread().setName(thread.getName());
+                Thread.currentThread().setPriority(thread.getPriority());
+            }
+
+            // Get the message deatils
             String text = ((TextMessage) message).getText();
             JsonSimpleConfig config = new JsonSimpleConfig(text);
             String oid = config.getString(null, "oid");
-            log.info("Received job, object id={}, text={}", oid, text);
+            log.info("Received job, object id={}", oid);
 
-            File configFile = new File(config.getString(null, "configFile"));
-            File uploadedFile = new File(oid);
+            // Get our object from storage
+            object = storage.getObject(oid);
+            sendNotification(oid, "renderStart", "(" + name
+                    + ") Renderer starting : '" + oid + "'");
 
-            Boolean deleted = config.getBoolean(false, "deleted");
-            try {
-                HarvestClient harvestClient = new HarvestClient(configFile,
-                        uploadedFile, "guest");
-                if (!deleted) {
-                    harvestClient.start();
-                }
-            } catch (PluginException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            // Push through the conveyer belt
+            log.info("Updating object...");
+            object = conveyer.transform(object, config);
+
+            // Index the object
+            log.info("Indexing object...");
+            indexer.index(object.getId());
+            if (autoCommit || config.getBoolean(false, "commit")) {
+                indexer.commit();
             }
 
-            // Delete object
-            if (deleted) {
-                String objectId = StorageUtils.generateOid(uploadedFile);
-                log.info("Removing object {}...", oid);
-                storage.removeObject(objectId);
-                indexer.remove(objectId);
-                indexer.annotateRemove(objectId);
+            // Log event
+            sentMessage(oid, "modify");
 
-                // Log event
-                sentMessage(oid, "delete");
-                sentMessage(oid, "delete-anotar");
-
-                return;
-            } else {
-                // Log event
-                sentMessage(oid, "modify");
-            }
+            // Finish up
+            sendNotification(oid, "renderComplete", "(" + name
+                    + ") Renderer complete : '" + oid + "'");
+            Properties props = object.getMetadata();
+            props.setProperty("render-pending", "false");
+            object.close();
 
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse.getMessage());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
+        } catch (StorageException se) {
+            log.error("Failed to update storage: {}", se.getMessage());
+        } catch (TransformerException te) {
+            log.error("Failed to transform object: {}", te.getMessage());
         } catch (IndexerException ie) {
             log.error("Failed to index object: {}", ie.getMessage());
-        } catch (StorageException e) {
-            log.error("Failed to delete object: {}", e.getMessage());
         }
+    }
+
+    /**
+     * Send the notification out on the broadcast topic
+     * 
+     * @param oid Object id
+     * @param status Status of the object
+     * @param message Message to be sent
+     */
+    private void sendNotification(String oid, String status, String message)
+            throws JMSException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.put("id", oid);
+        jsonMessage.put("idType", "object");
+        jsonMessage.put("status", status);
+        jsonMessage.put("message", message);
+
+        TextMessage msg = session.createTextMessage(jsonMessage.toString());
+        // producer.send(broadcast, msg);
     }
 
     /**
@@ -348,5 +373,9 @@ public class IngestQueueConsumer implements GenericListener {
      */
     @Override
     public void setPriority(int newPriority) {
+        if (newPriority >= Thread.MIN_PRIORITY
+                && newPriority <= Thread.MAX_PRIORITY) {
+            thread.setPriority(newPriority);
+        }
     }
 }

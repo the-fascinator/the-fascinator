@@ -17,18 +17,18 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.indexer.Indexer;
-import au.edu.usq.fascinator.api.indexer.IndexerException;
-import au.edu.usq.fascinator.api.indexer.SearchRequest;
-import au.edu.usq.fascinator.api.storage.DigitalObject;
-import au.edu.usq.fascinator.api.storage.Payload;
-import au.edu.usq.fascinator.api.storage.Storage;
-import au.edu.usq.fascinator.api.storage.StorageException;
-import au.edu.usq.fascinator.common.JsonObject;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.indexer.SearchRequest;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -17,15 +17,15 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginDescription;
-import au.edu.usq.fascinator.api.PluginException;
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.roles.Roles;
-import au.edu.usq.fascinator.api.roles.RolesException;
-import au.edu.usq.fascinator.api.roles.RolesManager;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.roles.Roles;
+import com.googlecode.fascinator.api.roles.RolesException;
+import com.googlecode.fascinator.api.roles.RolesManager;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.File;
 import java.io.IOException;

@@ -16,24 +16,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginException;
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.indexer.Indexer;
-import au.edu.usq.fascinator.api.indexer.IndexerException;
-import au.edu.usq.fascinator.api.storage.DigitalObject;
-import au.edu.usq.fascinator.api.storage.Storage;
-import au.edu.usq.fascinator.api.storage.StorageException;
-import au.edu.usq.fascinator.api.transformer.TransformerException;
-import au.edu.usq.fascinator.common.GenericListener;
-import au.edu.usq.fascinator.common.JsonObject;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
-import au.edu.usq.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.MessagingServices;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -43,6 +44,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
@@ -52,22 +54,28 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Consumer for rendering transformers. Jobs in this queue are generally longer
- * running running processes and are started after the initial harvest.
+ * Consumer for harvest transformers. Jobs in this queue should be short running
+ * processes as they are run at harvest time.
  * 
  * @author Oliver Lucido
  * @author Linda Octalina
  */
-public class RenderQueueConsumer implements GenericListener {
+public class HarvestQueueConsumer implements GenericListener {
 
-    /** Service Loader will look for this */
-    public static final String LISTENER_ID = "render";
+    /** Harvest Queue name */
+    public static final String HARVEST_QUEUE = "harvest";
+
+    /** Harvest Queue name */
+    public static final String USER_QUEUE = "harvestUser";
+
+    /** Logging */
+    private Logger log = LoggerFactory.getLogger(HarvestQueueConsumer.class);
 
     /** Render queue string */
     private String QUEUE_ID;
 
-    /** Logging */
-    private Logger log = LoggerFactory.getLogger(RenderQueueConsumer.class);
+    /** Name identifier to be put in the queue */
+    private String name;
 
     /** JSON configuration */
     private JsonSimpleConfig globalConfig;
@@ -78,8 +86,14 @@ public class RenderQueueConsumer implements GenericListener {
     /** JMS Session */
     private Session session;
 
-    /** JMS Topic */
+    /** Broadcast Topic */
     // private Topic broadcast;
+
+    /** Render Queues */
+    private Map<String, Queue> renderers;
+
+    /** Render Queue Names */
+    private Map<String, String> rendererNames;
 
     /** Indexer object */
     private Indexer indexer;
@@ -87,14 +101,11 @@ public class RenderQueueConsumer implements GenericListener {
     /** Storage */
     private Storage storage;
 
-    /** Message Consumer instance */
+    /** Messaging Consumer */
     private MessageConsumer consumer;
 
     /** Message Producer instance */
     private MessageProducer producer;
-
-    /** Name identifier to be put in the queue */
-    private String name;
 
     /** Thread reference */
     private Thread thread;
@@ -105,9 +116,6 @@ public class RenderQueueConsumer implements GenericListener {
     /** Transformer conveyer belt */
     private ConveyerBelt conveyer;
 
-    /** Auto commit flag on index */
-    private boolean autoCommit;
-
     /** Messaging services */
     private MessagingServices messaging;
 
@@ -115,8 +123,14 @@ public class RenderQueueConsumer implements GenericListener {
      * Constructor required by ServiceLoader. Be sure to use init()
      * 
      */
-    public RenderQueueConsumer() {
-        thread = new Thread(this, LISTENER_ID);
+    public HarvestQueueConsumer() {
+        thread = new Thread(this, HARVEST_QUEUE);
+
+        try {
+            messaging = MessagingServices.getInstance();
+        } catch (JMSException jmse) {
+            log.error("Failed to start connection: {}", jmse.getMessage());
+        }
     }
 
     /**
@@ -142,6 +156,11 @@ public class RenderQueueConsumer implements GenericListener {
             consumer.setMessageListener(this);
 
             // broadcast = session.createTopic(MessagingServices.MESSAGE_TOPIC);
+            renderers = new LinkedHashMap();
+            for (String selector : rendererNames.keySet()) {
+                renderers.put(selector,
+                        session.createQueue(rendererNames.get(selector)));
+            }
             producer = session.createProducer(null);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
@@ -159,18 +178,11 @@ public class RenderQueueConsumer implements GenericListener {
      */
     @Override
     public void init(JsonSimpleConfig config) throws Exception {
-        name = config.getString(null, "config", "name");
-        QUEUE_ID = name;
-        thread.setName(name);
-
-        // Set autoCommit if we are the user priority queue
-        if (name.equals(ConveyerBelt.CRITICAL_USER_SELECTOR)) {
-            autoCommit = true;
-        } else {
-            autoCommit = false;
-        }
-
         try {
+            name = config.getString(null, "config", "name");
+            QUEUE_ID = name;
+            thread.setName(name);
+
             globalConfig = new JsonSimpleConfig();
             File sysFile = JsonSimpleConfig.getSystemFile();
             indexer = PluginManager.getIndexer(
@@ -180,7 +192,18 @@ public class RenderQueueConsumer implements GenericListener {
                     globalConfig.getString("file-system", "storage", "type"));
             storage.init(sysFile);
 
-            conveyer = new ConveyerBelt(ConveyerBelt.RENDER);
+            // Setup render queue logic
+            rendererNames = new LinkedHashMap();
+            String userQueue = config.getString(null,
+                    "config", "user-renderer");
+            rendererNames.put(ConveyerBelt.CRITICAL_USER_SELECTOR, userQueue);
+            JsonObject map = config.getObject("config", "normal-renderers");
+            for (Object selector : map.keySet()) {
+                rendererNames.put(selector.toString(),
+                        map.get(selector).toString());
+            }
+
+            conveyer = new ConveyerBelt(ConveyerBelt.HARVEST);
 
         } catch (IOException ioe) {
             log.error("Failed to read configuration: {}", ioe.getMessage());
@@ -188,12 +211,6 @@ public class RenderQueueConsumer implements GenericListener {
         } catch (PluginException pe) {
             log.error("Failed to initialise plugin: {}", pe.getMessage());
             throw pe;
-        }
-
-        try {
-            messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
         }
     }
 
@@ -203,11 +220,11 @@ public class RenderQueueConsumer implements GenericListener {
      */
     @Override
     public String getId() {
-        return LISTENER_ID;
+        return HARVEST_QUEUE;
     }
 
     /**
-     * Start the queue based on the name identifier
+     * Start the harvest queue consumer
      * 
      * @throws JMSException if an error occurred starting the JMS connections
      */
@@ -217,8 +234,7 @@ public class RenderQueueConsumer implements GenericListener {
     }
 
     /**
-     * Stop the Render Queue Consumer. Including stopping the storage and
-     * indexer
+     * Stop the Harvest Queue consumer. Including: indexer and storage
      */
     @Override
     public void stop() throws Exception {
@@ -285,55 +301,113 @@ public class RenderQueueConsumer implements GenericListener {
                 Thread.currentThread().setPriority(thread.getPriority());
             }
 
-            // Get the message deatils
+            // Incoming message
             String text = ((TextMessage) message).getText();
             JsonSimpleConfig config = new JsonSimpleConfig(text);
             String oid = config.getString(null, "oid");
-            log.info("Received job, object id={}", oid);
+            log.info("Received job, object id='{}'", oid);
 
-            // Get our object from storage
-            object = storage.getObject(oid);
-            sendNotification(oid, "renderStart", "(" + name
-                    + ") Renderer starting : '" + oid + "'");
+            // Simple scenario, delete object
+            boolean deleted = config.getBoolean(false, "deleted");
+            if (deleted) {
+                log.info("Removing object {}...", oid);
+                storage.removeObject(oid);
+                indexer.remove(oid);
+                indexer.annotateRemove(oid);
 
-            // Push through the conveyer belt
-            log.info("Updating object...");
-            object = conveyer.transform(object, config);
-
-            // Index the object
-            log.info("Indexing object...");
-            indexer.index(object.getId());
-            if (autoCommit || config.getBoolean(false, "commit")) {
-                indexer.commit();
+                // Log event
+                sentMessage(oid, "delete");
+                sentMessage(oid, "delete-anotar");
+                return;
             }
+
+            // Retrieve and process the object
+            object = storage.getObject(oid);
+            object = conveyer.transform(object, config);
+            indexObject(config);
+            queueRenderJob(config);
 
             // Log event
             sentMessage(oid, "modify");
 
-            // Finish up
-            sendNotification(oid, "renderComplete", "(" + name
-                    + ") Renderer complete : '" + oid + "'");
-            Properties props = object.getMetadata();
-            props.setProperty("render-pending", "false");
-            object.close();
-
+        } catch (TransformerException tex) {
+            log.error("Error during transformation: {}", tex);
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse.getMessage());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
         } catch (StorageException se) {
             log.error("Failed to update storage: {}", se.getMessage());
-        } catch (TransformerException te) {
-            log.error("Failed to transform object: {}", te.getMessage());
         } catch (IndexerException ie) {
             log.error("Failed to index object: {}", ie.getMessage());
+        } catch (Exception e) {
+            log.error("An unknown error has occurred: {}", e);
         }
+    }
+
+    /**
+     * Arrange for the item specified by the message to be indexed
+     * 
+     * @param message The message received by the queue
+     * @throws JMSException if there was an error sending messages
+     * @throws IndexerException if the solr indexer failed
+     * @throws StorageException if the object's metadata was inaccessible
+     */
+    private void indexObject(JsonSimpleConfig message) throws JMSException,
+            IndexerException, StorageException {
+        // Are we indexing?
+        boolean doIndex = true;
+        Properties props = object.getMetadata();
+        String indexFlag = props.getProperty("indexOnHarvest");
+        if (indexFlag != null) {
+            // The harvest process changed the default
+            doIndex = Boolean.parseBoolean(indexFlag);
+        } else {
+            // Nothing specified, use the default
+            doIndex = message.getBoolean(true, "transformer", "indexOnHarvest");
+        }
+
+        if (doIndex) {
+            String oid = object.getId();
+            sendNotification(oid, "indexStart", "Indexing '" + oid
+                    + "' started");
+            log.info("{} : Indexing object {}...", name, oid);
+            indexer.index(oid);
+            sendNotification(oid, "indexComplete", "Index of '" + oid
+                    + "' completed");
+        }
+    }
+
+    /**
+     * Queue the render job
+     * 
+     * @param message The message received by the queue
+     * @throws JMSException if there was an error posting to the queue
+     * @throws StorageException if the object's metadata was inaccessible
+     */
+    private void queueRenderJob(JsonSimpleConfig message) throws JMSException,
+            StorageException {
+        // What transformations are required at the render step
+        List<String> plugins = ConveyerBelt.getTransformList(object, message,
+                ConveyerBelt.RENDER, true);
+
+        TextMessage msg = session.createTextMessage(message.toString());
+        // 'renderers' is a LinkedHashMap because the key order is significant
+        for (String selector : renderers.keySet()) {
+            if (plugins.contains(selector)) {
+                producer.send(renderers.get(selector), msg);
+                return;
+            }
+        }
+
+        // Default is the fallback
+        producer.send(renderers.get("default"), msg);
     }
 
     /**
      * Send the notification out on the broadcast topic
      * 
-     * @param oid Object id
+     * @param oid Object Id
      * @param status Status of the object
      * @param message Message to be sent
      */
@@ -362,7 +436,7 @@ public class RenderQueueConsumer implements GenericListener {
         param.put("oid", oid);
         param.put("eventType", eventType);
         param.put("username", "system");
-        param.put("context", "RenderQueueConsumer");
+        param.put("context", "HarvestQueueConsumer");
         messaging.onEvent(param);
     }
 

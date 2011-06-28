@@ -16,14 +16,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.subscriber.Subscriber;
-import au.edu.usq.fascinator.api.subscriber.SubscriberException;
-import au.edu.usq.fascinator.common.GenericListener;
-import au.edu.usq.fascinator.common.JsonObject;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.subscriber.Subscriber;
+import com.googlecode.fascinator.api.subscriber.SubscriberException;
+import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.File;
 import java.io.IOException;

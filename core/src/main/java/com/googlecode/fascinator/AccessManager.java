@@ -16,16 +16,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator;
+package com.googlecode.fascinator;
 
-import au.edu.usq.fascinator.api.PluginDescription;
-import au.edu.usq.fascinator.api.PluginException;
-import au.edu.usq.fascinator.api.PluginManager;
-import au.edu.usq.fascinator.api.access.AccessControl;
-import au.edu.usq.fascinator.api.access.AccessControlException;
-import au.edu.usq.fascinator.api.access.AccessControlManager;
-import au.edu.usq.fascinator.api.access.AccessControlSchema;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.access.AccessControl;
+import com.googlecode.fascinator.api.access.AccessControlException;
+import com.googlecode.fascinator.api.access.AccessControlManager;
+import com.googlecode.fascinator.api.access.AccessControlSchema;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
