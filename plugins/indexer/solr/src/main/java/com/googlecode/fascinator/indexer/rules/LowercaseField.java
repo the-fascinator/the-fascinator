@@ -16,7 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.indexer.rules;
+package com.googlecode.fascinator.indexer.rules;
+
+import com.googlecode.fascinator.api.indexer.rule.AddDoc;
+import com.googlecode.fascinator.api.indexer.rule.Field;
+import com.googlecode.fascinator.api.indexer.rule.Rule;
+import com.googlecode.fascinator.api.indexer.rule.RuleException;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -24,32 +29,23 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import au.edu.usq.fascinator.api.indexer.rule.AddDoc;
-import au.edu.usq.fascinator.api.indexer.rule.Field;
-import au.edu.usq.fascinator.api.indexer.rule.Rule;
-import au.edu.usq.fascinator.api.indexer.rule.RuleException;
+public class LowercaseField extends Rule {
 
-public class CopyField extends Rule {
+    private String fieldName;
 
-    private String sourceFieldName;
-
-    private String newFieldName;
-
-    public CopyField(String newFieldName, String sourceFieldName) {
-        super("Copy field");
-        this.newFieldName = newFieldName;
-        this.sourceFieldName = sourceFieldName;
+    public LowercaseField(String fieldName) {
+        super("Lowercase field", false);
+        this.fieldName = fieldName;
     }
 
     @Override
     public void run(Reader in, Writer out) throws RuleException {
-        log("Copying field " + sourceFieldName + " as " + newFieldName);
+        log("Changing '" + fieldName + "' value to lower case");
         try {
             AddDoc addDoc = AddDoc.read(in);
-            List<Field> sourceFields = addDoc.getFields(sourceFieldName);
-            for (Field sourceField : sourceFields) {
-                Field newField = new Field(newFieldName, sourceField.getValue());
-                addDoc.getFields().add(newField);
+            List<Field> fields = addDoc.getFields(fieldName);
+            for (Field field : fields) {
+                field.setValue(field.getValue().toLowerCase());
             }
             addDoc.write(out);
         } catch (JAXBException jaxbe) {

@@ -16,7 +16,9 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.indexer;
+package com.googlecode.fascinator.indexer;
+
+import com.googlecode.fascinator.common.BasicHttpClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +33,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import au.edu.usq.fascinator.common.BasicHttpClient;
 
 public class SolrSearcher {
 

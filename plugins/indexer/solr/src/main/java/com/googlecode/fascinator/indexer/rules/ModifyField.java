@@ -16,18 +16,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.indexer.rules;
+package com.googlecode.fascinator.indexer.rules;
+
+import com.googlecode.fascinator.api.indexer.rule.AddDoc;
+import com.googlecode.fascinator.api.indexer.rule.Field;
+import com.googlecode.fascinator.api.indexer.rule.Rule;
+import com.googlecode.fascinator.api.indexer.rule.RuleException;
 
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
-
-import au.edu.usq.fascinator.api.indexer.rule.AddDoc;
-import au.edu.usq.fascinator.api.indexer.rule.Field;
-import au.edu.usq.fascinator.api.indexer.rule.Rule;
-import au.edu.usq.fascinator.api.indexer.rule.RuleException;
 
 public class ModifyField extends Rule {
 

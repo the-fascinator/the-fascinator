@@ -16,28 +16,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.indexer.rules;
+package com.googlecode.fascinator.indexer.rules;
 
-import java.io.IOException;
+import com.googlecode.fascinator.api.indexer.rule.Rule;
+import com.googlecode.fascinator.api.indexer.rule.RuleException;
+
 import java.io.Reader;
 import java.io.Writer;
 
-import au.edu.usq.fascinator.api.indexer.rule.Rule;
-import au.edu.usq.fascinator.api.indexer.rule.RuleException;
+public class Skip extends Rule {
 
-public class New extends Rule {
+    private String reason;
 
-    public New() {
-        super("New", true);
+    public Skip(String reason) {
+        super("Skip", true);
+        this.reason = reason;
     }
 
     @Override
     public void run(Reader in, Writer out) throws RuleException {
-        //log("Creating new Solr document");
-        try {
-            out.write("<add allowDups=\"false\"><doc/></add>");
-        } catch (IOException ioe) {
-            throw new RuleException("Failed to create new Solr document", ioe);
-        }
+        String msg = "Item will not be indexed: " + reason;
+        log(msg);
+        throw new RuleException(msg);
     }
 }
