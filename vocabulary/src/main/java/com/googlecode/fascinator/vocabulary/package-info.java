@@ -7,10 +7,10 @@
  * <ul>
  * <li>The Nepomuk ontologies and XMP may be found in: org.semanticdesktop.aperture.vocabulary</li>
  * <li>RDF, RDFS, OWL and XSD: org.ontoware.rdf2go.vocabulary</li>
- * <li>BIBO, DC, DCTerms, FOAF and SKOS: au.edu.usq.fascinator.vocabulary</li>
+ * <li>BIBO, DC, DCTerms, FOAF and SKOS: com.googlecode.fascinator.vocabulary</li>
  * </ul>
  * @see <a href="http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/vocabulary">TF wiki</a>
  */
 
-package au.edu.usq.fascinator.vocabulary;
+package com.googlecode.fascinator.vocabulary;
 

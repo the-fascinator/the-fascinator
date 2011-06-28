@@ -7,7 +7,7 @@
         <version>1.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>au.edu.usq.fascinator</groupId>
+    <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-vocabulary</artifactId>
     <name>The Fascinator - Vocabulary Library</name>
     <version>1.0.3-SNAPSHOT</version>
@@ -103,7 +103,7 @@
                         <FOAF>http://xmlns.com/foaf/0.1/</FOAF>
                     </schema>
                     <outputFolder>src/main/java/</outputFolder>
-                    <packageName>au.edu.usq.fascinator.vocabulary</packageName>
+                    <packageName>com.googlecode.fascinator.vocabulary</packageName>
                 </configuration>
             </plugin>
         </plugins>
