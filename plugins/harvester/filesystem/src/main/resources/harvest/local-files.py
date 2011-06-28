@@ -1,6 +1,6 @@
 import time
 
-from au.edu.usq.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.api.storage import StorageException
 
 class IndexData:
     def __init__(self):

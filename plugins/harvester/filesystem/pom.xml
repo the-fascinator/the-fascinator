@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>au.edu.usq.fascinator.plugins</groupId>
-  <artifactId>plugin-harvester-filesystem</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
-  <name>The Fascinator - Plugin - Harvester - File System</name>
-  <description>Performs a batch harvest of any filesystem that can support Java</description>
-  <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/harvester/filesystem</url>
-  <parent>
-    <groupId>au.edu.usq.fascinator</groupId>
-    <artifactId>fascinator-plugins</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.googlecode.the-fascinator.plugins</groupId>
+    <artifactId>plugin-harvester-filesystem</artifactId>
     <version>1.0.3-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
-  <dependencies>
-    <dependency>
-      <groupId>au.edu.usq.fascinator</groupId>
-      <artifactId>fascinator-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>au.edu.usq.fascinator</groupId>
-      <artifactId>fascinator-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>au.edu.usq.fascinator.plugins</groupId>
-      <artifactId>plugin-storage-ram</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Database -->
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <!-- 10.5.3.0 has a buggy POM -->
-      <version>10.5.3.0_1</version>
-    </dependency>
-  </dependencies>
+    <name>The Fascinator - Plugin - Harvester - File System</name>
+    <description>Performs a batch harvest of any filesystem that can support Java</description>
+    <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/harvester/filesystem</url>
+    <parent>
+        <groupId>com.googlecode.the-fascinator</groupId>
+        <artifactId>fascinator-plugins</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>com.googlecode.the-fascinator</groupId>
+            <artifactId>fascinator-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.the-fascinator</groupId>
+            <artifactId>fascinator-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.the-fascinator.plugins</groupId>
+            <artifactId>plugin-storage-ram</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Database -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <!-- 10.5.3.0 has a buggy POM -->
+            <version>10.5.3.0_1</version>
+        </dependency>
+    </dependencies>
 </project>
  

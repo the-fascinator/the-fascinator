@@ -1,5 +1,5 @@
 import md5, os, time
-from au.edu.usq.fascinator.indexer.rules import AddField, New
+from com.googlecode.fascinator.indexer.rules import AddField, New
 from sets import Set
 import org.ontoware.rdf2go as rdf2go
 import java.io as io
