@@ -8,5 +8,5 @@
   <root level="INFO">
     <appender-ref ref="stdout" />
   </root>
-  <logger name="au.edu.usq" level="DEBUG" />
+  <logger name="com.googlecode.fascinator" level="DEBUG" />
 </configuration>

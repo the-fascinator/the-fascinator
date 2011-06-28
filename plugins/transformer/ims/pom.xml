@@ -1,23 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>au.edu.usq.fascinator.plugins</groupId>
+  <groupId>com.googlecode.the-fascinator.plugins</groupId>
   <artifactId>plugin-transformer-ims</artifactId>
   <version>1.0.3-SNAPSHOT</version>
   <name>The Fascinator - Plugin - Transformer - IMS Package</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/transformer/ims</url>
   <parent>
-    <groupId>au.edu.usq.fascinator</groupId>
+    <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
     <version>1.0.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>
     <dependency>
-      <groupId>au.edu.usq.fascinator</groupId>
+      <groupId>com.googlecode.the-fascinator</groupId>
       <artifactId>fascinator-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>au.edu.usq.fascinator</groupId>
+      <groupId>com.googlecode.the-fascinator</groupId>
       <artifactId>fascinator-plugin-api</artifactId>
     </dependency>
     <dependency>
@@ -38,7 +38,7 @@
           </exclusion></exclusions>
     </dependency>
     <dependency>
-      <groupId>au.edu.usq.fascinator.plugins</groupId>
+      <groupId>com.googlecode.the-fascinator.plugins</groupId>
       <artifactId>plugin-storage-ram</artifactId>
       <scope>test</scope>
     </dependency>
@@ -50,7 +50,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.1.1</version>
         <configuration>
-          <mainClass>au.edu.usq.fascinator.transformer.ims.ImsTransformer</mainClass>
+          <mainClass>com.googlecode.the-fascinator.transformer.ims.ImsTransformer</mainClass>
         </configuration>
       </plugin>
     </plugins>
