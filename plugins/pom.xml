@@ -1,42 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>au.edu.usq.fascinator</groupId>
-  <artifactId>fascinator-plugins</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0.3-SNAPSHOT</version>
-  <name>The Fascinator - Plugins</name>
-  <parent>
-    <groupId>au.edu.usq.fascinator</groupId>
-    <artifactId>the-fascinator</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.googlecode.the-fascinator</groupId>
+    <artifactId>fascinator-plugins</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.3-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <modules>
-    <module>access/derby</module>
-    <module>authentication/internal</module>
-    <module>authentication/filesystem</module>
-    <module>harvester/filesystem</module>
-    <module>harvester/ice2</module>
-    <module>harvester/oai-pmh</module>
-    <module>harvester/solrmarc</module>
-    <module>harvester/workflow</module>
-    <module>indexer/solr</module>
-    <module>roles/internal</module>
-    <module>storage/filesystem</module>
-    <module>storage/ram</module>
-    <module>transformer/aperture</module>
-    <module>transformer/ffmpeg</module>
-    <module>transformer/ice2</module>
-    <module>transformer/ims</module>
-    <module>transformer/solrmarc</module>
-    <module>transformer/jython</module>
-    <module>subscriber/solrEventLog</module>
-    <!-- TODO The following modules need to be updated to new Storage API -->
-    <!--
-    <module>harvester/jsonq</module>
-    <module>storage/couchdb</module>
-    <module>storage/fedora3</module>
-    -->
-  </modules>
+    <name>The Fascinator - Plugins</name>
+    <parent>
+        <groupId>com.googlecode.the-fascinator</groupId>
+        <artifactId>the-fascinator</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modules>
+        <module>access/derby</module>
+        <module>authentication/internal</module>
+        <module>authentication/filesystem</module>
+        <module>harvester/filesystem</module>
+        <module>harvester/oai-pmh</module>
+        <module>harvester/workflow</module>
+        <module>indexer/solr</module>
+        <module>roles/internal</module>
+        <module>storage/filesystem</module>
+        <module>storage/ram</module>
+        <module>subscriber/solrEventLog</module>
+        <module>transformer/aperture</module>
+        <module>transformer/ffmpeg</module>
+        <module>transformer/ice2</module>
+        <module>transformer/ims</module>
+        <module>transformer/jython</module>
+        <!-- TODO The following modules need to be updated to new Storage API -->
+        <!--
+        <module>harvester/jsonq</module>
+        <module>storage/couchdb</module>
+        <module>storage/fedora3</module>
+        -->
+    </modules>
 </project>
