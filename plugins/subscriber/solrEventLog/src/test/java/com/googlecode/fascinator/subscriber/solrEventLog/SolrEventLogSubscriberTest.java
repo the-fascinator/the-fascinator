@@ -1,4 +1,4 @@
-package au.edu.usq.fascinator.subscriber.solrEventLog;
+package com.googlecode.fascinator.subscriber.solrEventLog;
 
 import org.junit.Test;
 

@@ -16,14 +16,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.subscriber.solrEventLog;
+package com.googlecode.fascinator.subscriber.solrEventLog;
 
-import au.edu.usq.fascinator.api.PluginDescription;
-import au.edu.usq.fascinator.api.PluginException;
-import au.edu.usq.fascinator.api.authentication.AuthenticationException;
-import au.edu.usq.fascinator.api.subscriber.Subscriber;
-import au.edu.usq.fascinator.api.subscriber.SubscriberException;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.authentication.AuthenticationException;
+import com.googlecode.fascinator.api.subscriber.Subscriber;
+import com.googlecode.fascinator.api.subscriber.SubscriberException;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.File;
 import java.io.IOException;
