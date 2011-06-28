@@ -16,12 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package au.edu.usq.fascinator.roles.internal;
+package com.googlecode.fascinator.roles.internal;
 
-import au.edu.usq.fascinator.api.PluginDescription;
-import au.edu.usq.fascinator.api.roles.Roles;
-import au.edu.usq.fascinator.api.roles.RolesException;
-import au.edu.usq.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.roles.Roles;
+import com.googlecode.fascinator.api.roles.RolesException;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 import java.io.File;
 import java.io.FileInputStream;
