@@ -57,7 +57,7 @@ if running; then
 			-f $PROG_DIR/core/pom.xml \
 			-P dev \
 			-Dexec.args=$JSON_FILE \
-			-Dexec.mainClass=au.edu.usq.fascinator.HarvestClient \
+			-Dexec.mainClass=com.googlecode.fascinator.HarvestClient \
 			exec:java &> $TF_HOME/logs/harvest.out
 		echo "   - Finished on `date`"
 		echo "   - Log file: $TF_HOME/logs/harvest.out"

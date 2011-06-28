@@ -24,7 +24,7 @@ if not exist "%BASE_FILE%" goto notfound
 REM escape slashes for exec.args
 set BASE_FILE=%BASE_FILE:\=\\%
 pushd "%TF_HOME%\core"
-call mvn -P dev -Dexec.args="%BASE_FILE%" -Dexec.mainClass=au.edu.usq.fascinator.HarvestClient exec:java > "%FASCINATOR_HOME%/logs/harvest.out"
+call mvn -P dev -Dexec.args="%BASE_FILE%" -Dexec.mainClass=com.googlecode.fascinator.HarvestClient exec:java > "%FASCINATOR_HOME%/logs/harvest.out"
 popd
 goto end
 

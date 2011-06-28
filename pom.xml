@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>au.edu.usq.fascinator</groupId>
+    <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>the-fascinator</artifactId>
     <packaging>pom</packaging>
     <name>The Fascinator</name>
     <version>1.0.3-SNAPSHOT</version>
     <parent>
-        <groupId>au.edu.usq.fascinator</groupId>
+        <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>organisation</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
     </parent>
     <description>
         The Fascinator platform is a set of components that can be
@@ -40,117 +40,117 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>au.edu.usq.fascinator</groupId>
+                <groupId>com.googlecode.the-fascinator</groupId>
                 <artifactId>fascinator-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator</groupId>
+                <groupId>com.googlecode.the-fascinator</groupId>
                 <artifactId>fascinator-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator</groupId>
+                <groupId>com.googlecode.the-fascinator</groupId>
                 <artifactId>fascinator-plugin-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator</groupId>
+                <groupId>com.googlecode.the-fascinator</groupId>
                 <artifactId>fascinator-vocabulary</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-access-derby</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-authentication-filesystem</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-authentication-internal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-roles-internal</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-storage-filesystem</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-harvester-jsonq</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-harvester-filesystem</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-harvester-ice2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-harvester-workflow</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-storage-ram</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-indexer-solr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-aperture</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-ffmpeg</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-ice2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-ims</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-solrmarc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-transformer-jython</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-harvester-oai-pmh</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>au.edu.usq.fascinator.plugins</groupId>
+                <groupId>com.googlecode.the-fascinator.plugins</groupId>
                 <artifactId>plugin-subscriber-solrEventLog</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -270,19 +270,10 @@
         </plugins>
     </build>
     <repositories>
-        <repository>
-            <id>fascinator-releases</id>
-            <url>https://fascinator.usq.edu.au/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+        <!-- Snapshots are not synched with Maven central -->
         <repository>
             <id>fascinator-snapshots</id>
-            <url>https://fascinator.usq.edu.au/nexus/content/groups/public-snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -291,28 +282,6 @@
             </snapshots>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>fascinator-releases</id>
-            <url>https://fascinator.usq.edu.au/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>fascinator-snapshots</id>
-            <url>https://fascinator.usq.edu.au/nexus/content/groups/public-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
     <distributionManagement>
         <site>
             <id>fascinator</id>
