@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common import JsonSimple
 from java.io import File
 from java.util import LinkedHashMap
 from org.apache.commons.lang.text import StrSubstitutor

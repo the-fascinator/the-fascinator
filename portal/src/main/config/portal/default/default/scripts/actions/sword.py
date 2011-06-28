@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.portal import SwordSimpleServer
+from com.googlecode.fascinator.portal import SwordSimpleServer
 from java.io import File
 from java.lang import Exception
 from org.apache.commons.io import FileUtils

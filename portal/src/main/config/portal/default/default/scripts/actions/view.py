@@ -1,5 +1,5 @@
-from au.edu.usq.fascinator.common import JsonSimple
-from au.edu.usq.fascinator.portal import Portal
+from com.googlecode.fascinator.common import JsonSimple
+from com.googlecode.fascinator.portal import Portal
 from java.lang import Exception
 
 class ViewData:

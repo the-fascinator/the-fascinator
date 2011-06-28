@@ -1,7 +1,7 @@
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator import HarvestClient
-from au.edu.usq.fascinator.common import JsonSimpleConfig
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator import HarvestClient
+from com.googlecode.fascinator.common import JsonSimpleConfig
 
 from java.io import File, ByteArrayInputStream, ByteArrayOutputStream
 

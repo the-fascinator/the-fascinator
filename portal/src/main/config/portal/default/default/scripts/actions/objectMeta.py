@@ -1,5 +1,5 @@
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator.common import JsonObject
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.common import JsonObject
 
 class ObjectMetaData:
     def __activate__(self, context):

@@ -1,11 +1,11 @@
 import array, md5, os
 
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.api.storage import Payload, PayloadType
-from au.edu.usq.fascinator.api import PluginManager
-from au.edu.usq.fascinator.common import JsonConfig, JsonConfigHelper
-from au.edu.usq.fascinator.common.storage.impl import GenericPayload
-from au.edu.usq.fascinator.portal import Pagination, Portal
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.api.storage import Payload, PayloadType
+from com.googlecode.fascinator.api import PluginManager
+from com.googlecode.fascinator.common import JsonConfig, JsonConfigHelper
+from com.googlecode.fascinator.common.storage.impl import GenericPayload
+from com.googlecode.fascinator.portal import Pagination, Portal
 
 from java.io import ByteArrayInputStream, ByteArrayOutputStream, File, StringWriter
 from java.lang import Boolean

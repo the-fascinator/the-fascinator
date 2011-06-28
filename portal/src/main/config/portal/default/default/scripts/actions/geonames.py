@@ -1,7 +1,7 @@
-import au.edu.usq.fascinator.common.BasicHttpClient as BasicHttpClient
+import com.googlecode.fascinator.common.BasicHttpClient as BasicHttpClient
 import org.apache.commons.httpclient.methods.GetMethod as GetMethod
 
-from au.edu.usq.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common import JsonSimple
 
 class GeonamesData:
     def __init__(self):

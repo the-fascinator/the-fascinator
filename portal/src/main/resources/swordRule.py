@@ -1,13 +1,13 @@
 import md5, os, time
-from au.edu.usq.fascinator.indexer.rules import AddField, New
+from com.googlecode.fascinator.indexer.rules import AddField, New
 from org.dom4j.io import SAXReader
 
-from au.edu.usq.fascinator.common.nco import Contact
-from au.edu.usq.fascinator.common.nfo import PaginatedTextDocument
-from au.edu.usq.fascinator.common.nid3 import ID3Audio
-from au.edu.usq.fascinator.common.nie import InformationElement
+from com.googlecode.fascinator.common.nco import Contact
+from com.googlecode.fascinator.common.nfo import PaginatedTextDocument
+from com.googlecode.fascinator.common.nid3 import ID3Audio
+from com.googlecode.fascinator.common.nie import InformationElement
 
-from au.edu.usq.fascinator.common.ctag import Tag, TaggedContent
+from com.googlecode.fascinator.common.ctag import Tag, TaggedContent
 
 #
 # Available objects:

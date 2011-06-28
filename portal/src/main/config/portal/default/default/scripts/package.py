@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.common import JsonObject, JsonSimple, JsonSimpleConfig
+from com.googlecode.fascinator.common import JsonObject, JsonSimple, JsonSimpleConfig
 
 ##### Debugging
 #from java.awt import FlowLayout

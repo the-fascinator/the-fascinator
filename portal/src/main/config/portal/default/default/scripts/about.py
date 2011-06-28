@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.api import PluginManager
+from com.googlecode.fascinator.api import PluginManager
 from java.io import StringWriter
 from org.apache.commons.io import IOUtils
 

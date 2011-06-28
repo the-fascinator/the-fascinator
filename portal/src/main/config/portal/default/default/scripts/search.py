@@ -1,10 +1,10 @@
 import md5
 import os.path
 
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.common import Manifest
-from au.edu.usq.fascinator.common.solr import SolrResult
-from au.edu.usq.fascinator.portal import Pagination
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.common import Manifest
+from com.googlecode.fascinator.common.solr import SolrResult
+from com.googlecode.fascinator.portal import Pagination
 
 from java.io import ByteArrayInputStream
 from java.io import ByteArrayOutputStream

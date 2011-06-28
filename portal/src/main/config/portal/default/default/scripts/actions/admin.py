@@ -1,5 +1,5 @@
 import sys
-from au.edu.usq.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.api.storage import StorageException
 
 class AdminData:
 

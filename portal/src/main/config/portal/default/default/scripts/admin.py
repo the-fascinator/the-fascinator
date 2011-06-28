@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common import JsonSimple
 
 class AdminData:
 

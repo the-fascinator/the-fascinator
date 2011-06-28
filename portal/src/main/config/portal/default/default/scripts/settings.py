@@ -1,6 +1,6 @@
-from au.edu.usq.fascinator.api import PluginManager
-from au.edu.usq.fascinator.common import JsonSimpleConfig
-from au.edu.usq.fascinator.portal import Portal
+from com.googlecode.fascinator.api import PluginManager
+from com.googlecode.fascinator.common import JsonSimpleConfig
+from com.googlecode.fascinator.portal import Portal
 
 from java.io import File
 from java.util import HashMap

@@ -1,5 +1,5 @@
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator.common import Manifest, JsonObject
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.common import Manifest, JsonObject
 
 from java.lang import Exception
 from java.util import ArrayList, HashMap

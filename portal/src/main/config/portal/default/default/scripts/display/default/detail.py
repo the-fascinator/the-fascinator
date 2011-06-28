@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common import JsonSimple
 from java.io import ByteArrayOutputStream
 from java.util import ArrayList
 from org.apache.commons.io import IOUtils

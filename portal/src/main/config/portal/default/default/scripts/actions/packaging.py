@@ -1,9 +1,9 @@
 import uuid
 
-from au.edu.usq.fascinator import HarvestClient
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator.common import FascinatorHome, JsonSimpleConfig, Manifest
-from au.edu.usq.fascinator.common.storage import StorageUtils
+from com.googlecode.fascinator import HarvestClient
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.common import FascinatorHome, JsonSimpleConfig, Manifest
+from com.googlecode.fascinator.common.storage import StorageUtils
 
 from java.io import File, FileOutputStream, OutputStreamWriter
 from java.lang import Exception

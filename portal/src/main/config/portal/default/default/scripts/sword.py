@@ -2,13 +2,13 @@
 #import org.apache.commons.httpclient.auth.AuthChallengeProcessor as AuthChallengeProcessor
 #import org.apache.commons.httpclient.HttpMethodDirector as HttpMethodDirector
 
-from au.edu.usq.fascinator import QueueStorage
-from au.edu.usq.fascinator.api import PluginManager
-from au.edu.usq.fascinator.common import JsonConfig
-from au.edu.usq.fascinator.common import JsonConfigHelper
-from au.edu.usq.fascinator.common.storage.impl import GenericDigitalObject
-from au.edu.usq.fascinator.common.storage.impl import FilePayload
-from au.edu.usq.fascinator.portal import SwordSimpleServer
+from com.googlecode.fascinator import QueueStorage
+from com.googlecode.fascinator.api import PluginManager
+from com.googlecode.fascinator.common import JsonConfig
+from com.googlecode.fascinator.common import JsonConfigHelper
+from com.googlecode.fascinator.common.storage.impl import GenericDigitalObject
+from com.googlecode.fascinator.common.storage.impl import FilePayload
+from com.googlecode.fascinator.portal import SwordSimpleServer
 
 from java.io import File
 from java.io import FileOutputStream

@@ -4,10 +4,10 @@
     <display-name>The Fascinator - Portal</display-name>
     <context-param>
         <param-name>tapestry.app-package</param-name>
-        <param-value>au.edu.usq.fascinator.portal</param-value>
+        <param-value>com.googlecode.fascinator.portal</param-value>
     </context-param>
     <listener>
-        <listener-class>au.edu.usq.fascinator.portal.servlet.IndexerServletContextListener</listener-class>
+        <listener-class>com.googlecode.fascinator.portal.servlet.IndexerServletContextListener</listener-class>
     </listener>
     <!-- URL Rewrite -->
     <filter>
@@ -42,7 +42,7 @@
     <!-- Indexer service -->
     <servlet>
         <servlet-name>indexer</servlet-name>
-        <servlet-class>au.edu.usq.fascinator.portal.servlet.IndexerServlet</servlet-class>
+        <servlet-class>com.googlecode.fascinator.portal.servlet.IndexerServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <!-- ActiveMQ AJAX messaging service -->

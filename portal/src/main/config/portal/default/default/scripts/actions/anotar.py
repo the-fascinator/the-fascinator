@@ -1,10 +1,10 @@
 import re, time, json2 as json
 
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator.common import JsonSimple
-from au.edu.usq.fascinator.common.solr import SolrResult
-from au.edu.usq.fascinator.common.storage import StorageUtils
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common.solr import SolrResult
+from com.googlecode.fascinator.common.storage import StorageUtils
 
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 

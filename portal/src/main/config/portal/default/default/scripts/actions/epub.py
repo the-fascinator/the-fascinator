@@ -1,5 +1,5 @@
-from au.edu.usq.fascinator.api.storage import Payload
-from au.edu.usq.fascinator.common import JsonSimple
+from com.googlecode.fascinator.api.storage import Payload
+from com.googlecode.fascinator.common import JsonSimple
 
 from java.io import ByteArrayOutputStream
 from java.lang import Exception, String

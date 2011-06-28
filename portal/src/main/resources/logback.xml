@@ -29,6 +29,6 @@
   <root level="INFO">
     <appender-ref ref="SIFT" />
   </root>
-  <logger name="au.edu.usq" level="DEBUG" />
+  <logger name="com.googlecode" level="DEBUG" />
   <logger name="org.apache.activemq" level="INFO" />
 </configuration>

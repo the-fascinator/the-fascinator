@@ -1,6 +1,6 @@
-from au.edu.usq.fascinator.api.access import AccessControlException;
-from au.edu.usq.fascinator.api.authentication import AuthenticationException;
-from au.edu.usq.fascinator.api.roles import RolesException;
+from com.googlecode.fascinator.api.access import AccessControlException;
+from com.googlecode.fascinator.api.authentication import AuthenticationException;
+from com.googlecode.fascinator.api.roles import RolesException;
 
 class AuthenticationData:
     active_access_plugin = None

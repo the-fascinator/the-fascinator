@@ -1,8 +1,8 @@
 import os.path, urllib
 
-from au.edu.usq.fascinator.common import JsonSimple
-from au.edu.usq.fascinator.api.storage import PayloadType
-from au.edu.usq.fascinator.ims import FileType, ItemType, ManifestType, \
+from com.googlecode.fascinator.common import JsonSimple
+from com.googlecode.fascinator.api.storage import PayloadType
+from com.googlecode.fascinator.ims import FileType, ItemType, ManifestType, \
     MetadataType, ObjectFactory, OrganizationType, OrganizationsType, \
     ResourceType, ResourcesType
 
@@ -49,7 +49,7 @@ class ImscpData:
     def __createPackage(self, outputFile=None):
         title = self.__manifest.getString(None, "title")
         manifest = self.__createManifest()
-        context = JAXBContext.newInstance("au.edu.usq.fascinator.ims")
+        context = JAXBContext.newInstance("com.googlecode.fascinator.ims")
         m = context.createMarshaller()
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, True)
         writer = StringWriter()

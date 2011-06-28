@@ -2,10 +2,10 @@ import random, time
 
 from datetime import datetime
 
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.api.storage import StorageException
-from au.edu.usq.fascinator.common import JsonSimpleConfig
-from au.edu.usq.fascinator.common.solr import SolrResult
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.api.storage import StorageException
+from com.googlecode.fascinator.common import JsonSimpleConfig
+from com.googlecode.fascinator.common.solr import SolrResult
 
 from java.io import BufferedReader
 from java.io import ByteArrayInputStream

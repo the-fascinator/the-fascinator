@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.common import JsonSimpleConfig, JsonSimple, JsonObject
+from com.googlecode.fascinator.common import JsonSimpleConfig, JsonSimple, JsonObject
 from java.io import FileWriter
 from org.apache.commons.lang import StringUtils
 

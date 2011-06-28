@@ -1,4 +1,4 @@
-import au.edu.usq.fascinator.common.BasicHttpClient as BasicHttpClient
+import com.googlecode.fascinator.common.BasicHttpClient as BasicHttpClient
 
 import org.apache.commons.httpclient.methods.DeleteMethod as DeleteMethod
 import org.apache.commons.httpclient.methods.GetMethod as GetMethod

@@ -1,4 +1,4 @@
-from au.edu.usq.fascinator.api import PluginManager
+from com.googlecode.fascinator.api import PluginManager
 
 class HarvestData:
     

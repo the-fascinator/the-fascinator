@@ -1,9 +1,9 @@
 import htmlentitydefs
 
-from au.edu.usq.fascinator.api.storage import PayloadType, StorageException
-from au.edu.usq.fascinator.api.indexer import SearchRequest
-from au.edu.usq.fascinator.common import FascinatorHome, Manifest
-from au.edu.usq.fascinator.common.solr import SolrResult
+from com.googlecode.fascinator.api.storage import PayloadType, StorageException
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.common import FascinatorHome, Manifest
+from com.googlecode.fascinator.common.solr import SolrResult
 
 from com.sun.syndication.feed.atom import Content
 from com.sun.syndication.propono.atom.client import AtomClientFactory, BasicAuthStrategy
