@@ -42,7 +42,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.6</version>
+            <version>1.8.3</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -176,20 +176,13 @@
             <artifactId>JOpenId</artifactId>
             <version>1.08</version>
         </dependency>
-        <dependency>
-            <groupId>org.dspace.dependencies.solr</groupId>
-            <artifactId>dspace-solr-webapp</artifactId>
-            <version>1.4.1.0</version>
-            <classifier>classes</classifier>
-            <type>jar</type>
-        </dependency>
     </dependencies>
     <profiles>
         <profile>
             <id>solr-webapp</id>
             <activation>
                 <file>
-                    <missing>${basedir}/target/dependency/dspace-solr-1.4.1.0.war</missing>
+                    <missing>${basedir}/target/dependency/solr-3.3.0.war</missing>
                 </file>
             </activation>
             <build>
@@ -209,9 +202,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.dspace</groupId>
-                                    <artifactId>dspace-solr</artifactId>
-                                    <version>1.4.1.0</version>
+                                    <groupId>org.apache.solr</groupId>
+                                    <artifactId>solr</artifactId>
+                                    <version>3.3.0</version>
                                     <type>war</type>
                                 </artifactItem>
                             </artifactItems>
@@ -420,7 +413,7 @@
                             </webAppConfig>
                             <contextHandlers>
                                 <contextHandler implementation="org.mortbay.jetty.webapp.WebAppContext">
-                                    <war>${basedir}/target/dependency/dspace-solr-1.4.1.0.war</war>
+                                    <war>${basedir}/target/dependency/solr-3.3.0.war</war>
                                     <contextPath>/solr</contextPath>
                                 </contextHandler>
                             </contextHandlers>

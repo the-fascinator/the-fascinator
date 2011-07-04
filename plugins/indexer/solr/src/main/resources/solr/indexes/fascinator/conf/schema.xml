@@ -178,8 +178,10 @@
     <field name="f_dc_rights" type="string" indexed="true" stored="false" multiValued="true" />
     <field name="f_dc_source" type="string" indexed="true" stored="false" multiValued="true" />
     <field name="f_dc_subject" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="f_dc_title" type="string" indexed="true" stored="false" multiValued="true" />
     <field name="f_dc_type" type="string" indexed="true" stored="false" multiValued="true" />
+
+    <!-- Faceted but sortable ie. non-multivalued -->
+    <field name="f_dc_title" type="string" indexed="true" stored="false" />
 
     <!--
       Dynamic field definitions. If a field name is not found, dynamicFields
