@@ -57,8 +57,6 @@
         "sort-fields": {
             "last_modified": "Last modified",
             "f_dc_title": "Title",
-            "f_dc_creator": "Creator",
-            "f_dc_subject": "Subject",
             "f_dc_type": "Type"
         }
     }

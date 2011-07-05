@@ -88,7 +88,7 @@ class IndexData:
             name = "dc_" + node.getName()
             text = node.getTextTrim()
             self.utils.add(self.index, name, text)
-            # Make sure we get the title and description just for the Fascanator
+            # Make sure we get the title and description just for the Fascinator
             if name == "dc_title":
                 self.utils.add(self.index, "title", text)
             if name == "dc_description":

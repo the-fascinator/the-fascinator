@@ -161,8 +161,9 @@
     <field name="dc_rights" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="dc_source" type="text" indexed="true" stored="true" multiValued="true" />
     <field name="dc_subject" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="dc_title" type="text" indexed="true" stored="true" multiValued="true" />
-    <field name="dc_type" type="text" indexed="true" stored="true" multiValued="true" />
+    <!-- sortable ie. non-multi-valued -->
+    <field name="dc_title" type="text" indexed="true" stored="true" />
+    <field name="dc_type" type="text" indexed="true" stored="true" />
 
     <!-- faceted -->
     <field name="f_dc_contributor" type="string" indexed="true" stored="false" multiValued="true" />
@@ -178,10 +179,10 @@
     <field name="f_dc_rights" type="string" indexed="true" stored="false" multiValued="true" />
     <field name="f_dc_source" type="string" indexed="true" stored="false" multiValued="true" />
     <field name="f_dc_subject" type="string" indexed="true" stored="false" multiValued="true" />
-    <field name="f_dc_type" type="string" indexed="true" stored="false" multiValued="true" />
 
     <!-- Faceted but sortable ie. non-multivalued -->
     <field name="f_dc_title" type="string" indexed="true" stored="false" />
+    <field name="f_dc_type" type="string" indexed="true" stored="false" />
 
     <!--
       Dynamic field definitions. If a field name is not found, dynamicFields

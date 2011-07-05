@@ -156,7 +156,7 @@ class IndexData:
         self.utils.removeAccessSchema(schema, "derby")
 
     def __metadata(self):
-        self.titleList = ["New package"]
+        self.title = None
         self.descriptionList = []
         self.creatorList = []
         self.creationDate = []
@@ -175,14 +175,14 @@ class IndexData:
         self.__filePath()
 
         # Some defaults if the above failed
-        if self.titleList == []:
-           self.titleList.append(self.object.getSourceId())
+        if self.title is None:
+           self.title = "New package"
         if self.formatList == []:
             source = self.object.getPayload(self.object.getSourceId())
             self.formatList.append(source.getContentType())
 
         # Index our metadata finally
-        self.__indexList("dc_title", self.titleList)
+        self.utils.add(self.index, "dc_title", self.title)
         self.__indexList("dc_creator", self.creatorList)  #no dc_author in schema.xml, need to check
         self.__indexList("dc_contributor", self.contributorList)
         self.__indexList("dc_description", self.descriptionList)
@@ -201,7 +201,10 @@ class IndexData:
             self.utils.registerNamespace("dc", "http://purl.org/dc/elements/1.1/")
             dcXml = self.utils.getXmlDocument(dcPayload)
             if dcXml is not None:
-                self.titleList = self.__getNodeValues(dcXml, "//dc:title")
+                titleList = self.__getNodeValues(dcXml, "//dc:title")
+                for dcTitle in titleList:
+                    if self.title is None:
+                        self.title = dcTitle
                 self.descriptionList = self.__getNodeValues(dcXml, "//dc:description")
                 self.creatorList = self.__getNodeValues(dcXml, "//dc:creator")
                 self.contributorList = self.__getNodeValues(dcXml, "//dc:contributor")
@@ -241,20 +244,18 @@ class IndexData:
             container = RDFContainerImpl(rdfModel, rdfId)
 
             # 1. get title only if no title returned by ICE
-            if self.titleList == []:
+            if self.title is None:
                 titleCollection = container.getAll(NIE.title)
                 iterator = titleCollection.iterator()
-                while iterator.hasNext():
+                while iterator.hasNext() and self.title is None:
                     node = iterator.next()
-                    result = str(node).strip()
-                    self.titleList.append(result)
+                    self.title = str(node).strip()
 
                 titleCollection = container.getAll(NID3.title)
                 iterator = titleCollection.iterator()
-                while iterator.hasNext():
+                while iterator.hasNext() and self.title is None:
                     node = iterator.next()
-                    result = str(node).strip()
-                    self.titleList.append(result)
+                    self.title = str(node).strip()
 
             # 2. get creator only if no creator returned by ICE
             if self.creatorList == []:
@@ -419,9 +420,11 @@ class IndexData:
             coreFields = ["title", "creator", "contributor", "description", "format", "creationDate"]
             if formData is not None:
                 # Core fields
-                title = formData.getStringList(["title"])
-                if title:
-                    self.titleList = title
+                formTitles = formData.getStringList(["title"])
+                if formTitles:
+                    for formTitle in formTitles:
+                        if self.title is None:
+                            self.title = formTitle
                 creator = formData.getStringList(["creator"])
                 if creator:
                     self.creatorList = creator
