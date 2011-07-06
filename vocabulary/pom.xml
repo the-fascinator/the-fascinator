@@ -93,7 +93,7 @@
             <plugin>
                 <groupId>com.googlecode.the-fascinator.maven-plugins</groupId>
                 <artifactId>schemagen</artifactId>
-                <version>0.0.2-SNAPSHOT</version>
+                <version>0.0.2</version>
                 <configuration>
                     <schema>
                         <DC>http://purl.org/dc/elements/1.1/</DC>
@@ -125,17 +125,17 @@
         </repository>
         <!-- Needed for aperture-* artifacts -->
         <repository>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
             <id>aperture-repo</id>
             <name>Aperture Dependencies Repo</name>
             <url>http://aperture.sf.net/maven</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 </project>
