@@ -4,12 +4,12 @@
     <groupId>com.googlecode.the-fascinator.plugins</groupId>
     <artifactId>plugin-indexer-solr</artifactId>
     <name>The Fascinator - Plugin - Indexer - Solr</name>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/indexer/solr</url>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>fascinator-plugins</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <dependencies>
