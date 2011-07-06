@@ -5,11 +5,11 @@
     <artifactId>fascinator-portal</artifactId>
     <packaging>war</packaging>
     <name>The Fascinator - Portal</name>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>the-fascinator</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
