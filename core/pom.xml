@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-core</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <name>The Fascinator - Core</name>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>the-fascinator</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>

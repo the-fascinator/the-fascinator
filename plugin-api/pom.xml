@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.the-fascinator</groupId>
   <artifactId>fascinator-plugin-api</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <name>The Fascinator - Plugin API</name>
   <description>https://sites.google.com/site/fascinatorhome/home/documentation/technical/documents/plugin-api</description>
   <parent>
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>the-fascinator</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <dependencies>
