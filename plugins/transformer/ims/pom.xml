@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>
