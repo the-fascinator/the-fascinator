@@ -1,0 +1,14 @@
+#if(!$previews.isEmpty())
+    <div id="preview-menu">
+        #set($menuTitle = "Previews")
+        #parseTemplate("wrapping/main-menu-open.vm")
+        <ul class="menu">
+            <li><a href="$portalPath/detail/$oid/">$parent.object.getPayload($parent.object.sourceId).label</a></li>
+            #foreach($pid in $previews)
+                #set($label = $parent.object.getPayload($pid).label)
+                <li><a href="$portalPath/detail/$oid/$pid?download=false">$label</a></li>
+            #end
+        </ul>
+        #parseTemplate("wrapping/main-menu-close.vm")
+    </div>
+#end

@@ -1,0 +1,5 @@
+<div id="anno-root" class="content-preview">
+    <div rel="${oid}-tags">
+        <div class="object-tag-list">Tags: <span class="object-tags"></span></div>
+        ##<div class="location-tag-list">Location: <span class="location-tags"></span></div>
+    </div>

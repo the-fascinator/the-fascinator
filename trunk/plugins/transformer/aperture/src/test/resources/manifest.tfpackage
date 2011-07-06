@@ -1,0 +1,27 @@
+{
+  "title" : "New package",
+  "viewId" : "photos",
+  "manifest" : {
+    "node-0d7257296968387328217f8102293ffd" : {
+      "id" : "0d7257296968387328217f8102293ffd",
+      "title" : "funny-pictures-cat-has-experience-writing-computer-code.jpg"
+    },
+    "node-dc370f845c45532184b5d345d776658d" : {
+      "id" : "dc370f845c45532184b5d345d776658d",
+      "title" : "Pensive Parakeet.jpg"
+    },
+    "node-251f2e177713331360d78fc0415e6bdf" : {
+      "id" : "251f2e177713331360d78fc0415e6bdf",
+      "title" : "PNG_transparency_demonstration_1.png"
+    },
+    "node-7809fb83c5e20e64d5575cbde75cc5e7" : {
+      "id" : "7809fb83c5e20e64d5575cbde75cc5e7",
+      "title" : "Costa Rican Frog.jpg"
+    },
+    "node-d20f097c64225cede6c892751f1a96d2" : {
+      "id" : "d20f097c64225cede6c892751f1a96d2",
+      "title" : "Boston City Flow.jpg"
+    }
+  },
+  "packageType" : "default"
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema name="anotar" version="1.1">
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true" />
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true" />
+
+    <!-- date field format: 1995-12-31T23:59:59(.999)Z -->
+    <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true" />
+
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory" />
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1" />
+        <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory" />
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory" />
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1" />
+        <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory" />
+      </analyzer>
+    </fieldType>
+  </types>
+
+  <fields>
+    <field name="schemaVersion" type="string" indexed="true" stored="true" />
+    <field name="clientVersion" type="string" indexed="true" stored="true" />
+    <field name="id" type="string" indexed="true" stored="true" />
+    <field name="uri" type="string" indexed="true" stored="true" />
+    <field name="type" type="string" indexed="true" stored="true" />
+    <field name="titleLiteral" type="string" indexed="true" stored="true" />
+    <field name="titleUri" type="string" indexed="true" stored="true" />
+    <field name="annotatesLiteral" type="string" indexed="true" stored="true" />
+    <field name="annotatesUri" type="string" indexed="true" stored="true" />
+    <field name="rootUri" type="string" indexed="true" stored="true" />
+    <field name="locators" type="string" indexed="false" stored="true" multiValued="true" />
+    <field name="locatorValue" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="locatorContent" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="creatorLiteral" type="string" indexed="true" stored="true" />
+    <field name="creatorUri" type="string" indexed="true" stored="true" />
+    <field name="creatorEmail" type="string" indexed="true" stored="true" />
+    <field name="creatorEmailMd5" type="string" indexed="true" stored="true" />
+    <field name="dateCreated" type="date" indexed="true" stored="true" />
+    <field name="tzCreated" type="string" indexed="true" stored="true" />
+    <field name="dateModified" type="date" indexed="true" stored="true" />
+    <field name="tzModified" type="string" indexed="true" stored="true" />
+    <field name="contentType" type="string" indexed="true" stored="true" />
+    <field name="contentLiteral" type="text" indexed="true" stored="true" />
+    <field name="isPrivate" type="boolean" indexed="true" stored="true" />
+    <field name="lang" type="string" indexed="true" stored="true" />
+    <field name="jsonString" type="string" indexed="false" stored="true" />
+  </fields>
+
+  <uniqueKey>uri</uniqueKey>
+  <defaultSearchField>contentLiteral</defaultSearchField>
+  <solrQueryParser defaultOperator="OR" />
+</schema>

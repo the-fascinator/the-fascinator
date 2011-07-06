@@ -1,0 +1,28 @@
+#set($menuTitle = "Navigation")
+#parseTemplate("wrapping/main-menu-open.vm")
+<div id="package-toc"></div>
+#parseTemplate("wrapping/main-menu-close.vm")
+
+<script type="text/javascript" src="$portalPath/js/tree/jquery.tree.min.js"></script>
+
+#####################
+#### NOTE: Swap custom-dev.vm for this file if you want the un-minified code
+#####################
+###<script type="text/javascript" src="$portalPath/js/rvt.js"></script>
+<script type="text/javascript" src="$portalPath/js/rvt.min.js"></script>
+
+<script type="text/javascript">
+<!--
+$(function(){$("#open-this, #reharvest-this").parent().remove();if($("#actions-menu ul.menu li").length==0){$("#actions-menu").hide();}
+var isTocPage=/^(blank|package)-/;function setupTocPage(id,node){var rawId=id.replace(isTocPage,"");$(".package-content").html("");$(".package-content").append('<div id="'+rawId+'-content"></div>');var dest=$("#"+rawId+"-content");var source=$(node).find(" > ul");source.clone(true).appendTo(dest);$(dest).find("ul li a").each(function(count,item){$(item).attr("href","#"+$(item).parent().attr("id"));});}
+function fixLinks(content,selector,attrName,oid){content.find(selector).each(function(count,item){item=jQ(item);var attr=item.attr(attrName);if(attr!=null){var href=window.location.href;hrefBase=href.substring(0,href.lastIndexOf("/"));attrBase=attr.substring(0,hrefBase.length);if(hrefBase==attrBase){attr=attr.substring(hrefBase.length+1);}
+if(attr.indexOf("tfObject:")==0){var relUrl="$portalPath/detail/";var tmpUrl=attr.substring(9);item.attr(attrName,escape(relUrl+tmpUrl));}else{if(attr.indexOf("#")!=0&&attr.indexOf("://")==-1&&attr.indexOf("/")!=0){var relUrl="$portalPath/detail/"+oid+"/";item.attr(attrName,relUrl+escape(attr));}}}});}
+var rvt=rvtFactory(jQuery);rvt.tocSelector="#package-toc";rvt.contentSelector=".package-content";rvt.contentBaseUrl="$portalPath/detail/";rvt.serverRequestTemplate="$portalPath/detail/{rvtHash}/?inPackage=true&preview=true";rvt.fixRelativeLinks=false;rvt.ignoreTest=function(hash){if(isTocPage.test(hash)){return true;}
+return false;};rvt.contentParser=function(content){var oid=window.location.hash.substring(1);fixLinks(content,"a","href",oid);fixLinks(content,"img","src",oid);};rvt.contentLoadedCallback=function(rvt){var oid=window.location.hash.substring(1);var title=$(window.location.hash).children("a").text();$(".article-heading").html(title);var tree=jQuery.tree.reference(rvt.tocSelector);tree.select_branch("#"+oid+" > a");if(isTocPage.test(oid)){setupTocPage(oid,$("#"+oid));}else{$(".package-content .object-comments").remove();$(".package-content > div:visible").append('<div class="object-comments"><div class="annotatable"><span class="hidden">'+oid+'</span>Comment on this item:</div></div>');$("div[rel='"+oid+"-tags']").remove();var tagTemplate='<div rel="'+oid+'-tags">'+'<div class="object-tag-list">Tags: <span class="object-tags"></span></div>'+'</div>';$(".package-content > div:visible > :first").before(tagTemplate);$("#object-tag-list, #location-tag-list, .annotatable").show();}
+setupTagging('div[rel="'+oid+'-tags"]',"$oid#"+oid);setupCommenting("$oid#"+oid,"p:not([anotar-hash]),"+"h1:not([anotar-hash]),"+"h2:not([anotar-hash]),"+"h3:not([anotar-hash]),"+"h4:not([anotar-hash]),"+"h5:not([anotar-hash]),"+"h6:not([anotar-hash]),"+".annotatable:not([anotar-hash])",false);var imageNode=$("div[rel='"+oid+"'] > img");if(imageNode.length>0&&imageNode.attr("rel")!="loaded"){var imageObj=new Image();imageObj.src=imageNode.attr("src");$(imageObj).load(function(){imageNode.attr("rel","loaded");setupImageTagging("div[rel='"+oid+"'] > img","$oid%23"+oid);});}
+return false;};rvt.displayTOC=function(nodes){var opts={data:{type:"json",opts:{static:nodes}},ui:{dots:false},types:{"default":{draggable:false}},callback:{onselect:function(node,tree){var id=$(node).attr("id");if(isTocPage.test(id)){setupTocPage(id,node);}else{$("#object-tag-list, #location-tag-list, .annotatable").show();}
+window.location.hash="#"+id;var itemTitle=jQuery.trim($(node).children("a").text());$(".article-heading").html(itemTitle);return false;}}}
+$(rvt.tocSelector).tree(opts);}
+var manifestUrl="$portalPath/workflows/organiser.ajax?func=get-rvt-manifest&oid=$oid";rvt.getManifestJson(manifestUrl);});
+-->
+</script>

@@ -1,0 +1,49 @@
+{
+    "harvester": {
+        "type": "workflow-harvester",
+        "workflow-harvester": {
+            "force-storage": "true"
+        }
+    },
+
+    "transformer": {
+        "harvestQueue": ["aperture"],
+        "indexOnHarvest": "true",
+        "renderQueue": ["ffmpeg", "ice2", "ims"]
+    },
+
+    "indexer": {
+        "script": {
+            "type": "python",
+            "rules": "workflow-harvester.py"
+        },
+        "params": {
+            "repository.name": "Generic Workflow",
+            "repository.type": "Uploaded Files",
+            "workflow_field": "workflowStep"
+        }
+    },
+
+    "stages": [
+        {
+            "name": "pending",
+            "label": "Pending",
+            "security": ["metadata", "admin"],
+            "visibility": ["metadata", "editor", "admin"]
+        },
+        {
+            "name": "metadata",
+            "label": "Basic Metadata Check",
+            "security": ["editor", "admin"],
+            "visibility": ["metadata", "editor", "admin"],
+            "template": "workflows/basicInit"
+        },
+        {
+            "name": "live",
+            "label": "Live",
+            "security": ["editor", "admin"],
+            "visibility": ["guest"],
+            "template": "workflows/basicLive"
+        }
+    ]
+}

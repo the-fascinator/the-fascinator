@@ -1,0 +1,19 @@
+<form method="post" action="$portalPath/workflow">
+  <fieldset class="search">
+    <legend>Basic Metadata Input</legend>
+    <p><b>Current workflow step</b>: '$self.getFormData('currentStepLabel')'
+    <br/><b>Next workflow step</b>: '$self.getFormData('nextStepLabel')'</p>
+    <p>Please enter some basic metadata below for the newly uploaded object:</p>
+    <p>
+      <label for="title">Title</label>
+      <input type="text" name="title" value="$self.getFormData('title')" />
+    </p>
+    <p>
+      <label for="description">Description</label>
+      <input type="text" name="description" value="$self.getFormData('description')" />
+    </p>
+    <input type="hidden" name="targetStep" value="$self.getFormData('nextStep')" />
+    <input type="hidden" name="oid" value="$self.getFormData('oid')" />
+    <input type="submit" name="submit" value="Submit" />
+  </fieldset>
+</form>

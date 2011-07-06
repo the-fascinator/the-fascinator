@@ -1,0 +1,16 @@
+==Release 0.2.0==
+Planning notes on this release can be found in: http://fascinator.usq.edu.au/trac/wiki/tf2/Planning
+
+Feature:
+* Tag system interface 
+* Create view-based grouping system
+* Backup functionality, refer to: http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/core/BackupClient
+
+Enhancement:
+* Update Aperture plugin to 1.3
+* Make links to local files open them from filesystem (like ICE) rather than download 
+* Add a 'view as slideshow' button when slides are present
+* Display first 100 characters from a document with no abstract 
+* Allow configurable thumbnail conversion ratio 
+* PDF to HTML transformer 
+* Able to use local Ice-Service, refer to: ICE service installation on Ubuntu904 (http://ice.usq.edu.au/trac/wiki/ICEService/Ubuntu904)

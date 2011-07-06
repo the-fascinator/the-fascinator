@@ -1,0 +1,3 @@
+#set($menuClass = "hidden")
+#parseTemplate("wrapping/menu-open.vm")
+#set($menuClass = $NULL)

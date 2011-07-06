@@ -1,0 +1,56 @@
+<script type="text/javascript">
+<!--
+    $(function() {
+        $(".paging .select-page").click(function() {
+            doAction("select-page", $(this).attr("rel"));
+            return false;
+        });
+    });
+-->
+</script>
+#set($paging = $self.paging)
+#set($currentPage = $paging.page)
+#set($lastPage = $paging.lastPage)
+#if($paging.pages.size() > 1)
+<div class="paging">
+  <ul>
+    #if($currentPage > 1)
+      #set($prev = $currentPage - 1)
+      <li>
+        <a class="select-page" rel="1" href="#">
+          First
+          <!-- <img src="$portalPath/images/icons/resultset_first.png" /> -->
+        </a>
+      </li>
+      <li>
+        <a class="select-page" rel="$prev" href="#">
+          Previous
+          <!-- <img src="$portalPath/images/icons/resultset_previous.png" /> -->
+        </a>
+      </li>
+    #end
+    #foreach($pageNum in $paging.pages)
+      #if($pageNum.selected)
+        <li class="selected-page">$pageNum.value</li>
+      #else
+        <li><a class="select-page" rel="$pageNum.value" href="#">$pageNum.value</a></li>
+      #end
+    #end
+    #if($currentPage < $lastPage)
+      #set($next = $currentPage + 1)
+      <li>
+        <a class="select-page" rel="$next" href="#">
+          Next
+          <!-- <img src="$portalPath/images/icons/resultset_next.png" /> -->
+        </a>
+      </li>
+      <li>
+        <a class="select-page" rel="$lastPage" href="#">
+          Last
+          <!-- <img src="$portalPath/images/icons/resultset_last.png" /> -->
+        </a>
+      </li>
+    #end
+  </ul>
+</div>
+#end

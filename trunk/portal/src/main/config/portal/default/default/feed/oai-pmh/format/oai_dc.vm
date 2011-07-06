@@ -1,0 +1,28 @@
+#macro(showElement $tag $field $attr)
+    #set($valueList = $item.getList($field))
+    #foreach($value in $valueList)
+        <$tag $attr>$self.encodeXml($value)</$tag>
+    #end
+#end
+
+<oai_dc:dc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd" 
+    xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    #showElement("dc:title" "dc_title", "")
+    #showElement("dc:creator" "dc_creator", "")
+    #showElement("dc:contributor" "dc_contributor", "")
+    #showElement("dc:coverage" "dc_coverage", "")
+    #showElement("dc:date" "dc_date", "")
+    #showElement("dc:description" "dc_description", "")
+    #showElement("dc:format" "dc_format", "")
+    #showElement("dc:identifier" "dc_identifier", "")
+    #showElement("dc:language" "dc_language", "")
+    #showElement("dc:publisher" "dc_publisher", "")
+    #showElement("dc:relation" "dc_relation", "")
+    #showElement("dc:publisher" "dc_publisher", "")
+    #showElement("dc:rights" "dc_rights", "")
+    #showElement("dc:source" "dc_source", "")
+    #showElement("dc:subject" "dc_subject", "")
+    #showElement("dc:type" "dc_type", "")
+</oai_dc:dc>

@@ -1,0 +1,49 @@
+#set($menuId = "create-view-box")
+#set($menuClass = "hidden")
+#set($menuTitle = "Create view")
+#parseTemplate("wrapping/info-box-open.vm")
+<form method="post" action="#">
+    <fieldset class="login">
+        <legend>View</legend>
+        <p>
+            <label for="create-view-id">Identifier</label>
+            <input type="text" id="create-view-id" name="create-view-id" />
+        </p>
+        <p>
+            <label for="create-view-description">Name</label>
+            <input type="text" id="create-view-description" name="create-view-description" />
+        </p>
+        <input class="button" id="create-view-accept" type="button" value="Create" />
+        <input id="create-view-cancel" type="button" value="Cancel" />
+    </fieldset>
+</form>
+#parseTemplate("wrapping/info-box-close.vm")
+<script type="text/javascript">
+<!--
+    $(function() {
+        // create view
+        $("#create-view, #create-view-cancel").click(function() {
+            $("#create-view").toggleClass("selected");
+            $("#create-view-box").toggle("blind");
+            $("#create-view-id").focus();
+            return false;
+        });
+        $("#create-view-accept").click(function() {
+            jQuery.post("$portalPath/actions/view.ajax",
+                {
+                    func: "create-view",
+                    id: $("#create-view-id").val(),
+                    description: $("#create-view-description").val()
+                },
+                function(data, status) {
+                    $("#create-view-box").toggle("blind");
+                    $("#create-view-id").val("");
+                    $("#create-view-description").val("");
+                    window.location = data.url;
+                },
+                "json"
+            );
+        });
+    });
+-->
+</script>

@@ -1,0 +1,58 @@
+#if($page.authentication.is_admin())
+<div class="box hidden" id="reharvest-form">
+    <h2>Reharvest view</h2>
+    <div class="block hidden" id="reharvest-progress">
+        <p>
+            A reharvest of this view is currently in progress. You must wait
+            until it has completed before starting a new reharvest.
+        </p>
+        <button id="reharvest-cancel">Close</button>
+        <img id="backup-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+    </div>
+    <div class="block" id="reharvest-start">
+        <p>
+            This process will reharvest all objects in the current view. This
+            is generally used to apply a harvest configuration change to all
+            relevant objects. Please note that it may take a while depending
+            on the number of items. Would you like to continue?
+        </p>
+        <button id="reharvest-accept">Start</button>
+        <button id="reharvest-cancel">Cancel</button>
+    </div>
+</div>
+<script type="text/javascript">
+$(function() {
+    $("#reharvest-view, #reharvest-cancel").click(function() {
+        $("#reharvest-view").toggleClass("selected");
+        $("#reharvest-form").toggle("blind");
+        jQuery.post("$portalPath/actions/state.ajax",
+            { func: "get", name: "reharvest/running/$portalId" },
+            function(data, status) {
+                var running = (data.value == "true");
+                $("#reharvest-start").toggle(!running);
+                $("#reharvest-progress").toggle(running);
+            },
+            "json");
+        return false;
+    });
+
+    $("#reharvest-accept").click(function() {
+        var reharvestLogTimerId;
+        jQuery.post("$portalPath/actions/state.ajax",
+            { func: "get", name: "reharvest/running/$portalId" },
+            function(data, status) {
+                var running = (data.value == "true");
+                $("#reharvest-start").toggle(running);
+                $("#reharvest-progress").toggle(!running);
+                jQuery.post("$portalPath/actions/reharvest.ajax",
+                    { func: "reharvest", portalId: "$portalId" },
+                    function(data, status) {
+                        $("#reharvest-start").show();
+                        $("#reharvest-progress").hide();
+                    });
+            },
+            "json");
+    });
+});
+</script>
+#end

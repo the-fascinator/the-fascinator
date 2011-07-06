@@ -1,0 +1,5 @@
+com.googlecode.fascinator.HarvestQueueConsumer
+com.googlecode.fascinator.RenderQueueConsumer
+com.googlecode.fascinator.IngestQueueConsumer
+com.googlecode.fascinator.SubscriberQueueConsumer
+com.googlecode.fascinator.EmailNotificationConsumer

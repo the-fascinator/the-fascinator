@@ -1,0 +1,11 @@
+#set($pageTitle = 'Database Testing')
+
+#parse($page.getTemplate('menus/home-main-menu.vm'))
+
+<div class="grid_12">
+$self.pageContent()
+</div>
+<div class="clear"></div>
+
+<!-- IE7 needs a blank div here, class="prefix_4" doesn't work -->
+<div class="grid_4">&nbsp;</div>

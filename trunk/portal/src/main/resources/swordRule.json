@@ -1,0 +1,19 @@
+{
+    "transformer": {
+        "harvestQueue": ["aperture", "ims"],
+        "renderQueue": []
+    },
+
+    "source": "sword",
+
+    "indexer": {
+        "script": {
+            "type": "python",
+            "rules": "swordRule.py"
+        },
+        "params": {
+            "repository.name": "Sword",
+            "repository.type": "Sword"
+        }
+    }
+}

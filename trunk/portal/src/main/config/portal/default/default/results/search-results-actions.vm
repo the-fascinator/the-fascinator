@@ -1,0 +1,38 @@
+#set($showPackageMenu = false)
+#set($showActionsMenu = false)
+
+#set($createViewEnabled = ($paging.totalFound > 0 && ($query != "" || $self.hasSelectedFacets())))
+#set($query = $sessionState.get("query"))
+
+#if($hasResult && $packagingEnabled)
+    #set($showPackageMenu = true)
+#end
+#if("$!query" != "" || $self.hasSelectedFacets())
+    #set($showActionsMenu = true)
+#end
+
+#if($showPackageMenu || $showActionsMenu)
+<ul class="nav main">
+    <li><a class="inactive">Actions:</a></li>
+    #if($showActionsMenu)
+        #if($createViewEnabled)
+            <li><a href="#" id="create-view">Create view...</a></li>
+        #end
+        #if ($self.hasSelectedFacets())
+            <li><a href="#" id="clear-facets">Clear selection</a></li>
+        #end
+        #if("$!query" != "")
+            <li><a href="$portalPath/search">Clear search query</a></li>
+        #end
+    #end
+
+    #if($showPackageMenu)
+        #parse($page.getTemplate('results/packaging-menu.vm'))
+    #end
+</ul>
+#end
+
+## Put the scripts outside the UL element
+#if($showPackageMenu)
+    #parse($page.getTemplate('results/packaging-script.vm'))
+#end

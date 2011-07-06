@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.googlecode.the-fascinator.plugins</groupId>
+  <artifactId>plugin-roles-internal</artifactId>
+  <name>The Fascinator - Plugin - Roles - Internal</name>
+  <description>TODO</description>
+  <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/roles/internal</url>
+  <parent>
+    <groupId>com.googlecode.the-fascinator</groupId>
+    <artifactId>fascinator-plugins</artifactId>
+    <version>1.0.3</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>com.googlecode.the-fascinator</groupId>
+      <artifactId>fascinator-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.the-fascinator</groupId>
+      <artifactId>fascinator-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+</project>

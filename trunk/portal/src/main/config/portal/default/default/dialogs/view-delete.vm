@@ -1,0 +1,27 @@
+#if($page.authentication.is_logged_in() && $page.authentication.is_admin())
+<div class="box hidden" id="delete-form" >
+  <h2>Delete view</h2>
+  <div class="block">
+    <p>Are you sure you want to delete this view ($page.portalName)?</p>
+    <a id="delete-accept" href="$urlBase$defaultPortal/home">
+      <img src="$portalPath/images/icons/tick.png" />
+    </a>
+    <a id="delete-cancel" href="#"><img src="$portalPath/images/icons/cross.png" /></a>
+  </div>
+</div>
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#delete-view, #delete-cancel").click(function() {
+            $("#delete-view").toggleClass("selected");
+            $("#delete-form").toggle("blind");
+            return false;
+        });
+        $("#delete-accept").click(function() {
+            jQuery.post("$portalPath/actions/view.ajax",
+                { func: "delete-view", view: "$portalId" });
+        });
+    });
+-->
+</script>
+#end

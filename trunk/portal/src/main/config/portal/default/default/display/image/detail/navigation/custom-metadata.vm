@@ -1,0 +1,4 @@
+<table>
+    #displayField("dc_format")
+    #displayField("dc_size")
+</table>

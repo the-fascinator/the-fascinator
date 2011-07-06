@@ -1,0 +1,21 @@
+#set($contentClass = "search")
+#set($contentTitle = "Search")
+#parseTemplate("wrapping/content-block-open.vm")
+<div class="block">
+    <p>Search all items by entering one or more keywords</p>
+    <form action="$portalPath/search" id="search-form" method="get">
+        <input type="text" name="query" size="60" id="search-query" />
+        <button id="search-button">Search</button>
+    </form>
+    <p>There are currently <strong>$self.itemCount</strong> items available</p>
+</div>
+#parseTemplate("wrapping/content-block-close.vm")
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#search-button").click(function() {
+            $("#search-form").submit();
+        });
+    });
+-->
+</script>

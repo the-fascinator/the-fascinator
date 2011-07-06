@@ -1,0 +1,16 @@
+{
+    "baseDir": {
+        "type": "text",
+        "default": "${user.home}",
+        "size": 60
+    },
+    "ignoreFilter": {
+        "type": "text",
+        "default": ".svn",
+        "size": 40
+    },
+    "recursive": {
+        "type": "boolean",
+        "default": false
+    }
+}

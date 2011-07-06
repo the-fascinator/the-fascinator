@@ -1,0 +1,5 @@
+#set($preview = $metadata.get("preview"))
+<div class="image" rel="$oid">
+    <img id="image-content" src="$portalPath/download/$oid/$preview" />
+</div>
+<div class="clear"></div>

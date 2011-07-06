@@ -1,0 +1,22 @@
+<script type="text/javascript">
+<!--
+    function setActionUri(uri) {
+        $("#action-form").attr("action", uri);
+    }
+    function addActionParam(name, value) {
+        $("#action-form").append('<input id="' + name + '" name="' + name + '" type="hidden" value="' + value + '" />');
+    }
+    function doAction(action) {
+        doAction(action, "");
+    }
+    function doAction(action, value) {
+        $("#verb").val(action);
+        $("#value").val(value);
+        $("#action-form").submit();
+    }
+-->
+</script>
+<form action="$portalPath/$pageName" id="action-form" method="post">
+  <input id="verb" name="verb" type="hidden" />
+  <input id="value" name="value" type="hidden" />
+</form>

@@ -1,0 +1,356 @@
+#macro(createNavTree $nodeList $class)
+<ul class="$class">
+  #foreach($node in $nodeList)
+    #set($id = $node.getId())
+    #if ($id == $nullValue)
+        #set ($id = "blank")
+    #end
+    #set($children = $node.getChildren())
+    #set($numChildren = $children.size())
+    #set($hidden = $node.getHidden())
+    #set($itemTitle = $node.getTitle())
+    #set($itemKey = $node.getKey())
+    <li id="$itemKey" rel="$!id">
+      $self.getMimeTypeIcon($portalPath, $id)
+      <a class="#if($id == $oid)clicked#end #if("$!hidden" == "True")item-hidden#end" href="#"><ins></ins>$itemTitle</a>
+      #if($numChildren > 0)
+        #createNavTree($children "children")
+      #end
+    </li>
+  #end
+</ul>
+#end
+#if($formData.get("oid"))
+#set($manifest = $self.manifest)
+#set($oid = $self.getFormData('oid'))
+#set($title = $self.getFormData('title'))
+#set($pageTitle = $title)
+<div class="grid_4">
+  <div class="box menu">
+    <h2>Actions</h2>
+    <ul class="menu" id="actions">
+      <li><a href="$portalPath/detail/$oid">View package...</a></li>
+      <li><a href="#" id="package-modify">Select package items...</a></li>
+      <li>
+        <a href="#" id="package-add-custom">
+          Add custom item
+          <img class="hidden right" id="package-add-custom-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="box">
+    <h2>Package properties</h2>
+    <form action="$portalPath/workflow" id="package-form" method="post">
+      <fieldset>
+        <p>
+          <label for="title">Package title</label>
+          <input type="text" id="package-title" name="title" value="$!self.getPackageTitle()" />
+        </p>
+        <p>
+          <label for="package-description">Description</label>
+          <input type="text" id="package-description" name="description" value="$!self.getMeta('description')" />
+        </p>
+        <input type="hidden" name="targetStep" value="$self.getFormData('nextStep')" />
+        <input type="hidden" name="oid" value="$oid" />
+        <input class="button" id="update-package" type="button" value="Update" />
+      </fieldset>
+    </form>
+  </div>
+  <div id="item-props" class="box hidden">
+    <h2>Item properties</h2>
+    <div id="item-form">
+      <fieldset>
+        <p>
+          <label for="item-title">Title</label>
+          <input type="text" id="item-title" name="title" />
+        </p>
+        <p>
+          <label class="checkbox" for="item-hidden">Hidden</label>
+          <input class="checkbox" type="checkbox" id="item-hidden" name="hidden" />
+        </p>
+        <input class="button" id="update-item" type="button" value="Update" />
+        <input class="button" id="delete-item" type="button" value="Remove" />
+        <img class="hidden" id="item-loading" src="$portalPath/images/icons/loading.gif" alt="Loading" />
+      </fieldset>
+    </div>
+  </div>
+</div>
+<div class="grid_12">
+  <div class="box">
+    <h2>Contents</h2>
+    <br />
+    <p>Drag and drop the items to organise the package or select an item to change its properties</p>
+    <p id="item-message"></p>
+    <div id="toc">
+      #createNavTree($self.manifest.getTopNodes() "toc")
+    </div>
+  </div>
+  <div class="box hidden" id="preview">
+    <h2>Preview</h2>
+    <div id="content"></div>
+  </div>
+</div>
+<div class="hidden" id="delete-package-item">
+</div>
+<script type="text/javascript" src="$portalPath/js/tree/jquery.tree.min.js"></script>
+<script type="text/javascript">
+<!--
+    $(function() {
+    ##  #if($self.getFormData("auto-complete"))
+    ##    $("#package-form").submit();
+    ##  #end
+        function getParentIds(node) {
+            var parents = "";
+            $(node).parents("li").each(function() {
+                parents = "," + $(this).attr("id") + parents;
+            });
+            if (parents != "") {
+                parents = parents.substring(1);
+            }
+            return parents;
+        }
+
+        $("#toc").tree({
+            ui: {
+                animation: 250,
+                dots: false,
+                theme_name: "classic"
+            },
+            plugins: {
+                checkbox: {}
+            },
+            callback: {
+                check_move : function(node, refNode, type, tree) {
+                    var rel = $(refNode).prev(".mime-type").attr("rel");
+                    return (rel != "application/x-fascinator-package");
+                },
+                onmove: function(node, refNode, type, tree, rollback) {
+                    jQuery.ajax({
+                        type : "POST",
+                        url : "$portalPath/actions/manifest.ajax",
+                        success:
+                            function(data, status) {
+                                // We don't do anything on success
+                            },
+                        error:
+                            function (req, status, e) {
+                                var data = eval("(" + req.responseText + ")");
+                                if (data.message == "Only registered users can access this API") {
+                                    alert("Please login first!");
+                                }
+                                alert("Error during move: " + data.message);
+                            },
+                        data: {
+                            func: "move",
+                            oid: "$oid",
+                            id: "$portalId",
+                            nodeId: $(node).attr("id"),
+                            refNodeId: $(refNode).attr("id"),
+                            parents: getParentIds(node),
+                            refParents: getParentIds(refNode),
+                            type: type
+                        }
+                    });
+                },
+                onselect: function(node, tree) {
+                    var node = $(node);
+                    var id = node.attr("rel");
+                    if (id == "blank") {
+                        $("#preview").hide();
+                    } else {
+                        $("#content").load(
+                            "$portalPath/detail/" + escape(id) + "/?preview=true&inPackage=true",
+                            function(data, status, xhr) {
+                                function fixLinks(selector, attrName) {
+                                    $(selector).each(function() {
+                                        var attr = $(this).attr(attrName);
+                                        if (attr != null) {
+                                            // fix for IE7 attr() returning resolved URLs - strip base URL
+                                            var href = window.location.href;
+                                            hrefBase = href.substring(0, href.lastIndexOf("/"));
+                                            attrBase = attr.substring(0, hrefBase.length);
+                                            if (hrefBase == attrBase) {
+                                                attr = attr.substring(hrefBase.length + 1);
+                                            }
+                                            if (attr.indexOf("#") != 0 && attr.indexOf("://") == -1 && attr.indexOf("/") != 0) {
+                                                var relUrl = "$portalPath/download/" + id + "/";
+                                                $(this).attr(attrName, relUrl + escape(attr));
+                                            }
+                                        }
+                                    });
+                                }
+                                fixLinks("#content a", "href");
+                                fixLinks("#content img", "src");
+                                $("#preview:hidden").fadeIn();
+                            });
+                    }
+                    var item = node.children("a");
+                    $("#item-title").val(item.text());
+                    $("#item-hidden").attr("checked", item.hasClass("item-hidden"));
+                    $("#item-props:hidden").fadeIn(function() {
+                        $("#item-title").focus();
+                    });
+                }
+            }
+        });
+        var manifestTree = jQuery.tree.reference("#toc");
+
+        $(".toc.hidden").removeClass("hidden");
+
+        $("#update-package").click(function() {
+            jQuery.ajax({
+                type : "POST",
+                url : "$portalPath/actions/manifest.ajax",
+                success:
+                    function(data, status) {
+                        $("#package-form").submit();
+                    },
+                error:
+                    function (req, status, e) {
+                        var data = eval("(" + req.responseText + ")");
+                        if (data.message == "Only registered users can access this API") {
+                            alert("Please login first!");
+                        }
+                        alert("Error updating package: " + data.message);
+                    },
+                data: {
+                    func: "update-package-meta",
+                    oid: "$oid",
+                    metaList: ["title", "description"],
+                    title: $("#package-title").val(),
+                    description: $("#package-description").val()
+                }
+            });
+            return false;
+        });
+
+        $("#update-item").click(function() {
+            var item = $("#toc a.clicked");
+            var node = item.parent("li");
+            $("#item-loading").show();
+            jQuery.ajax({
+                type : "POST",
+                dataType : "json",
+                url : "$portalPath/actions/manifest.ajax",
+                success:
+                    function(data, status) {
+                        item.text(data.title);
+                        if (data.hidden == "True") {
+                            item.addClass("item-hidden");
+                        } else {
+                            item.removeClass("item-hidden");
+                        }
+                        $("#item-loading").hide();
+                        $("#item-message").html("<strong>Updated '" + data.title + "' OK</strong>").fadeIn();
+                        setTimeout(function() {
+                            $("#item-message").fadeOut(function() { $(this).empty(); });
+                            }, 3000);
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#item-loading").hide();
+                        var data = eval("(" + req.responseText + ")");
+                        if (data.message == "Only registered users can access this API") {
+                            alert("Please login first!");
+                        }
+                        alert("Error updating package: " + data.message);
+                    },
+                data: {
+                    func: "update",
+                    oid: "$oid",
+                    nodeId: $(node).attr("id"),
+                    title: $("#item-title").val(),
+                    hidden: $("#item-hidden").is(":checked"),
+                    parents: getParentIds(node)
+                }
+            });
+        });
+
+        $("#delete-item").click(function() {
+            var item = $("#toc a.clicked");
+            if (confirm("Remove '" + item.text() + "' from this package?\nNote: Any sub-items will also be deleted.")) {
+                var node = item.parent("li");
+                $("#item-loading").show();
+                jQuery.ajax({
+                    type : "POST",
+                    dataType : "json",
+                    url : "$portalPath/actions/manifest.ajax",
+                    success:
+                        function(data, status) {
+                            item.fadeOut(function() {
+                                item.remove();
+                                $("#item-loading").hide();
+                                $("#item-message").html("<strong>Deleted '" + data.title + "' OK</strong>").fadeIn();
+                                $("#item-props").hide();
+                            });
+                            setTimeout(function() {
+                                $("#item-message").fadeOut(function() {
+                                    $(this).empty();
+                                });
+                            }, 3000);
+                        },
+                    error:
+                        function (req, status, e) {
+                            $("#item-loading").hide();
+                            var data = eval("(" + req.responseText + ")");
+                            if (data.message == "Only registered users can access this API") {
+                                alert("Please login first!");
+                            }
+                            alert("Error deleting item: " + data.message);
+                        },
+                    data: {
+                        func: "delete",
+                        oid: "$oid",
+                        oid: "$oid",
+                        nodeId: $(node).attr("id"),
+                        parents: getParentIds(node)
+                    }
+                });
+            }
+        });
+
+        $("#package-modify").click(function() {
+            jQuery.post("$portalPath/actions/packaging.ajax",
+                { func: "modify", oid: "$oid" },
+                function(data, status) {
+                    window.location.href = "$urlBase$self.getManifestViewId()/search";
+                });
+            return false;
+        });
+
+        $("#package-add-custom").click(function() {
+            $("#package-add-custom-loading").show();
+            jQuery.ajax({
+                type : "POST",
+                dataType : "json",
+                url : "$portalPath/actions/manifest.ajax",
+                success:
+                    function(data, status) {
+                        var node = manifestTree.create(data, -1, "before");
+                        node.find("ins").remove();
+                        manifestTree.select_branch(node);
+                        $("#package-add-custom-loading").hide();
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#package-add-custom-loading").hide();
+                        var data = eval("(" + req.responseText + ")");
+                        if (data.message == "Only registered users can access this API") {
+                            alert("Please login first!");
+                        }
+                        alert("Error adding custom node: " + data.message);
+                    },
+                data: {
+                    func: "add-custom",
+                    oid: "$oid"
+                }
+            });
+            return false;
+        });
+
+        $("#package-title").focus();
+    });
+-->
+</script>
+#end

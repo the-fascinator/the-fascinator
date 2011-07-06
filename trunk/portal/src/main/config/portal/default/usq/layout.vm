@@ -1,0 +1,27 @@
+#if ($noLayout)
+$!pageContent
+#else
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+#parse($page.getTemplate('layout/html-head.vm'))
+    <link href="http://www.usq.edu.au/Migration.Standard.Website/App_Themes/Default/Common.css" rel="Stylesheet" type="text/css" />
+    <link href="http://www.usq.edu.au/Migration.Standard.Website/App_Themes/Default/Print.css" rel="Stylesheet" type="text/css" media="print" />
+    <!--[if IE]><link href="http://www.usq.edu.au/Migration.Standard.Website/App_Themes/Default/CommonIE.css" rel="stylesheet" type="text/css" /><![endif]-->
+    <!--[if IE 6]><link href="http://www.usq.edu.au/Migration.Standard.Website/App_Themes/Default/CommonIE6.css" rel="stylesheet" type="text/css" /><![endif]-->
+    <script type="text/javascript" src="http://www.usq.edu.au/Migration.Standard.Website/Scripts/swfobject.js"></script>
+    <link rel="stylesheet" type="text/css" href="$portalPath/css/usq-skin.css" />
+    <link rel="stylesheet" type="text/css" href="$portalPath/css/local-style.css" />
+    #if($pageName=="home")
+    <style type="text/css" media="all">
+        .mainbannerimage {background-image: url("http://www.usq.edu.au/~/media/USQ/SiteBanners/20081290decbansljpg.ashx");}
+        .mainbannerimageleft {background-image: url("http://www.usq.edu.au/~/media/USQ/SiteBanners/20081290decbanjpg.ashx");}
+    </style>
+    #end
+  </head>
+  <body>
+#parse($page.getTemplate('layout/page-structure.vm'))
+#parse($page.getTemplate('layout/action-form.vm'))
+  </body>
+</html>
+#end

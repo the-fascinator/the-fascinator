@@ -1,0 +1,11 @@
+{
+    "harvester": {
+        "type": "file-system",
+        "file-system": {
+            "targets": [ {
+                "baseDir": "${test.dir}",
+                "recursive": true
+            } ]
+        }
+    }
+}

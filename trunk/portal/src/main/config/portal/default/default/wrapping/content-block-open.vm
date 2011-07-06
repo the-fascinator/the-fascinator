@@ -1,0 +1,6 @@
+<div class="box#if($contentClass) $!contentClass#end"#if($contentId) id="$!contentId"#end>
+    <h2>#if($contentTitle)$!contentTitle#{else}&nbsp;#end</h2>
+## Reset parameters
+#set($contentId = $NULL)
+#set($contentClass = $NULL)
+#set($contentTitle = $NULL)

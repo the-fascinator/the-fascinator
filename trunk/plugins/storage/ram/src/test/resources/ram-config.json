@@ -1,0 +1,8 @@
+{
+    "email" : "test@usq.edu.au",
+    "storage": {
+        "type": "ram",
+        "ram": {
+        }
+    }
+}

@@ -1,0 +1,55 @@
+<div class="header_search" id="ctl5">
+  <div class="header_right" id="ctl6">
+    <div class="header_links" id="ctl7">USQ:
+      <a title="USQ website home" href="http://www.usq.edu.au/">Home</a>
+      | <a title="Contact USQ" href="http://www.usq.edu.au/contact/">Contact us</a>
+      | <a title="Search for USQ staff" href="http://apps.usq.edu.au/usqwebsite/aspnet/staffsearch/default.aspx?action=stafflookup">Staff directory</a>
+      | <a title="UConnect (Previously USQConnect)" href="http://uconnect.usq.edu.au"  target="_blank">UConnect</a>
+    </div>
+    <!--Search Start-->
+    <!-- Google CSE Search Box Begins -->
+    <script type="text/javascript">
+    <!--
+      function focusSearch(obj) {if (obj.value == " Search USQ ") {obj.value = "";}}
+      function blurSearch(obj) {if (obj.value == "") {obj.value = " Search USQ ";}}
+    -->
+    </script>
+    <form name="gs" action="http://websearch.usq.edu.au/search" method="get">
+      <fieldset>
+        <div class="searchbox_go" id="ctl8">
+          <label for="usqsearch">
+            <input type="image" alt="Go" src="http://www.usq.edu.au/Migration.Standard.Website/Images/button_go.jpg" name="sa" />
+          </label>
+        </div>
+        <div class="searchbox_t" id="ctl9">
+          <div class="searchbox_b" id="ctl10">
+            <div class="searchbox_l" id="ctl11">
+              <div class="searchbox_r" id="ctl12">
+                <div class="searchbox_bl" id="ctl13">
+                  <div class="searchbox_br" id="ctl14">
+                    <div class="searchbox_tl" id="ctl15">
+                      <div class="searchbox_tr" id="ctl16">
+                        <input class="inpt-search" id="usqsearch" onblur="blurSearch(this);" onfocus="focusSearch(this);" type="text" maxlength="2047" size="2" value=" Search USQ " name="q" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" value="0" name="entqr" />
+        <input type="hidden" value="xml_no_dtd" name="output" />
+        <input type="hidden" value="date:D:L:d1" name="sort" />
+        <input type="hidden" value="default_frontend" name="client" />
+        <input type="hidden" value="1" name="ud" />
+        <input type="hidden" value="UTF-8" name="oe" />
+        <input type="hidden" value="UTF-8" name="ie" />
+        <input type="hidden" value="default_frontend" name="proxystylesheet" />
+        <input type="hidden" value="default_collection" name="site" />
+      </fieldset>
+    </form>
+    <!-- Google CSE Search Box Ends -->
+    <!--Search End-->
+  </div>
+</div>

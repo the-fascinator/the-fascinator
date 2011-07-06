@@ -1,0 +1,49 @@
+#set($pageTitle = "File upload")
+<h2 id="page-heading">File Upload</h2>
+<div id="form-section" class="grid_12">
+  <div class="box" id="upload-file-form">
+    $self.render_upload_form()
+  </div>
+</div>
+<script type="text/javascript">
+<!--
+    $(function() {
+        $("#upload-file-submit").click(function() {
+            var upload = $("#upload-file-file").val();
+            if (upload == "") {
+                alert("Please select a file to upload!");
+            } else {
+                $("#upload-file").submit();
+                $("#upload-file-loading").show();
+                ## $("#upload-progress").show();
+                ## window.setTimeout("update_progress();", 100);
+            }
+        });
+
+        window['update_progress'] = function() {
+            jQuery.ajax({
+                type : "POST",
+                url : "$portalPath/actions/upload.ajax",
+                success:
+                    function(data, status) {
+                        $("#upload-progress-filler").width(data + "%");
+                        $("#upload-progress-number").html(data + "%");
+                        if (data != 100) {
+                            window.setTimeout("update_progress();", 100);
+                        }
+                    },
+                error:
+                    function (req, status, e) {
+                        $("#upload-file-error").show();
+                        $("#upload-file-message").html(req.responseText);
+                        $("#upload-progress").hide();
+                    },
+                data: {}
+            });
+
+            return false;
+        }
+
+    });
+-->
+</script>

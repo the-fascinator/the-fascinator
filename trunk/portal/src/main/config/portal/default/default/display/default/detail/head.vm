@@ -1,0 +1,2 @@
+<link rel="stylesheet" type="text/css" href="$portalPath/css/anotar/anotar.css" />
+#parseDisplayTemplate("detail/custom-head.vm")

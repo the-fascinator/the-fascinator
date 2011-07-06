@@ -1,0 +1,162 @@
+#set($pageTitle = 'Content')
+#set($harvesters = $self.harvesters)
+<script type="text/javascript">
+<!--
+    $(function() {
+        $('#selected').attr('value', $('#harvesters > div:first').attr('id'));
+
+        // prefix each field with its parent plugin
+        $('#harvestForm input').each(function() {
+          this.name = $(this).closest('div').attr('id') + ":" + this.name;
+        });
+
+        // populate harvester options
+        $('#addButton').click(function() {
+            $('#add-content-dialog').dialog({
+                autoOpen: false,
+                bgiframe: true,
+                draggable: false,
+                modal: true,
+                resizable: false,
+                width: 500,
+                buttons: {
+                    'Add': function() {
+                        // TODO checking
+                        $('#contents tbody:first').append('<tr>' +
+                        '<td>' + $('#id').val() + '</td>' +
+                        '<td>' + $('#description').val() + '</td>' +
+                        '<td>' + $('#harvester').val() + '</td>' +
+                        '<td>* * * * *</td>' +
+                        '</tr>');
+                        $(this).dialog('close');
+                    },
+                    'Cancel': function() {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function() {
+                }
+            });
+            $('#add-content-dialog').dialog('open');
+        })
+
+        $('button').hover(function() { $(this).addClass('ui-state-hover'); },
+                          function() { $(this).removeClass('ui-state-hover'); })
+
+        $('#contents tbody tr[id]').click(function() {
+          // show harvester config
+          $('#contents tbody tr[id]').removeClass('ui-state-highlight').attr('selected', 'false');
+          $(this).addClass('ui-state-highlight').attr('selected', 'true');
+          $('#harvesterConfig div').hide();
+          $('#' + this.id + '-config').show('blind');
+        });
+
+        $("#content-toolbar li").addClass("ui-state-default ui-corner-all");
+        $("#content-toolbar li").hover(
+                function() { $(this).addClass("ui-state-hover"); },
+                function() { $(this).removeClass("ui-state-hover"); });
+    });
+-->
+</script>
+<h2>Content</h2>
+<p>Get some Fascinating stuff!</p>
+#if($self.contents.isEmpty() == true)
+  <p><em>No content sources defined!</em></p>
+#else
+  <div id="content-toolbar">
+    <ul class="ui-widget ui-helper-clearfix">
+      <li>
+        <span class="ui-icon ui-icon-document" title="Add new content"></span>
+      </li>
+      <li>
+        <span class="ui-icon ui-icon-trash" title="Delete selected content"></span>
+      </li>
+    </ul>
+  </div>
+  <table id="contents" class="ui-widget ui-widget-content">
+    <thead>
+      <tr class="ui-widget-header">
+        <th>Id</th>
+        <th>Name</th>
+        <th>Harvester</th>
+        <th>Indexing</th>
+        <th>Schedule</th>
+      </tr>
+    </thead>
+    <tbody>
+    #foreach($entry in $self.contents)
+      #set($content = $entry.value)
+      #set($harvester = $content.harvester)
+      <tr id="$content.id">
+        <td>$content.id</td>
+        <td>$content.description</td>
+        <td>$harvester.name</td>
+        <td>$content.rulesFile.path</td>
+        <td>$content.get("content/schedule")</td>
+      </tr>
+    #end
+    </tbody>
+    <tfoot>
+    
+    </tfoot>
+#*    
+    <tr><td colspan="4"></td></tr>
+    <tr><td colspan="4">
+<div id="harvesterConfig">
+#foreach($entry in $self.contents)
+  #set($content = $entry.value)
+  #set($harvester = $content.harvester)
+  <div class="ui-helper-hidden" id="${content.id}-config2" title="$harvester.name">
+    <h3 class="ui-widget-header">$content.description</h3>
+    <h4>Harvester</h4>
+    $harvester.config
+    <h4>Indexer</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+      #foreach($entry in $content.indexerParams)
+        <tr>
+          <td>$entry.key</td>
+          <td>$entry.value</td>
+        </tr>
+      #end
+      </tbody>
+    </table>
+  </div>
+#end
+</div>
+    </td></tr>
+    </tfoot>
+ *#
+  </table>
+#end
+<br />
+<button id="addButton">Add content</button>
+<button id="saveButton">Save changes</button>
+
+<div class="debug">
+  <pre>contents: $self.contents.toString()</pre>
+  <pre>harvesters: $self.harvesters.toString()</pre>
+</div>
+## dialog
+
+<div id="add-content-dialog" title="Add content">
+  <form id="add-content-form" method="post">
+    <input id="selected" type="hidden" name="selected" />
+    <label for="id">Identifier</label>
+    <input type="text" name="id" id="id" />
+    <label for="description">Description</label>
+    <input type="text" name="description" id="description" size="40" />
+    <label for="harvester">Harvester</label>
+    <select id="harvester">
+    #foreach($harvester in $harvesters)
+      <option value="$harvester.id">$harvester.name</option>
+    #end
+    </select>
+  </form>
+</div>
