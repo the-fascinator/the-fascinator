@@ -172,13 +172,15 @@ class PackagingData:
             titles = self.vc("formData").getValues("titles")
             for i in range(len(added)):
                 id = added[i]
-                title = titles[i]
-                node = activeManifest.getNode("node-%s" % id)
-                if node is None:
-                    self.vc("log").debug("adding: '{}', '{}'", id, title.encode("UTF-8"))
-                    activeManifest.addTopNode(id, title)
-                else:
-                    self.vc("log").debug("'{}' already in manifest", id)
+                # Protect against bad form data
+                if id != '':
+                    title = titles[i]
+                    node = activeManifest.getNode("node-%s" % id)
+                    if node is None:
+                        self.vc("log").debug("adding: '{}', '{}'", id, title.encode("UTF-8"))
+                        activeManifest.addTopNode(id, title)
+                    else:
+                        self.vc("log").debug("'{}' already in manifest", id)
         removed = self.vc("formData").getValues("removed")
         if removed:
             for id in removed:

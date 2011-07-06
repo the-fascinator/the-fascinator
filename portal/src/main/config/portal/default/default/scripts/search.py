@@ -23,7 +23,8 @@ class SearchData:
         self.sessionState = context["sessionState"]
         self.request = context["request"]
         self.pageName = context["pageName"]
-        
+        self.log = context["log"]
+
         self.__portal = context["page"].getPortal()
         self.__useSessionNavigation = self.__portal.getBoolean(True, ["portal", "use-session-navigation"])
         self.__result = None
@@ -41,7 +42,7 @@ class SearchData:
             # use form data not specified, check session
             sortField = self.__portal.sortFieldDefault or "score"
             sortOrder = self.__portal.sortFieldDefaultOrder or "desc"
-            print "f:%s,o:%s" % (sortField, sortOrder)
+            #print "f:%s,o:%s" % (sortField, sortOrder)
             self.__sortField = self.sessionState.get("sortField", sortField)
             self.__sortOrder = self.sessionState.get("sortOrder", sortOrder)
         self.sessionState.set("sortField", self.__sortField)
@@ -108,7 +109,7 @@ class SearchData:
             for annoDoc in resultForAnotar:
                 annotatesUri = annoDoc.getFirst("annotatesUri")
                 ids.add(annotatesUri)
-                print "Found annotation for %s" % annotatesUri
+                self.log.debug("Found annotation for %s" % annotatesUri)
             # add annotation ids to query
             query += ' OR id:("' + '" OR "'.join(ids) + '")'
         

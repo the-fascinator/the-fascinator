@@ -12,6 +12,8 @@ class OrganiserData:
 
     def __activate__(self, context):
         self.velocityContext = context
+        self.services = context["Services"]
+        self.log = context["log"]
 
         #print "formData: %s" % self.vc("formData")
         self.__oid = self.vc("formData").get("oid")
@@ -25,7 +27,7 @@ class OrganiserData:
                 result = self.__getRvtManifest(self.getManifest())
                 #print "Result: ", result
         except Exception, e:
-            log.error("Failed to load manifest", e);
+            self.log.error("Failed to load manifest", e);
             result = '{ status: "error", message: "%s" }' % str(e)
 
         if result is not None:
@@ -38,7 +40,7 @@ class OrganiserData:
         if self.velocityContext[index] is not None:
             return self.velocityContext[index]
         else:
-            log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
+            self.log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
             return None
 
     def getManifest(self):
@@ -76,7 +78,7 @@ class OrganiserData:
             altText = format
         # check for specific icon
         iconPath = "images/icons/mimetype/%s/icon.png" % format
-        resource = Services.getPageService().resourceExists(self.vc("portalId"), iconPath)
+        resource = self.services.velocityService.resourceExists(self.vc("portalId"), iconPath)
         if resource is not None:
             return "<img class=\"mime-type\" src=\"%s/%s\" title=\"%s\" alt=\"%s\" />" % (path, iconPath, altText, altText)
         elif format.find("/") != -1:
@@ -100,7 +102,7 @@ class OrganiserData:
                 payload.close()
                 object.close()
             except StorageException, e:
-                log.error("Error during getObject()", e)
+                self.log.error("Error during getObject()", e)
         return contentType
 
     def __readManifest(self, oid):
@@ -147,5 +149,5 @@ class OrganiserData:
                     rvtNode.put("relPath", oid)
                     rvtNodes.add(rvtNode)
             except Exception, e:
-                log.error("Failed to process node '%s': '%s'" % (node.toString(), str(e)))
+                self.log.error("Failed to process node '%s': '%s'" % (node.toString(), str(e)))
         return rvtNodes

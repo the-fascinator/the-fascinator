@@ -32,7 +32,7 @@ class ResultData:
             altText = format
         # check for specific icon
         iconPath = "images/icons/mimetype/%s/icon.png" % format
-        resource = self.services.getPageService().resourceExists(self.portalId, iconPath)
+        resource = self.services.velocityService.resourceExists(self.portalId, iconPath)
         if resource is not None:
             return "<img src=\"%s/%s\" title=\"%s\" alt=\"%s\" />" % (path, iconPath, altText, altText)
         elif format.find("/") != -1:

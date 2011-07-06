@@ -165,7 +165,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      */
     @Override
     public PyObject getScriptObject(String path) {
-        //log.debug("getScriptObject: {} ({})", path, tid);
+        //log.debug("getScriptObject: '{}'", path);
         if (lastModifiedCheck) {
             // check if the script was modified and remove from cache
             File scriptFile = new File(portalManager.getHomeDir(), path);
@@ -197,7 +197,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      */
     @Override
     public String getPath(String pathId) {
-        //log.debug("getPath: {}", id);
+        //log.debug("getPath: {}", pathId);
         Element element = pathCache.get(pathId);
         if (element != null) {
             return element.getObjectValue().toString();
@@ -213,7 +213,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      */
     @Override
     public void putPath(String pathId, String path) {
-        //log.debug("putPath: {} {}", id, path);
+        //log.debug("putPath: {} {}", pathId, path);
         pathCache.put(new Element(pathId, path));
     }
 

@@ -17,17 +17,18 @@ from com.googlecode.fascinator.common import JsonObject, JsonSimple, JsonSimpleC
 #        print "popupDebugMessage Error - '%s'\n'message was '%s'" % (str(e), msg)
 #####
 
-class PackageData(object):
+class PackageData:
     def __init__(self):
         pass
 
     def __activate__(self, context):
         self.sysConfig = JsonSimpleConfig()
         self.velocityContext = context
+        self.log = context["log"]
         self.__meta = {}
         formData = self.vc("formData")
 
-        self.isAjax = self.vc("formData").get("ajax") != None
+        self.isAjax = formData.get("ajax") != None
         if self.isAjax:
             ok = JsonObject()
             ok.put("ok", "OK")
@@ -36,8 +37,8 @@ class PackageData(object):
             self.json = ""
 
         self.__selectedPackageType = formData.get("packageType", "default")
-        #print "formData=%s" % self.vc("formData")
-        #print "selectedPackageType='%s'" % self.__selectedPackageType
+        self.log.debug("formData = %s" % self.vc("formData"))
+        self.log.debug("selectedPackageType = '%s'" % self.__selectedPackageType)
         self.__meta["packageType"] = formData.get("packageType", "default")
         self.__meta["description"] = formData.get("description", "")
 
@@ -56,7 +57,7 @@ class PackageData(object):
         try:
             JOptionPane.showMessageDialog(None, msg)
         except Exception, e:
-            print "popupDebugMessage Error - '%s'\n'message was '%s'" % (str(e), msg)
+            self.log.debug("popupDebugMessage Error - '%s'\n'message was '%s'" % (str(e), msg))
 
     def getFormData(self, field):
         return self.__encoded(self.vc("formData").get(field, ""))
