@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.the-fascinator.plugins</groupId>
     <artifactId>plugin-harvester-oai-pmh</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
     <name>The Fascinator - Plugin - Harvester - OAI-PMH</name>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/harvester/oai-pmh</url>
     <parent>

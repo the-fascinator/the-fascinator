@@ -3,7 +3,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.the-fascinator.plugins</groupId>
   <artifactId>plugin-subscriber-solrEventLog</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
   <name>The Fascinator - Plugin - Subscriber - Solr Event Logs</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/subscriber/solrEventLog</url>
   <parent>

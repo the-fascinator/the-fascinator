@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-core</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
     <name>The Fascinator - Core</name>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>

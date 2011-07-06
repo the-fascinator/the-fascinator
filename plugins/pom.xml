@@ -4,7 +4,6 @@
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-plugins</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.3-SNAPSHOT</version>
     <name>The Fascinator - Plugins</name>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
