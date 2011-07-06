@@ -1,1 +1,0 @@
-<div class="results-total right">Showing ${paging.startNum} to ${paging.endNum} of ${paging.totalFound} items</div>

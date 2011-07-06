@@ -1,9 +1,0 @@
-#set($status = $self.setStatus(401))
-
-#set($pageTitle = "Login Required")
-<h2 id="page-heading">$pageTitle</h2>
-<div class="grid_16">
-    <div class="box">
-        <p>A login is required to view this item. Please <a class="login-now" href="#">login now</a>.</p>
-    </div>
-</div>

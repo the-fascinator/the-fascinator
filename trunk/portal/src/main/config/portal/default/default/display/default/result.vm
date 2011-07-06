@@ -1,5 +1,0 @@
-#parseDisplayTemplate("result/common.vm")
-#parseDisplayTemplate("result/header.vm")
-#parseDisplayTemplate("result/actions.vm")
-#parseDisplayTemplate("result/body.vm")
-#parseDisplayTemplate("result/footer.vm")

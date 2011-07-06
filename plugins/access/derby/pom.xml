@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.the-fascinator.plugins</groupId>
     <artifactId>plugin-access-derby</artifactId>
-    <version>1.0.3</version>
     <name>The Fascinator - Plugin - Access - Derby</name>
     <description>TODO</description>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/access/derby</url>

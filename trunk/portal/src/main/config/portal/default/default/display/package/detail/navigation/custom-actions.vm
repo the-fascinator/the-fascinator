@@ -1,3 +1,0 @@
-#if($self.hasWorkflowAccess())
-    <li><a href="$portalPath/workflow/$oid">Organise...</a></li>
-#end

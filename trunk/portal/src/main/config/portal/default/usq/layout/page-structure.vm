@@ -1,8 +1,0 @@
-<div class="body">
-
-#parse($page.getTemplate('layout/header-branding.vm'))
-#parse($page.getTemplate('layout/header-application.vm'))
-#parse($page.getTemplate('layout/usq-page-content.vm'))
-#parse($page.getTemplate("layout/footer-branding.vm"))
-
-</div>

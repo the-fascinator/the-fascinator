@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.the-fascinator.plugins</groupId>
     <artifactId>plugin-harvester-filesystem</artifactId>
-    <version>1.0.3</version>
     <name>The Fascinator - Plugin - Harvester - File System</name>
     <description>Performs a batch harvest of any filesystem that can support Java</description>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/harvester/filesystem</url>

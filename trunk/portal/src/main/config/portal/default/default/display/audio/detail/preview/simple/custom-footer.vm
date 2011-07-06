@@ -1,3 +1,0 @@
-## Need to include jquery as the standard scripts are not included in preview mode
-<script type="text/javascript" src="$portalPath/js/jquery-1.4.4.min.js"></script>
-#parseDisplayTemplate("detail/player.vm")

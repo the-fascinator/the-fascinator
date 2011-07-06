@@ -10,7 +10,6 @@
     <groupId>com.googlecode.the-fascinator</groupId>
     <artifactId>fascinator-vocabulary</artifactId>
     <name>The Fascinator - Vocabulary Library</name>
-    <version>1.0.3</version>
     <properties>
         <aperture.version>1.4.0</aperture.version>
         <rdf2go.version>4.7.2</rdf2go.version>

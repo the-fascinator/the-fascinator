@@ -3,7 +3,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.the-fascinator.plugins</groupId>
   <artifactId>plugin-transformer-ice2</artifactId>
-  <version>1.0.3</version>
   <name>The Fascinator - Plugin - Transformer - ICE 2</name>
   <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/plugins/transformer/ice2</url>
   <parent>

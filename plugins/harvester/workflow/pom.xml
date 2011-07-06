@@ -3,7 +3,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.the-fascinator.plugins</groupId>
   <artifactId>plugin-harvester-workflow</artifactId>
-  <version>1.0.3</version>
   <name>The Fascinator - Plugin - Harvester - Workflow</name>
   <url>https://sites.google.com/site/fascinatorhome/home/documentation/technical/documents/common-library/plugins/harvester/workflows-harvester</url>
   <parent>

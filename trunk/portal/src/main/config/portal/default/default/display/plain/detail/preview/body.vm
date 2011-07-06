@@ -1,1 +1,0 @@
- $self.getContent($oid, $metadata)
