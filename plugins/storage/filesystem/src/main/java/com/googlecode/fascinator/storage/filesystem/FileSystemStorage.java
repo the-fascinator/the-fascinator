@@ -250,12 +250,14 @@ public class FileSystemStorage implements Storage {
                     is = new FileInputStream(file);
                     sofMeta.load(is);
                     String objectId = sofMeta.getProperty("objectId");
-                    if (objectId != null) {
-                        objectList.add(objectId);
-                    } else {
-                        log.error("Null object ID found in "
-                                + file.getAbsolutePath());
+                    if (objectId == null) {
+                        // objectId wasn't recorded. Try to infer it from path
+                        objectId = file.getParentFile().getName();
+                        log.warn("Null object ID found in '{}', "
+                                + "inferring from path: '{}'",
+                                file.getAbsolutePath(), objectId);
                     }
+                    objectList.add(objectId);
                 } catch (FileNotFoundException e) {
                     log.error("Error reading object metadata file", e);
                 } catch (IOException e) {
