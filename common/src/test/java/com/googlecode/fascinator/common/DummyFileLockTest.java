@@ -26,6 +26,7 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -80,9 +81,7 @@ public class DummyFileLockTest {
                 @Override
                 public Boolean call() throws Exception {
                     int delay = generator.nextInt(1000);
-                    // TODO : Some rare occurances of two threads getting the
-                    //  the same values from 'complexI'. Need a better idea
-                    int i = complexI++;
+                    int i = incCounter();
 
                     try {
                         System.out.println("Thread " + i + " starting.");
@@ -116,4 +115,8 @@ public class DummyFileLockTest {
         System.out.println("=========================");
     }
 
+    // Thread safe counter increment method.
+    private synchronized int incCounter() {
+        return complexI++;
+    }
 }
