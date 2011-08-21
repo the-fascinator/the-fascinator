@@ -721,7 +721,7 @@ public class HouseKeeper implements GenericListener {
                     qStats.put("speed",   String.valueOf(spd));
                     // Change from milliseconds to seconds
                     float avg = Float.valueOf(
-                            qData.getString(null, "average")) / 1000;
+                            qData.getString("0.0", "average")) / 1000;
                     // Round to two digits
                     avg = Math.round(avg * 100)/100;
                     qStats.put("average", String.valueOf(avg));
