@@ -758,6 +758,7 @@ public class SolrIndexer implements Indexer {
             bindings.put("payload", payload);
             bindings.put("params", props);
             bindings.put("pyUtils", pyUtils);
+            bindings.put("log", log);
 
             // Run the data through our script
             PyObject script = getPythonObject(rulesOid);

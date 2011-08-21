@@ -1,5 +1,7 @@
 import time
 
+from com.googlecode.fascinator.api.storage import StorageException
+
 class IndexData:
     def __init__(self):
         pass
@@ -11,6 +13,7 @@ class IndexData:
         self.payload = context["payload"]
         self.params = context["params"]
         self.utils = context["pyUtils"]
+        self.log = context["log"]
 
         # Common data
         self.__newDoc()
@@ -60,7 +63,7 @@ class IndexData:
                     self.utils.add(self.index, "preview", self.previewPid)
                 elif str(payload.getType())=="AltPreview":
                     self.utils.add(self.index, "altpreview", payload.getId())
-            except Exception, e:
+            except StorageException, e:
                 pass
 
     def __security(self):
@@ -76,18 +79,56 @@ class IndexData:
             self.utils.setAccessSchema(schema, "derby")
             self.utils.add(self.index, "security_filter", "guest")
 
+    def __getDcPayload(self):
+        # Try for the source first
+        pid = self.object.getSourceId()
+        if pid is not None:
+            try:
+                payload = self.object.getPayload(pid)
+            except Exception, e:
+                self.log.error("Source PID '{}' not accessible", pid, e)
+                return None
+
+        # Or 'dc.xml'
+        else:
+            self.log.error("Object '{}' has no SOURCE payload! Trying 'oai_dc.xml'...", self.oid)
+            try:
+                payload = self.object.getPayload("oai_dc.xml")
+                self.log.warn("... found 'oai_dc.xml' in object '{}'. Using it instead.", self.oid)
+                return payload
+            except StorageException, e:
+                self.log.error("... 'oai_dc.xml' not found either. Please check harvest logs, object '{}' does not appear to harvested correctly.", self.oid)
+                return None
+
     def __metadata(self):
         self.utils.registerNamespace("oai_dc", "http://www.openarchives.org/OAI/2.0/oai_dc/")
         self.utils.registerNamespace("dc", "http://purl.org/dc/elements/1.1/")
 
-        dcPayload = self.object.getPayload(self.object.getSourceId())
+        dcPayload = self.__getDcPayload()
+        if dcPayload is None:
+            title = "Unknown %s" % self.oid
+            self.utils.add(self.index, "title", title)
+            self.utils.add(self.index, "dc_title", title)
+            description = "Error during harvest/index for item '%s'. Could not access metadata from storage." % self.oid
+            self.utils.add(self.index, "description", description)
+            self.utils.add(self.index, "dc_description", description)
+            return
         dc = self.utils.getXmlDocument(dcPayload.open())
         dcPayload.close()
+
+        # Make sure we only get one type
+        dcType = None
         nodes = dc.selectNodes("//dc:*")
         for node in nodes:
             name = "dc_" + node.getName()
             text = node.getTextTrim()
-            self.utils.add(self.index, name, text)
+            if name == "dc_type":
+                # Only index the first type
+                if dcType is None:
+                    self.utils.add(self.index, name, text)
+                    dcType = text
+            else:
+                self.utils.add(self.index, name, text)
             # Make sure we get the title and description just for the Fascinator
             if name == "dc_title":
                 self.utils.add(self.index, "title", text)
