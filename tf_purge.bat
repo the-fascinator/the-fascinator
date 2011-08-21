@@ -39,6 +39,10 @@ echo echo Deleting: %FASCINATOR_HOME%\logs
 rd /s/q %FASCINATOR_HOME%\logs
 echo ----
 
+echo Deleting: %FASCINATOR_HOME%\database\fsHarvestCache
+rd /s/q %FASCINATOR_HOME%\database\fsHarvestCache
+echo ----
+
 echo Deleting: %FASCINATOR_HOME%\cache
 rd /s/q %FASCINATOR_HOME%\cache
 echo ----

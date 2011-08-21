@@ -42,6 +42,9 @@ if [ "$1" == "all" ]; then
     echo Deleting: $TF_HOME/logs
     rm -rf $TF_HOME/logs
 
+    echo Deleting: $TF_HOME/database/fsHarvestCache
+    rm -rf $TF_HOME/database/fsHarvestCache
+
     echo Deleting: $TF_HOME/cache
     rm -rf $TF_HOME/cache
 fi
