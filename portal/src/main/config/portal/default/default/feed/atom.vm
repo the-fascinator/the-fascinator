@@ -25,7 +25,7 @@
         <entry>
             <title>$title</title>
             <author><name>fascinator</name></author>
-            #<link href="$self.baseUrl$portal.name/detail/$oid"/>
+            <link href="${urlBase}$portal.name/detail/$oid"/>
             <id>$oid</id>
             <updated>$item.get("last_modified")</updated>
             <published></published>
