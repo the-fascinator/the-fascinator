@@ -14,15 +14,13 @@
     <description>
         The Fascinator platform is a set of components that can be
         remixed/mashed to meet a variety of repository-centric needs.
-        Developers: For code analysis, please refer to
-        https://build.adfi.usq.edu.au/sonar/project/index/au.edu.usq.fascinator:the-fascinator.
     </description>
-    <url>http://fascinator.usq.edu.au</url>
+    <url>http://code.google.com/p/the-fascinator/</url>
     <issueManagement>
     </issueManagement>
     <ciManagement>
-        <system>Hudson</system>
-        <url>https://build.adfi.usq.edu.au/ci/job/The%20Fascinator/</url>
+        <system>Jenkins</system>
+        <url>https://redbox-build.cqu.edu.au/jenkins/job/Fascinator%20SVN%20Build/</url>
     </ciManagement>
     <scm>
         <url>http://the-fascinator.googlecode.com/svn/the-fascinator/trunk</url> 
