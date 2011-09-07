@@ -1,5 +1,5 @@
 {
-    "version": "0.7.17",
+    "version": "1.0.5.1",
     "configured": false,
     "urlBase": "http://localhost:9997/portal/",
     "email": "fascinator@usq.edu.au",
@@ -443,5 +443,13 @@
                 "timeLimit": "30"
             }
         }
+    },
+    "restoreTool": {
+        "harvestRemap": {
+            "enabled": false,
+            "allowOlder": false,
+            "failOnMissing": true
+        },
+        "migrationScript": ""
     }
 }

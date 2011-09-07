@@ -29,15 +29,21 @@ import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.MessagingServices;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.jms.JMSException;
 
+import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +56,12 @@ import org.slf4j.LoggerFactory;
  * @author Greg Pendlebury
  */
 public class ReIndexClient {
+    /** The name of the core class inside migration scripts */
+    private static String SCRIPT_CLASS_NAME = "MigrateData";
+
+    /** The name of the activation method required on instantiated classes */
+    private static String SCRIPT_ACTIVATE_METHOD = "__activate__";
+
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(ReIndexClient.class);
 
@@ -64,6 +76,15 @@ public class ReIndexClient {
 
     /** Item configuration cache */
     private Map<String, JsonSimple> harvestConfigs;
+
+    /** Harvest mapping config */
+    private boolean harvestRemap;
+    private boolean oldHarvestFiles;
+    private boolean failOnMissing;
+    private Map<String, String> harvestUpdates;
+
+    /** Migration Script */
+    private PyObject migrationScript;
 
     /**
      * ReIndex Client Constructor
@@ -111,8 +132,88 @@ public class ReIndexClient {
             return;
         }
 
+        // How are we handling harvest files?
+        harvestRemap = systemConfig.getBoolean(false,
+                "restoreTool", "harvestRemap", "enabled");
+        oldHarvestFiles = systemConfig.getBoolean(false,
+                "restoreTool", "harvestRemap", "allowOlder");
+        failOnMissing = systemConfig.getBoolean(true,
+                "restoreTool", "harvestRemap", "failOnMissing");
+        harvestUpdates = new HashMap();
+
+        // Migration Scripting?
+        String scriptString = systemConfig.getString(null,
+                "restoreTool", "migrationScript");
+        if (scriptString != null && !scriptString.equals("")) {
+            migrationScript = evalScript(scriptString);
+            if (migrationScript != null) {
+
+                // Make sure our activation method is available
+                if (migrationScript.__findattr__(SCRIPT_ACTIVATE_METHOD)
+                        == null) {
+                    log.error("Expected method '{}' not found in"
+                            + " migration script!", SCRIPT_ACTIVATE_METHOD);
+                    migrationScript = null;
+                }
+
+            } else {
+                log.error("A migration script has been configured, but there"
+                        + " were errors preparing, aborting rebuild!");
+                return;
+            }
+        }
+
         // Go do all the work we require
         logicLoop();
+    }
+
+    /**
+     * Evaluate the requested python script and return the resulting object
+     * for later user.
+     * 
+     * @param script The path to the script's location
+     * @return PyObject An evaluated PyObject, null for errors
+     * 
+     */
+    private PyObject evalScript(String script) {
+        // Find the script file
+        File file = new File(script);
+        if (file == null || !file.exists()) {
+            log.error("Could not find script: '{}'", script);
+            return null;
+        }
+
+        // Open the file for reading
+        FileInputStream inStream = null;
+        try {
+            inStream = new FileInputStream(file);
+        } catch (Exception ex) {
+            log.error("Error accessing script: '{}'", script, ex);
+            return null;
+        }
+
+        // Run it though an interpreter 
+        PythonInterpreter python = null;
+        try {
+            python = new PythonInterpreter();
+            python.execfile(inStream, "scriptname");
+        } catch (Exception ex) {
+            log.error("Error evaluating Python script: '{}'", script, ex);
+            return null;
+        }
+
+        // Get the result and cleanup
+        PyObject scriptClass = null;
+        try {
+            scriptClass = python.get(SCRIPT_CLASS_NAME);
+            python.cleanup();
+        } catch (Exception ex) {
+            log.error("Error accessing class: '{}'", SCRIPT_CLASS_NAME, ex);
+            return null;
+        }
+
+        // Instantiate and return the result
+        return scriptClass.__call__();
     }
 
     /**
@@ -127,23 +228,132 @@ public class ReIndexClient {
             return;
         }
 
-        int numObjects = objectList.size();
-        log.debug("Found {} objects in storage. Index process commencing...", numObjects);
+        firstPass(objectList);
+        processObjects(objectList);
+        log.info("Rebuild complete...");
+    }
+
+    /**
+     * First pass processing of objects. This stage is looking for changes that
+     * need to be made regarding the mapping of harvest files.
+     * 
+     * @param oids The set of OIDs to process
+     */
+    private void firstPass(Set oids) {
+        int numObjects = oids.size();
+        log.info("Found {} objects in storage. Assessing contents...",
+                numObjects);
+        if (!harvestRemap) {
+            log.info("No harvest remapping required in config.");
+            return;
+        }
+
+        // Prepare some holding variables
+        List<String> harvestFiles = new ArrayList();
+        Map<String, String> usedHarvestFiles = new HashMap();
+
+        // Look through storage and populate them
+        for (Object object : oids) {
+            if (object instanceof String) {
+                assessObject((String) object, harvestFiles, usedHarvestFiles);
+            } else {
+                log.error("Unexpected: Non-String OID! '{}'", object);
+            }
+        }
+
+        // Now sort out how we need to alter things
+        for (String key : usedHarvestFiles.keySet()) {
+            String pid = usedHarvestFiles.get(key);
+            if (pid != null) {
+                // Find the version we know was in use
+                Payload oldP = getPayload(key, pid);
+                // Look for an aternative
+                for (String newOid : harvestFiles) {
+                    // Make sure we don't find the same one
+                    if (!newOid.equals(key)) {
+                        Payload newP = getPayload(newOid, pid);
+                        // We found one
+                        if (newP != null) {
+                            // Check it's date
+                            if (newP.lastModified() >= oldP.lastModified()) {
+                                harvestUpdates.put(key, newOid);
+                                //log.debug("'{}' > '{}' ({})", new Object[] {key, newOid, pid});
+                            } else {
+                                // Do we allow older harvest files?
+                                if (oldHarvestFiles) {
+                                    harvestUpdates.put(key, newOid);
+                                // Rejected base on age
+                                } else {
+                                    log.error("Found an older harvest file,"
+                                            + " ignoring: '{}' > '{}'",
+                                            newOid, pid);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                log.error("Errors observed in storage for object(s) using"
+                        + " harvest file '{}'. PID should not be null!", key);
+            }
+        }
+    }
+
+    /**
+     * A basic loop for the handling of second stage processing.
+     * 
+     * @param oids The set of OIDs to process
+     */
+    private void processObjects(Set oids) {
         int i = 0;
-        //Object object = objectList.toArray()[0];
-        for (Object object : objectList) {
+        for (Object object : oids) {
             if (object instanceof String) {
                 processObject((String) object);
                 i++;
                 if (i % 50 == 0) {
                     log.info("{} objects rebuilt...", i);
                 }
-            } else {
-                log.error("Unexpected: Non-String OID! '{}'", object);
+            }
+        }
+    }
+
+    /**
+     * Assess the provided object OID. We are looking for whether or not it is
+     * a harvest file, or if not what harvest file it is using.
+     * 
+     * @param oid The Object ID to process.
+     * @param harvestFiles A List in which to store any found harvest files
+     * @param usedHarvestFiles A Map in which to store observed instances of a harvest file in use
+     */
+    private void assessObject(String oid, List<String> harvestFiles,
+            Map<String, String> usedHarvestFiles) {
+        Properties metadata = getMetadata(oid);
+
+        // Config file
+        String configOid = metadata.getProperty("jsonConfigOid");
+        if (configOid == null) {
+            // This is a harvest file
+            harvestFiles.add(oid);
+            //log.debug("Harvest File: '{}'", oid);
+        } else {
+            // This is a standard object
+            if (!usedHarvestFiles.containsKey(configOid)) {
+                String configPid = metadata.getProperty("jsonConfigPid");
+                usedHarvestFiles.put(configOid, configPid);
+                //log.debug("New Harvest Config File: '{}' > '{}'", configOid, configPid);
             }
         }
 
-        log.info("Rebuild complete...");
+        // Rules file
+        String rulesOid = metadata.getProperty("rulesOid");
+        if (rulesOid != null) {
+            // This is a standard object
+            if (!usedHarvestFiles.containsKey(rulesOid)) {
+                String rulesPid = metadata.getProperty("rulesPid");
+                usedHarvestFiles.put(rulesOid, rulesPid);
+                //log.debug("New Harvest Rules File: '{}' > '{}'", rulesOid, rulesPid);
+            }
+        }
     }
 
     /**
@@ -161,6 +371,7 @@ public class ReIndexClient {
             digitalObject = storage.getObject(oid);
         } catch (StorageException ex) {
             log.error("Retrieving OID '{}' failed!: ", oid, ex);
+            return;
         }
 
         // Retrieve the key/value metadata list
@@ -168,7 +379,8 @@ public class ReIndexClient {
         try {
             metadata = digitalObject.getMetadata();
         } catch (StorageException ex) {
-            log.error("Retrieving OID '{}' failed!: ", oid, ex);
+            log.error("Retrieving metadata for OID '{}' failed!: ", oid, ex);
+            return;
         }
 
         // Find which configuration file should be used
@@ -187,6 +399,61 @@ public class ReIndexClient {
             }
         }
 
+        // Are we remapping this one?
+        if (harvestRemap) {
+            String rulesOid = metadata.getProperty("rulesOid");
+            // We want a mapping for both files
+            if (harvestUpdates.containsKey(configOid) &&
+                    harvestUpdates.containsKey(rulesOid)) {
+                remapHarvestFile(metadata, "jsonConfigOid");
+                remapHarvestFile(metadata, "rulesOid");
+
+            // Is a missing harvest file a problem?
+            } else {
+                if (failOnMissing) {
+                    log.error("Failed to process object '{}'."
+                            + " No mapping exists for harvest file!", oid);
+                    return;
+                }
+                // Otherwise try mapping each alone (they could even both fail)
+                remapHarvestFile(metadata, "jsonConfigOid");
+                remapHarvestFile(metadata, "rulesOid");
+            }
+            // If anything was altered it has to be saved
+            try {
+                digitalObject.close();
+            } catch (StorageException ex) {
+                log.error("Error saving the object '{}' back to storage: ",
+                        oid, ex);
+                return;
+            }
+            // And don't forget to update this variable
+            configOid = metadata.getProperty("jsonConfigOid");
+        }
+
+        // Are we running a migration script?
+        if (migrationScript != null) {
+            Map<String, Object> bindings = new HashMap();
+            bindings.put("object", digitalObject);
+            bindings.put("log", log);
+            try {
+                migrationScript.invoke(SCRIPT_ACTIVATE_METHOD,
+                        Py.java2py(bindings));
+            } catch (Exception ex) {
+                log.error("Error executing migration script"
+                        + " against object '{}'", oid, ex);
+                return;
+            }
+            // Sometimes the migration script will alter object contents
+            try {
+                digitalObject.close();
+            } catch (StorageException ex) {
+                log.warn("There is most likely an open File handle"
+                        + " left over in the migration script");
+                log.error("Error closing object '{}'", oid, ex);
+            }
+        }
+
         // Get our configuration
         JsonSimple itemConfig = getConfiguration(configOid);
         if (itemConfig == null) {
@@ -199,10 +466,77 @@ public class ReIndexClient {
     }
 
     /**
+     * Remap a harvest file OID stored in the provided properties using
+     * the provided key.
+     * 
+     * @param metadata The Properties Object to fix
+     * @param key The key storing the harvest file OID
+     */
+    private void remapHarvestFile(Properties metadata, String key) {
+        String oldOid = metadata.getProperty(key);
+        if (oldOid == null) return;
+        if (!harvestUpdates.containsKey(oldOid)) return;
+
+        String newOid = harvestUpdates.get(oldOid);
+        if (newOid == null) return;
+        metadata.setProperty(key, newOid);
+    }
+
+    /**
+     * Retrieve the metadata properties from storage for the request OID.
+     * 
+     * @param oid The Object ID of the object in storage
+     * @return Properties An instantiated Properties Object, or null for errors
+     */
+    private Properties getMetadata(String oid) {
+        // Get the object from storage
+        DigitalObject digitalObject = null;
+        try {
+            digitalObject = storage.getObject(oid);
+        } catch (StorageException ex) {
+            log.error("Retrieving OID '{}' failed!: ", oid, ex);
+            return null;
+        }
+
+        // Retrieve the key/value metadata list
+        try {
+            return digitalObject.getMetadata();
+        } catch (StorageException ex) {
+            log.error("Retrieving metadata for OID '{}' failed!: ", oid, ex);
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve a Payload from storage
+     * 
+     * @param oid The Object ID of the object in storage
+     * @param pid The Payload ID in the object
+     * @return Payload An instantiated Payload Object, or null for errors
+     */
+    private Payload getPayload(String oid, String pid) {
+        // Get the object from storage
+        DigitalObject digitalObject = null;
+        try {
+            digitalObject = storage.getObject(oid);
+        } catch (StorageException ex) {
+            log.error("Retrieving OID '{}' failed!: ", oid, ex);
+            return null;
+        }
+
+        // Return the payload... if it exists
+        try {
+            return digitalObject.getPayload(pid);
+        } catch (StorageException ex) {
+            return null;
+        }
+    }
+
+    /**
      * Get the requested configuration from storage and parse into a JSON
      * object. Will cache results to lower I/O performance hit.
      * 
-     * @param The Object ID of the configuration file to retrieve.
+     * @param oid The Object ID of the configuration file to retrieve.
      */
     private JsonSimple getConfiguration(String oid) {
         // Try the cache first
