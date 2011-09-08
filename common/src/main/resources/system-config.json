@@ -1,5 +1,5 @@
 {
-    "version": "1.0.5.1",
+    "version": "1.0.5.2",
     "configured": false,
     "urlBase": "http://localhost:9997/portal/",
     "email": "fascinator@usq.edu.au",
@@ -435,7 +435,7 @@
         "path": "${INSTALL_PATH}/watcher"
     },
     "subscriber": {
-        "solr": {
+        "solr-event-log": {
             "uri": "http://localhost:9997/solr/eventlog",
             "buffer": {
                 "docLimit": "200",

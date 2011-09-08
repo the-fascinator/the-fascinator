@@ -1,6 +1,7 @@
 /* 
  * The Fascinator - Common - Subscriber Queue Consumer
  * Copyright (C) 2010-2011 University of Southern Queensland
+ * Copyright (C) 2011 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +21,6 @@ package com.googlecode.fascinator;
 
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.subscriber.Subscriber;
-import com.googlecode.fascinator.api.subscriber.SubscriberException;
 import com.googlecode.fascinator.common.GenericListener;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
@@ -98,7 +98,11 @@ public class SubscriberQueueConsumer implements GenericListener {
     /** Thread reference */
     private Thread thread;
 
+    /** List of plugins waiting for news */
     private List<Subscriber> subscriberList;
+
+    /** Important field names */
+    private List<String> coreFields;
 
     /**
      * Constructor required by ServiceLoader. Be sure to use init()
@@ -151,6 +155,15 @@ public class SubscriberQueueConsumer implements GenericListener {
         name = config.getString(null, "config", "name");
         QUEUE_ID = name;
         thread.setName(name);
+
+        // A list of core fields
+        coreFields = new ArrayList();
+        coreFields.add("id");
+        coreFields.add("oid");
+        coreFields.add("eventType");
+        coreFields.add("context");
+        coreFields.add("user");
+        coreFields.add("eventTime");
 
         try {
             subscriberList = new ArrayList<Subscriber>();
@@ -259,8 +272,8 @@ public class SubscriberQueueConsumer implements GenericListener {
 
             log.info(" *** Received event, object id={}, from={}", oid, context);
 
-            sendNotification(oid, "logging start", "(" + name
-                    + ") Event Logging starting : '" + oid + "'");
+            //sendNotification(oid, "logging start", "(" + name
+            //        + ") Event Logging starting : '" + oid + "'");
 
             DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
             String now = df.format(new Date());
@@ -272,22 +285,35 @@ public class SubscriberQueueConsumer implements GenericListener {
             param.put("oid", oid);
             param.put("eventType", config.getString(null, "eventType"));
             param.put("context", context);
-            param.put("user", config.getString("guest", "user"));
+            param.put("user", config.getString("{unknown}", "user"));
             param.put("eventTime", now);
+            // Now map all non-core fields as well
+            for (Object key : config.getJsonObject().keySet()) {
+                if (key instanceof String) {
+                    String sKey = (String) key;
+                    if (!coreFields.contains(sKey)) {
+                        String value = config.getString(null, sKey);
+                        if (value != null) {
+                            param.put(sKey, value);
+                        }
+                    }
+                }
+            }
 
+            // Let all subscribers know
             for (Subscriber subscriber : subscriberList) {
                 subscriber.onEvent(param);
             }
 
-            sendNotification(oid, "logging end", "(" + name
-                    + ") Event Logging ending : '" + oid + "'");
+            //sendNotification(oid, "logging end", "(" + name
+            //        + ") Event Logging ending : '" + oid + "'");
 
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse.getMessage());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
-        } catch (SubscriberException e) {
-            log.error("Failed to log the events: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to log the event: {}", e.getMessage());
         }
     }
 

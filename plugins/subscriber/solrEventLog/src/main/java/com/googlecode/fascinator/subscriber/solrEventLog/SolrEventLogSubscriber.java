@@ -1,6 +1,7 @@
 /*
  * The Fascinator - Solr Event Log Subscriber
  * Copyright (C) 2010-2011 University of Southern Queensland
+ * Copyright (C) 2011 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -234,7 +235,7 @@ public class SolrEventLogSubscriber implements Subscriber {
     private void setConfig(JsonSimpleConfig config) throws SubscriberException {
         try {
             // Find our solr index
-            uri = new URI(config.getString(null, "subscriber", "solr", "uri"));
+            uri = new URI(config.getString(null, "subscriber", getId(), "uri"));
             if (uri == null) {
                 throw new SubscriberException("No Solr URI provided");
             }
@@ -250,11 +251,11 @@ public class SolrEventLogSubscriber implements Subscriber {
             bufferSize = 0;
             bufferOldest = 0;
             bufferDocLimit = config.getInteger(BUFFER_LIMIT_DOCS,
-                    "subscriber", "solr", "buffer", "docLimit");
+                    "subscriber", getId(), "buffer", "docLimit");
             bufferSizeLimit = config.getInteger(BUFFER_LIMIT_SIZE,
-                    "subscriber", "solr", "buffer", "sizeLimit");
+                    "subscriber", getId(), "buffer", "sizeLimit");
             bufferTimeLimit = config.getInteger(BUFFER_LIMIT_TIME,
-                    "subscriber", "solr", "buffer", "timeLimit");
+                    "subscriber", getId(), "buffer", "timeLimit");
 
             // Timeout 'tick' for buffer (10s)
             timer = new Timer("SolrEventLog:" + this.toString(), true);

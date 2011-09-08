@@ -31,6 +31,8 @@
     <field name="user" type="string" indexed="true" stored="true" />
     <field name="context" type="string" indexed="true" stored="true" />
     <field name="text" type="string" indexed="true" stored="true" />
+
+    <dynamicField name="*" type="string" indexed="true" stored="true" />
   </fields>
 
   <uniqueKey>id</uniqueKey>
