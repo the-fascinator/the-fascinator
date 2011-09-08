@@ -32,7 +32,7 @@ class AboutData:
 
     def getAboutPage(self, plugin, type):
         if type is None or plugin is None:
-            return "<em>'plugin/%s/%s/about.html' not found!</em>" % (type, plugin)
+            return "<em>This plugin has provided no information about itself.</em>"
         pid = plugin.replace("-", "_")
         resource = "plugin/%s/%s/about.html" % (type, pid)
         stream = self.pageService.getResource(resource)
@@ -41,4 +41,4 @@ class AboutData:
             IOUtils.copy(stream, writer, "UTF-8")
             html = writer.toString()
             return html
-        return "<em>'plugin/%s/%s/about.html' not found!</em>" % (type, pid)
+        return "<em>This plugin has provided no information about itself.</em>"
