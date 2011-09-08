@@ -29,8 +29,8 @@
     <fieldset class="search">
       <legend>User Data</legend>
       <p>
-        <label for="username">User ID</label>
-        <input type="text" id="username" readonly="readonly" value="$page.authentication.get_username()" />
+        <label for="udUsername">User ID</label>
+        <input type="text" id="udUsername" readonly="readonly" value="$page.authentication.get_username()" />
       </p>
       <p>
         <label for="name">Name</label>
