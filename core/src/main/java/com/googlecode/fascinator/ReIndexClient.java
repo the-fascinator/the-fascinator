@@ -433,9 +433,15 @@ public class ReIndexClient {
 
         // Are we running a migration script?
         if (migrationScript != null) {
+            // Prepare variables for access
             Map<String, Object> bindings = new HashMap();
+            List<String> auditMessages = new ArrayList();
+            bindings.put("systemConfig", systemConfig);
             bindings.put("object", digitalObject);
             bindings.put("log", log);
+            bindings.put("auditMessages", auditMessages);
+
+            // Execute
             try {
                 migrationScript.invoke(SCRIPT_ACTIVATE_METHOD,
                         Py.java2py(bindings));
@@ -444,6 +450,12 @@ public class ReIndexClient {
                         + " against object '{}'", oid, ex);
                 return;
             }
+
+            // Make sure audit entries are sent
+            for (String msg : auditMessages) {
+                auditLog(oid, msg);
+            }
+
             // Sometimes the migration script will alter object contents
             try {
                 digitalObject.close();
@@ -635,6 +647,23 @@ public class ReIndexClient {
                     oid);
             log.error("Error stacktrace: ", ex);
         }
+    }
+
+    /**
+     * Send events to subscriber queue for audit logging
+     * 
+     * @param oid Object id
+     * @param message Message to send to the log
+     * @param context where the event happened
+     * @param jsonFile Configuration file
+     */
+    private void auditLog(String oid, String message) {
+        Map<String, String> param = new HashMap<String, String>();
+        param.put("oid", oid);
+        param.put("eventType", message);
+        param.put("username", "system");
+        param.put("context", "ReIndexClient");
+        messaging.onEvent(param);
     }
 
     /**

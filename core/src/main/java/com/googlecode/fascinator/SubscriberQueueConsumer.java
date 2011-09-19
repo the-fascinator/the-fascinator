@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -66,7 +67,7 @@ public class SubscriberQueueConsumer implements GenericListener {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
     /** DateTime format */
-    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'hh:mm:ss'Z'";
+    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss'Z'";
 
     /** Render queue string */
     private String QUEUE_ID;
@@ -280,7 +281,7 @@ public class SubscriberQueueConsumer implements GenericListener {
 
             // Convert to Map
             Map<String, String> param = new LinkedHashMap<String, String>();
-            String id = DigestUtils.md5Hex(oid + now);
+            String id = UUID.randomUUID().toString();
             param.put("id", id);
             param.put("oid", oid);
             param.put("eventType", config.getString(null, "eventType"));
