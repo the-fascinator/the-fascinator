@@ -16,13 +16,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.googlecode.fascinator;
+package com.googlecode.fascinator.messaging;
 
-import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -186,8 +187,8 @@ public class EmailNotificationConsumer implements GenericListener {
 
         try {
             messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
+        } catch (MessagingException ex) {
+            log.error("Failed to start connection: {}", ex.getMessage());
         }
     }
 
@@ -350,7 +351,11 @@ public class EmailNotificationConsumer implements GenericListener {
         param.put("eventType", eventType);
         param.put("username", "system");
         param.put("context", this.getClass().getName());
-        messaging.onEvent(param);
+        try {
+            messaging.onEvent(param);
+        } catch (MessagingException ex) {
+            log.error("Unable to send message: ", ex);
+        }
     }
 
     /**

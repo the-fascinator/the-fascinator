@@ -1,6 +1,7 @@
 /* 
- * The Fascinator - Core
- * Copyright (C) 2009-2011 University of Southern Queensland
+ * The Fascinator - Common - Subscriber Queue Consumer
+ * Copyright (C) 2010-2011 University of Southern Queensland
+ * Copyright (C) 2011 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +17,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.googlecode.fascinator;
+package com.googlecode.fascinator.messaging;
 
-import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.indexer.IndexerException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.api.subscriber.Subscriber;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.UUID;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -52,22 +51,28 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Consumer for rendering transformers. Jobs in this queue are generally longer
- * running running processes and are started after the initial harvest.
+ * Consumer for Subscribers. Jobs in this queue should be short running
+ * processes as they are run when object is modified/deleted.
  * 
  * @author Oliver Lucido
  * @author Linda Octalina
  */
-public class RenderQueueConsumer implements GenericListener {
+public class SubscriberQueueConsumer implements GenericListener {
 
-    /** Service Loader will look for this */
-    public static final String LISTENER_ID = "render";
+    /** Subscriber Queue name */
+    public static final String SUBSCRIBER_QUEUE = "subscriber";
+
+    /** Date format */
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    /** DateTime format */
+    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss'Z'";
 
     /** Render queue string */
     private String QUEUE_ID;
 
     /** Logging */
-    private Logger log = LoggerFactory.getLogger(RenderQueueConsumer.class);
+    private Logger log = LoggerFactory.getLogger(SubscriberQueueConsumer.class);
 
     /** JSON configuration */
     private JsonSimpleConfig globalConfig;
@@ -81,12 +86,6 @@ public class RenderQueueConsumer implements GenericListener {
     /** JMS Topic */
     // private Topic broadcast;
 
-    /** Indexer object */
-    private Indexer indexer;
-
-    /** Storage */
-    private Storage storage;
-
     /** Message Consumer instance */
     private MessageConsumer consumer;
 
@@ -99,24 +98,18 @@ public class RenderQueueConsumer implements GenericListener {
     /** Thread reference */
     private Thread thread;
 
-    /** Object being processed */
-    private DigitalObject object;
+    /** List of plugins waiting for news */
+    private List<Subscriber> subscriberList;
 
-    /** Transformer conveyer belt */
-    private ConveyerBelt conveyer;
-
-    /** Auto commit flag on index */
-    private boolean autoCommit;
-
-    /** Messaging services */
-    private MessagingServices messaging;
+    /** Important field names */
+    private List<String> coreFields;
 
     /**
      * Constructor required by ServiceLoader. Be sure to use init()
      * 
      */
-    public RenderQueueConsumer() {
-        thread = new Thread(this, LISTENER_ID);
+    public SubscriberQueueConsumer() {
+        thread = new Thread(this, SUBSCRIBER_QUEUE);
     }
 
     /**
@@ -163,37 +156,39 @@ public class RenderQueueConsumer implements GenericListener {
         QUEUE_ID = name;
         thread.setName(name);
 
-        // Set autoCommit if we are the user priority queue
-        if (name.equals(ConveyerBelt.CRITICAL_USER_SELECTOR)) {
-            autoCommit = true;
-        } else {
-            autoCommit = false;
-        }
+        // A list of core fields
+        coreFields = new ArrayList();
+        coreFields.add("id");
+        coreFields.add("oid");
+        coreFields.add("eventType");
+        coreFields.add("context");
+        coreFields.add("user");
+        coreFields.add("eventTime");
 
         try {
+            subscriberList = new ArrayList<Subscriber>();
             globalConfig = new JsonSimpleConfig();
             File sysFile = JsonSimpleConfig.getSystemFile();
-            indexer = PluginManager.getIndexer(
-                    globalConfig.getString("solr", "indexer", "type"));
-            indexer.init(sysFile);
-            storage = PluginManager.getStorage(
-                    globalConfig.getString("file-system", "storage", "type"));
-            storage.init(sysFile);
-
-            conveyer = new ConveyerBelt(ConveyerBelt.RENDER);
+            List<String> subscribers = config.getStringList(
+                    "config", "subscribers");
+            if (subscribers != null && !subscribers.isEmpty()) {
+                for (String sid : subscribers) {
+                    if (!sid.equals("")) {
+                        Subscriber subscriber = PluginManager
+                                .getSubscriber(sid);
+                        if (subscriber != null) {
+                            subscriber.init(sysFile);
+                            subscriberList.add(subscriber);
+                        } else {
+                            log.error("Error loading subscriber: '{}'", sid);
+                        }
+                    }
+                }
+            }
 
         } catch (IOException ioe) {
             log.error("Failed to read configuration: {}", ioe.getMessage());
             throw ioe;
-        } catch (PluginException pe) {
-            log.error("Failed to initialise plugin: {}", pe.getMessage());
-            throw pe;
-        }
-
-        try {
-            messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
         }
     }
 
@@ -203,7 +198,7 @@ public class RenderQueueConsumer implements GenericListener {
      */
     @Override
     public String getId() {
-        return LISTENER_ID;
+        return SUBSCRIBER_QUEUE;
     }
 
     /**
@@ -223,22 +218,6 @@ public class RenderQueueConsumer implements GenericListener {
     @Override
     public void stop() throws Exception {
         log.info("Stopping {}...", name);
-        if (indexer != null) {
-            try {
-                indexer.shutdown();
-            } catch (PluginException pe) {
-                log.error("Failed to shutdown indexer: {}", pe.getMessage());
-                throw pe;
-            }
-        }
-        if (storage != null) {
-            try {
-                storage.shutdown();
-            } catch (PluginException pe) {
-                log.error("Failed to shutdown storage: {}", pe.getMessage());
-                throw pe;
-            }
-        }
         if (producer != null) {
             try {
                 producer.close();
@@ -268,6 +247,16 @@ public class RenderQueueConsumer implements GenericListener {
                 log.warn("Failed to close connection: {}", jmse);
             }
         }
+        if (subscriberList != null && !subscriberList.isEmpty()) {
+            for (Subscriber sub : subscriberList) {
+                try {
+                    sub.shutdown();
+                } catch (Exception ex) {
+                    log.warn("Failed to shutdown Subscriber: {}", sub.getName(),
+                            ex);
+                }
+            }
+        }
     }
 
     /**
@@ -285,48 +274,56 @@ public class RenderQueueConsumer implements GenericListener {
                 Thread.currentThread().setPriority(thread.getPriority());
             }
 
-            // Get the message deatils
+            // Get the message details
             String text = ((TextMessage) message).getText();
             JsonSimpleConfig config = new JsonSimpleConfig(text);
             String oid = config.getString(null, "oid");
-            log.info("Received job, object id={}", oid);
+            String context = config.getString("", "context");
 
-            // Get our object from storage
-            object = storage.getObject(oid);
-            sendNotification(oid, "renderStart", "(" + name
-                    + ") Renderer starting : '" + oid + "'");
+            log.info(" *** Received event, object id={}, from={}", oid, context);
 
-            // Push through the conveyer belt
-            log.info("Updating object...");
-            object = conveyer.transform(object, config);
+            //sendNotification(oid, "logging start", "(" + name
+            //        + ") Event Logging starting : '" + oid + "'");
 
-            // Index the object
-            log.info("Indexing object...");
-            indexer.index(object.getId());
-            if (autoCommit || config.getBoolean(false, "commit")) {
-                indexer.commit();
+            DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
+            String now = df.format(new Date());
+
+            // Convert to Map
+            Map<String, String> param = new LinkedHashMap<String, String>();
+            String id = UUID.randomUUID().toString();
+            param.put("id", id);
+            param.put("oid", oid);
+            param.put("eventType", config.getString(null, "eventType"));
+            param.put("context", context);
+            param.put("user", config.getString("{unknown}", "user"));
+            param.put("eventTime", now);
+            // Now map all non-core fields as well
+            for (Object key : config.getJsonObject().keySet()) {
+                if (key instanceof String) {
+                    String sKey = (String) key;
+                    if (!coreFields.contains(sKey)) {
+                        String value = config.getString(null, sKey);
+                        if (value != null) {
+                            param.put(sKey, value);
+                        }
+                    }
+                }
             }
 
-            // Log event
-            sentMessage(oid, "modify");
+            // Let all subscribers know
+            for (Subscriber subscriber : subscriberList) {
+                subscriber.onEvent(param);
+            }
 
-            // Finish up
-            sendNotification(oid, "renderComplete", "(" + name
-                    + ") Renderer complete : '" + oid + "'");
-            Properties props = object.getMetadata();
-            props.setProperty("render-pending", "false");
-            object.close();
+            //sendNotification(oid, "logging end", "(" + name
+            //        + ") Event Logging ending : '" + oid + "'");
 
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse.getMessage());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
-        } catch (StorageException se) {
-            log.error("Failed to update storage: {}", se.getMessage());
-        } catch (TransformerException te) {
-            log.error("Failed to transform object: {}", te.getMessage());
-        } catch (IndexerException ie) {
-            log.error("Failed to index object: {}", ie.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to log the event: {}", e.getMessage());
         }
     }
 
@@ -347,23 +344,6 @@ public class RenderQueueConsumer implements GenericListener {
 
         TextMessage msg = session.createTextMessage(jsonMessage.toString());
         // producer.send(broadcast, msg);
-    }
-
-    /**
-     * To put events to subscriber queue
-     * 
-     * @param oid Object id
-     * @param eventType type of events happened
-     * @param context where the event happened
-     * @param jsonFile Configuration file
-     */
-    private void sentMessage(String oid, String eventType) {
-        Map<String, String> param = new LinkedHashMap<String, String>();
-        param.put("oid", oid);
-        param.put("eventType", eventType);
-        param.put("username", "system");
-        param.put("context", "RenderQueueConsumer");
-        messaging.onEvent(param);
     }
 
     /**

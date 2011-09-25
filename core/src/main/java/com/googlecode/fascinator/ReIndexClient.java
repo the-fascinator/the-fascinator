@@ -18,6 +18,7 @@
  */
 package com.googlecode.fascinator;
 
+import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.storage.DigitalObject;
@@ -27,7 +28,8 @@ import com.googlecode.fascinator.api.storage.StorageException;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.jms.JMSException;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -127,7 +128,7 @@ public class ReIndexClient {
         // Establish a messaging session
         try {
             messaging = MessagingServices.getInstance();
-        } catch (JMSException ex) {
+        } catch (MessagingException ex) {
             log.error("Error connecting to messaging broker: ", ex);
             return;
         }
@@ -195,7 +196,7 @@ public class ReIndexClient {
         // Run it though an interpreter 
         PythonInterpreter python = null;
         try {
-            python = new PythonInterpreter();
+            python = PythonInterpreter.threadLocalStateInterpreter(null);
             python.execfile(inStream, "scriptname");
         } catch (Exception ex) {
             log.error("Error evaluating Python script: '{}'", script, ex);
@@ -663,7 +664,11 @@ public class ReIndexClient {
         param.put("eventType", message);
         param.put("username", "system");
         param.put("context", "ReIndexClient");
-        messaging.onEvent(param);
+        try {
+            messaging.onEvent(param);
+        } catch (MessagingException ex) {
+            log.error("Error sending message to audit log: ", ex);
+        }
     }
 
     /**

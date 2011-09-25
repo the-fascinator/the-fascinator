@@ -1,6 +1,7 @@
 /*
  * The Fascinator - Core
  * Copyright (C) 2010-2011 University of Southern Queensland
+ * Copyright (C) 2011 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package com.googlecode.fascinator.portal;
+package com.googlecode.fascinator.messaging;
 
 import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.common.JsonObject;
@@ -62,6 +63,9 @@ public class BrokerMonitor implements GenericListener {
     /** Queue string */
     public static final String QUEUE_ID = "BrokerMonitor";
 
+    /** Default house keeping queue */
+    public static final String DEFAULT_STATS_QUEUE = "houseKeeping";
+
     /** Broker queue prefix for stats */
     public static final String STATS_PREFIX = "ActiveMQ.Statistics.Destination";
 
@@ -89,8 +93,11 @@ public class BrokerMonitor implements GenericListener {
     /** Message Destination - This object */
     private Queue destStatsUpdate;
 
-    /** Message Destination - House Keeping*/
-    private Queue destHouseKeeping;
+    /** Message Destination - Statistics */
+    private Queue statsQueue;
+
+    /** Message Destination - Statistics (Name) */
+    private String statsQueueName;
 
     /** Message Consumer instance */
     private MessageConsumer consumer;
@@ -166,6 +173,19 @@ public class BrokerMonitor implements GenericListener {
         try {
             globalConfig = new JsonSimpleConfig();
 
+            boolean enabled = globalConfig.getBoolean(true,
+                    "messaging", "statistics", "enabled");
+            if (!enabled) {
+                log.warn("Statistics have been DISABLED by configuration");
+                return;
+            }
+            statsQueueName = globalConfig.getString(DEFAULT_STATS_QUEUE,
+                    "messaging", "statistics", "destination");
+            if (statsQueueName == null || statsQueueName.isEmpty()) {
+                log.error("Invalid Queue provided for statistics!");
+                return;
+            }
+
             // Get a connection to the broker
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
@@ -185,7 +205,7 @@ public class BrokerMonitor implements GenericListener {
             consumer.setMessageListener(this);
 
             // Producer
-            destHouseKeeping = pSession.createQueue(HouseKeeper.QUEUE_ID);
+            statsQueue = pSession.createQueue(statsQueueName);
             producer = pSession.createProducer(null);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
@@ -331,7 +351,7 @@ public class BrokerMonitor implements GenericListener {
 
                 // Make sure we don't check housekeeping for
                 // the send flag, it causes an infinite loop
-                if (!queue.equals(HouseKeeper.QUEUE_ID)) {
+                if (!queue.equals(statsQueueName)) {
                     // If the queue has new items, send
                     if (key.equals("size") && !value.equals("0")) send = true;
                     // Or we processed new items, send
@@ -458,7 +478,9 @@ public class BrokerMonitor implements GenericListener {
     @Override
     public void stop() {
         log.info("Stopping Broker Monitor...");
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
 
         if (producer != null) {
             try {
@@ -584,7 +606,7 @@ public class BrokerMonitor implements GenericListener {
      */
     private void sendUpdate(String message) throws JMSException {
         TextMessage msg = pSession.createTextMessage(message);
-        producer.send(destHouseKeeping, msg);
+        producer.send(statsQueue, msg);
     }
 
     /**

@@ -30,6 +30,8 @@ import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.roles.Roles;
 import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.subscriber.Subscriber;
+import com.googlecode.fascinator.api.transaction.TransactionException;
+import com.googlecode.fascinator.api.transaction.TransactionManager;
 import com.googlecode.fascinator.api.transformer.Transformer;
 import com.googlecode.fascinator.api.transformer.TransformerException;
 
@@ -241,6 +243,42 @@ public class PluginManager {
             storageMap.put(plugin.getId(), plugin);
         }
         return storageMap;
+    }
+
+    /**
+     * Gets a TransactionManager plugin
+     * 
+     * @param id Plugin identifier
+     * @return TransactionManager Instantiated plugin, or null if not found
+     */
+    public static TransactionManager getTransactionManager(String id)
+            throws TransactionException {
+        ServiceLoader<TransactionManager> plugins = ServiceLoader
+                .load(TransactionManager.class);
+        for (TransactionManager plugin : plugins) {
+            if (id.equals(plugin.getId())) {
+                return plugin;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a list of TransactionManager plugins
+     * 
+     * @return Map of TransactionManager plugins and their IDs, or empty map
+     * if not found
+     */
+    public static Map<String, TransactionManager>
+            getTransactionManagerPlugins() {
+        Map<String, TransactionManager> managers =
+                new HashMap<String, TransactionManager>();
+        ServiceLoader<TransactionManager> plugins = ServiceLoader
+                .load(TransactionManager.class);
+        for (TransactionManager plugin : plugins) {
+            managers.put(plugin.getId(), plugin);
+        }
+        return managers;
     }
 
     /**

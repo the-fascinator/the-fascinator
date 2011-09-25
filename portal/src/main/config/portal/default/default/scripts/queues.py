@@ -1,5 +1,5 @@
 from com.googlecode.fascinator.common import JsonSimpleConfig
-from com.googlecode.fascinator.common import MessagingServices
+from com.googlecode.fascinator.common.messaging import MessagingServices
 
 class QueuesData:
     def __init__(self):

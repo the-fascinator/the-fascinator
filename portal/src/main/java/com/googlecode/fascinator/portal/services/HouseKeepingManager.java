@@ -18,6 +18,7 @@
  */
 package com.googlecode.fascinator.portal.services;
 
+import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.portal.UserAction;
 
 import java.util.List;
@@ -50,13 +51,13 @@ public interface HouseKeepingManager extends RegistryShutdownListener {
      * Send a message to HouseKeeping.
      *
      */
-    public void sendMessage(String message);
+    public void sendMessage(String message) throws MessagingException;
 
     /**
      * Request a low priority restart from HouseKeeping.
      *
      */
-    public void requestRestart();
+    public void requestRestart() throws MessagingException;
 
     /**
      * Request a high priority restart from HouseKeeping.
@@ -64,7 +65,7 @@ public interface HouseKeepingManager extends RegistryShutdownListener {
      * occurs.
      *
      */
-    public void requestUrgentRestart();
+    public void requestUrgentRestart() throws MessagingException;
 
     /**
      * Get the latest statistics on message queues.

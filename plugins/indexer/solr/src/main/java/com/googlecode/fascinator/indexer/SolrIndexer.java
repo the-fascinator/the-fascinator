@@ -31,8 +31,9 @@ import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
 import com.googlecode.fascinator.common.PythonUtils;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.jms.JMSException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -323,8 +323,8 @@ public class SolrIndexer implements Indexer {
 
             try {
                 messaging = MessagingServices.getInstance();
-            } catch (JMSException jmse) {
-                log.error("Failed to start connection: {}", jmse.getMessage());
+            } catch (MessagingException ex) {
+                log.error("Failed to start connection: {}", ex.getMessage());
             }
         }
         loaded = true;
@@ -645,7 +645,11 @@ public class SolrIndexer implements Indexer {
      * @param jsonFile Configuration file
      */
     private void sendToIndex(String message) {
-        messaging.queueMessage(SolrWrapperQueueConsumer.QUEUE_ID, message);
+        try {
+            messaging.queueMessage(SolrWrapperQueueConsumer.QUEUE_ID, message);
+        } catch (MessagingException ex) {
+            log.error("Unable to send message: ", ex);
+        }
     }
 
     /**

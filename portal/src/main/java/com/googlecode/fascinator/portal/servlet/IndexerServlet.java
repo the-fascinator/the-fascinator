@@ -18,10 +18,12 @@
  */
 package com.googlecode.fascinator.portal.servlet;
 
-import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.common.FascinatorHome;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.messaging.MessageBroker;
 import com.googlecode.fascinator.portal.BrokerMonitor;
 
 import java.io.IOException;
@@ -61,31 +63,11 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("serial")
 public class IndexerServlet extends HttpServlet {
-
-    /** Directory to store operational AMQ data */
-    public static final String DEFAULT_MESSAGING_HOME = FascinatorHome
-            .getPath("activemq-data");
-
     /** Logger */
     private Logger log = LoggerFactory.getLogger(IndexerServlet.class);
 
-    /** Timer to support startup */
-    private Timer timer;
-
-    /** Configurable list of message queues */
-    private List<GenericListener> messageQueues;
-
-    /** Config */
-    private JsonSimpleConfig config;
-
-    /** AMQ Broker Monitor */
-    private BrokerMonitor monitor;
-
-    /**
-     * activemq broker NOTE: Will use Fedora's broker if fedora is running,
-     * otherwise use activemq broker
-     */
-    private BrokerService broker;
+    /** Message broker */
+    private MessageBroker broker;
 
     /**
      * Initialise the Servlet, called at Server startup
@@ -94,26 +76,12 @@ public class IndexerServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        // configure the broker
+        // Start the Message Broker
         try {
-            config = new JsonSimpleConfig();
-
-            String dataDir = config.getString(DEFAULT_MESSAGING_HOME,
-                    "messaging", "home");
-            broker = new BrokerService();
-            broker.setDataDirectory(dataDir);
-            broker.addConnector(config.getString(
-                    ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
-                    "messaging", "url"));
-            String stompUrl = config.getString(null, "messaging", "stompUrl");
-            if (stompUrl != null) {
-                broker.addConnector(stompUrl);
-            }
-            enableAMQStatistics(broker);
-            broker.start();
-        } catch (Exception e) {
-            log.error("Failed to start broker: {}", e);
-            throw new ServletException("Error starting AMQ Broker: ", e);
+            broker = MessageBroker.getInstance();
+        } catch (MessagingException ex) {
+            log.error("Failed to start broker: {}", ex);
+            throw new ServletException("Error starting AMQ Broker: ", ex);
         }
 
         // add jars for jython to scan for packages
@@ -131,120 +99,6 @@ public class IndexerServlet extends HttpServlet {
         PySystemState.add_classdir(realPath + "WEB-INF/classes");
         PySystemState.add_classdir(realPath + "../../../target/classes");
         PySystemState.add_extdir(pythonHome, true);
-
-        // use a timer to start the indexer because tomcat's deployment order
-        // is not reliable, fedora may not have started yet thus the indexer
-        // is not able to subscribe to fedora messages. the timer will retry
-        // every 15 secs if it was unable to start initially
-
-        timer = new Timer("StartIndexer", true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                startIndexer();
-            }
-        }, 0, 15000);
-    }
-
-    /**
-     * Setup the broker so it will respond to statistics queries.
-     *
-     * @param broker to enable statistics for
-     */
-    private void enableAMQStatistics(BrokerService brokerService) {
-        // Start our stats plugin
-        StatisticsBrokerPlugin statsPlugin = new StatisticsBrokerPlugin();
-        // Find what plugins are already present
-        BrokerPlugin[] aPlugins = brokerService.getPlugins();
-        if (aPlugins == null) aPlugins = new BrokerPlugin[] {};
-        // Add stats to the list
-        List<BrokerPlugin> lPlugins = new ArrayList();
-        lPlugins.addAll(Arrays.asList(aPlugins));
-        lPlugins.add(statsPlugin);
-        // Setup the broker
-        broker.setPlugins(lPlugins.toArray(aPlugins));
-        broker.setEnableStatistics(true);
-    }
-
-    /**
-     * Startup our message queues.
-     *
-     */
-    private void startIndexer() {
-        log.info("Starting The Fascinator indexer...");
-        if (messageQueues == null) {
-            messageQueues = new ArrayList();
-        }
-        List<JsonSimple> threadConfig =
-                config.getJsonSimpleList("messaging", "threads");
-
-        try {
-            // Start the AMQ monitor
-            if (monitor == null) {
-                monitor = new BrokerMonitor(broker);
-                // One behind house keeping
-                monitor.setPriority(Thread.MAX_PRIORITY - 1);
-                monitor.start();
-            }
-
-            // Start our configurable queues
-            for (JsonSimple thread : threadConfig) {
-                String classId = thread.getString(null, "id");
-                String priority = thread.getString(null, "priority");
-                if (classId != null) {
-                    GenericListener queue = getListener(classId);
-                    if (queue != null) {
-                        if (priority != null) {
-                            queue.setPriority(Integer.valueOf(priority));
-                        }
-                        queue.init(new JsonSimpleConfig(thread.toString()));
-                        queue.start();
-                        messageQueues.add(queue);
-                    } else {
-                        log.error("Failed to find Listener: '{}'", classId);
-                        throw new Exception();
-                    }
-                } else {
-                    log.error("No message classId provided: '{}'",
-                            thread.toString());
-                    throw new Exception();
-                }
-            }
-            log.info("The Fascinator indexer was started successfully");
-            // All is good, stop our callback
-            timer.cancel();
-            timer = null;
-
-        } catch (Exception e) {
-            log.warn("Message queues startup failed. Shutting them down...");
-            for (GenericListener queue : messageQueues) {
-                try {
-                    queue.stop();
-                } catch (Exception ex) {
-                    log.error("Failed to stop listener '{}': {}",
-                            queue.getId(), ex.getMessage());
-                }
-            }
-            messageQueues = null;
-            log.warn("Will retry in 15 seconds.", e);
-        }
-    }
-
-    /**
-     * Get a message listener from the ServiceLoader
-     *
-     * @param id Listener identifier
-     * @return GenericMessageListener implementation matching the ID, if found
-     */
-    private GenericListener getListener(String id) {
-        ServiceLoader<GenericListener> listeners =
-                ServiceLoader.load(GenericListener.class);
-        for (GenericListener listener : listeners) {
-            if (id.equals(listener.getId())) {
-                return listener;
-            }
-        }
-        return null;
     }
 
     /**
@@ -285,27 +139,12 @@ public class IndexerServlet extends HttpServlet {
      */
     @Override
     public void destroy() {
-        try {
-            broker.stop();
-        } catch (Exception e) {
-            log.error("Failed to stop message broker: {}", e.getMessage());
-        }
-        if (monitor != null) {
-            monitor.stop();
-        }
-        if (messageQueues != null) {
-            for (GenericListener queue : messageQueues) {
-                try {
-                    queue.stop();
-                } catch (Exception e) {
-                    log.error("Failed to stop listener '{}': {}",
-                            queue.getId(), e.getMessage());
-                }
+        // Shutting down the message broker
+        if (broker != null) {
+            boolean result = broker.shutdown();
+            if (result != true) {
+                log.error("Message broker did not shut down correctly!");
             }
-        }
-        if (timer != null) {
-            timer.purge();
-            timer = null;
         }
         super.destroy();
     }

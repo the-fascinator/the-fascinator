@@ -30,8 +30,10 @@ import com.googlecode.fascinator.api.transformer.TransformerException;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.common.storage.StorageUtils;
+import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,8 +46,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.jms.JMSException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -166,8 +166,8 @@ public class HarvestClient {
 
         try {
             messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
+        } catch (MessagingException ex) {
+            log.error("Failed to start connection: {}", ex.getMessage());
         }
     }
 
@@ -187,7 +187,11 @@ public class HarvestClient {
             JsonObject message = new JsonObject();
             message.put("type", "harvest-update");
             message.put("oid", object.getId());
-            messaging.queueMessage("houseKeeping", message.toString());
+            try {
+                messaging.queueMessage("houseKeeping", message.toString());
+            } catch (MessagingException ex) {
+                log.error("Error sending message: ", ex);
+            }
         } else {
             // Otherwise grab the existing object
             String oid = StorageUtils.generateOid(file);
@@ -231,6 +235,8 @@ public class HarvestClient {
                     uploadedOid = objectIds.iterator().next();
                     processObject(uploadedOid, true);
                 }
+            } catch (MessagingException e) {
+                log.error("Could not queue the object: '{}'", uploadedOid, e);
             } catch (HarvesterException e) {
                 throw new PluginException(e);
             }
@@ -238,13 +244,21 @@ public class HarvestClient {
             // process harvested objects
             do {
                 for (String oid : harvester.getObjectIdList()) {
-                    processObject(oid);
+                    try {
+                        processObject(oid);
+                    } catch (MessagingException e) {
+                        log.error("Could not queue the object: '{}'", oid, e);
+                    }
                 }
             } while (harvester.hasMoreObjects());
             // process deleted objects
             do {
                 for (String oid : harvester.getDeletedObjectIdList()) {
-                    queueDelete(oid, configFile);
+                    try {
+                        queueDelete(oid, configFile);
+                    } catch (MessagingException e) {
+                        log.error("Could not queue the object: '{}'", oid, e);
+                    }
                 }
             } while (harvester.hasMoreDeletedObjects());
         }
@@ -265,8 +279,10 @@ public class HarvestClient {
      * @param oid Object Id
      * @throws IOException If necessary files not found
      * @throws PluginException If the harvester plugin not found
+     * @throws MessagingException If the object could not be queue'd
      */
-    public void reharvest(String oid) throws IOException, PluginException {
+    public void reharvest(String oid) throws IOException, PluginException,
+            MessagingException {
         reharvest(oid, false);
     }
 
@@ -278,9 +294,10 @@ public class HarvestClient {
      * @param userPriority Set flag to have high priority render
      * @throws IOException If necessary files not found
      * @throws PluginException If the harvester plugin not found
+     * @throws MessagingException If the object could not be queue'd
      */
     public void reharvest(String oid, boolean userPriority) throws IOException,
-            PluginException {
+            PluginException, MessagingException {
         log.info("Reharvest '{}'...", oid);
 
         // get the object from storage
@@ -348,9 +365,10 @@ public class HarvestClient {
      * @param oid Object Id
      * @throws StorageException If storage is not found
      * @throws TransformerException If transformer fail to transform the object
+     * @throws MessagingException If the object could not be queue'd
      */
     private void processObject(String oid) throws TransformerException,
-            StorageException {
+            StorageException, MessagingException {
         processObject(oid, false);
     }
 
@@ -361,9 +379,10 @@ public class HarvestClient {
      * @param commit Flag to commit after indexing
      * @throws StorageException If storage is not found
      * @throws TransformerException If transformer fail to transform the object
+     * @throws MessagingException If the object could not be queue'd
      */
     private void processObject(String oid, boolean commit)
-            throws TransformerException, StorageException {
+            throws TransformerException, StorageException, MessagingException {
         // get the object
         DigitalObject object = storage.getObject(oid);
 
@@ -403,8 +422,10 @@ public class HarvestClient {
      * @param oid Object id
      * @param jsonFile Configuration file
      * @param commit To commit each request to Queue (true) or not (false)
+     * @throws MessagingException if the message could not be sent
      */
-    private void queueHarvest(String oid, File jsonFile, boolean commit) {
+    private void queueHarvest(String oid, File jsonFile, boolean commit)
+            throws MessagingException {
         queueHarvest(oid, jsonFile, commit, HarvestQueueConsumer.HARVEST_QUEUE);
     }
 
@@ -415,9 +436,10 @@ public class HarvestClient {
      * @param jsonFile Configuration file
      * @param commit To commit each request to Queue (true) or not (false)
      * @param queueName Name of the queue to route to
+     * @throws MessagingException if the message could not be sent
      */
     private void queueHarvest(String oid, File jsonFile, boolean commit,
-            String queueName) {
+            String queueName) throws MessagingException {
         try {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
@@ -427,6 +449,7 @@ public class HarvestClient {
             messaging.queueMessage(queueName, json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
+            throw new MessagingException(ioe);
         }
     }
 
@@ -435,8 +458,10 @@ public class HarvestClient {
      * 
      * @param oid Object id
      * @param jsonFile Configuration file
+     * @throws MessagingException if the message could not be sent
      */
-    private void queueDelete(String oid, File jsonFile) {
+    private void queueDelete(String oid, File jsonFile)
+            throws MessagingException {
         try {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
@@ -445,6 +470,7 @@ public class HarvestClient {
                     json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
+            throw new MessagingException(ioe);
         }
     }
 
@@ -475,7 +501,11 @@ public class HarvestClient {
         param.put("eventType", eventType);
         param.put("username", "system");
         param.put("context", "HarvestClient");
-        messaging.onEvent(param);
+        try {
+            messaging.onEvent(param);
+        } catch (MessagingException ex) {
+            log.error("Unable to send message: ", ex);
+        }
     }
 
     /**

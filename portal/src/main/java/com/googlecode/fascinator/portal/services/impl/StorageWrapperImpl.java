@@ -5,14 +5,14 @@ import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.portal.JsonSessionState;
 
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.jms.JMSException;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.ApplicationStateManager;
@@ -44,8 +44,8 @@ public class StorageWrapperImpl implements Storage {
 
         try {
             messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
+        } catch (MessagingException ex) {
+            log.error("Failed to start connection: {}", ex.getMessage());
         }
     }
 
@@ -119,6 +119,10 @@ public class StorageWrapperImpl implements Storage {
         param.put("eventType", eventType);
         param.put("username", username);
         param.put("context", storage.getName());
-        messaging.onEvent(param);
+        try {
+            messaging.onEvent(param);
+        } catch (MessagingException ex) {
+            log.error("Unable to send message: ", ex);
+        }
     }
 }

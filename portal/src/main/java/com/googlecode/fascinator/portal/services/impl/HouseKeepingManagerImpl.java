@@ -21,7 +21,8 @@ package com.googlecode.fascinator.portal.services.impl;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.portal.HouseKeeper;
 import com.googlecode.fascinator.portal.UserAction;
 import com.googlecode.fascinator.portal.services.HouseKeepingManager;
@@ -140,7 +141,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
      */
     @Override
     @SuppressWarnings("static-access")
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws MessagingException {
         services.queueMessage(HouseKeeper.QUEUE_ID, message);
     }
 
@@ -149,7 +150,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
      *
      */
     @Override
-    public void requestRestart() {
+    public void requestRestart() throws MessagingException {
         log.info("System restart has been requested");
         JsonObject msg = new JsonObject();
         msg.put("type", "basic-restart");
@@ -163,7 +164,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
      *
      */
     @Override
-    public void requestUrgentRestart() {
+    public void requestUrgentRestart() throws MessagingException {
         log.info("Urgent system restart has been requested");
         JsonObject msg = new JsonObject();
         msg.put("type", "blocking-restart");

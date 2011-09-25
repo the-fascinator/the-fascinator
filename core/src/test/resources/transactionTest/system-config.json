@@ -1,0 +1,56 @@
+{
+    "version": "1.0.5.3",
+    "email": "fascinator@usq.edu.au",
+    "messaging": {
+        "url": "tcp://localhost:62626",
+        "testingUrl": "tcp://127.0.0.1:62626",
+        "stompUrl": "stomp://localhost:62623",
+        "home": "${fascinator.home}/activemq-data",
+        "startup": {
+            "delay": "0",
+            "timer": "1000"
+        },
+        "statistics": {
+            "enabled": false
+        },
+        "threads": [
+            {
+                "id": "transactionManager",
+                "description": "Transaction Manager Queue for complicated tool chains.",
+                "priority": "5",
+                "config": {
+                    "name": "transactionManager",
+                    "transactionManagerPlugin": "test"
+                }
+            },
+            {
+                "id": "subscriber",
+                "description": "Subscriber queue for event log.",
+                "priority": "7",
+                "config": {
+                    "name": "subscriber",
+                    "subscribers": ["fake"]
+                }
+            }
+        ]
+    },
+
+    "transformerDefaults": {
+        "fake": {
+            "id": "fake"
+        }
+    },
+    "indexer": {
+        "type": "fake",
+        "fake": {}
+    },
+    "storage": {
+        "type": "file-system",
+        "file-system": {
+            "home": "${fascinator.home}/storage"
+        }
+    },
+    "subscriber": {
+        "fake": {}
+    }
+}

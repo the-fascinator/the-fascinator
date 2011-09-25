@@ -19,9 +19,9 @@
 package com.googlecode.fascinator.indexer;
 
 import com.googlecode.fascinator.common.FascinatorHome;
-import com.googlecode.fascinator.common.GenericListener;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 
 import java.io.File;
 import java.io.IOException;

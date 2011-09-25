@@ -18,7 +18,7 @@
  */
 package com.googlecode.fascinator.portal;
 
-import com.googlecode.fascinator.common.GenericListener;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.indexer.Indexer;

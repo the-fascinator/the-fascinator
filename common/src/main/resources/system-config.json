@@ -1,5 +1,5 @@
 {
-    "version": "1.0.5.2",
+    "version": "1.0.5.3",
     "configured": false,
     "urlBase": "http://localhost:9997/portal/",
     "email": "fascinator@usq.edu.au",
@@ -40,6 +40,14 @@
         "url": "tcp://localhost:61616",
         "stompUrl": "stomp://localhost:61613",
         "home": "${fascinator.home}/activemq-data",
+        "startup": {
+            "delay": "5000",
+            "timer": "15000"
+        },
+        "statistics": {
+            "enabled": true,
+            "destination": "houseKeeping"
+        },
         "threads": [
             {
                 "id": "render",

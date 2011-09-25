@@ -18,7 +18,7 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.MessagingServices;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.api.PluginDescription;
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
@@ -26,6 +26,7 @@ import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.indexer.IndexerException;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.portal.JsonSessionState;
 import com.googlecode.fascinator.portal.services.IndexerService;
 
@@ -33,7 +34,6 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.jms.JMSException;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.ApplicationStateManager;
@@ -66,8 +66,8 @@ public class IndexerServiceImpl implements IndexerService {
 
         try {
             messaging = MessagingServices.getInstance();
-        } catch (JMSException jmse) {
-            log.error("Failed to start connection: {}", jmse.getMessage());
+        } catch (MessagingException ex) {
+            log.error("Failed to start connection: {}", ex.getMessage());
         }
 
         if (indexer == null) {
@@ -185,6 +185,10 @@ public class IndexerServiceImpl implements IndexerService {
         param.put("eventType", eventType);
         param.put("username", username);
         param.put("context", indexer.getName());
-        messaging.onEvent(param);
+        try {
+            messaging.onEvent(param);
+        } catch (MessagingException ex) {
+            log.error("Error sending message: ", ex);
+        }
     }
 }
