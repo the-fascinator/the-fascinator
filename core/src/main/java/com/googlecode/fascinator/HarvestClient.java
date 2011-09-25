@@ -69,6 +69,10 @@ public class HarvestClient {
     /** Default storage type */
     private static final String DEFAULT_STORAGE_TYPE = "file-system";
 
+    /** Default tool chain queue */
+    private static final String DEFAULT_TOOL_CHAIN_QUEUE =
+            HarvestQueueConsumer.HARVEST_QUEUE;
+
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(HarvestClient.class);
 
@@ -101,6 +105,9 @@ public class HarvestClient {
 
     /** Messaging services */
     private MessagingServices messaging;
+
+    /** Tool Chain entry queue */
+    private String toolChainEntry;
 
     /**
      * Harvest Client Constructor
@@ -163,6 +170,9 @@ public class HarvestClient {
         } catch (PluginException pe) {
             throw new HarvesterException("Failed to initialise storage", pe);
         }
+
+        toolChainEntry = config.getString(DEFAULT_TOOL_CHAIN_QUEUE,
+                "messaging", "toolChainQueue");
 
         try {
             messaging = MessagingServices.getInstance();
@@ -333,7 +343,7 @@ public class HarvestClient {
         }
 
         // queue for rendering
-        queueHarvest(oid, configFile, true, HarvestQueueConsumer.USER_QUEUE);
+        queueHarvest(oid, configFile, true, toolChainEntry);
         log.info("Object '{}' now queued for reindexing...", oid);
 
         // cleanup
@@ -426,7 +436,7 @@ public class HarvestClient {
      */
     private void queueHarvest(String oid, File jsonFile, boolean commit)
             throws MessagingException {
-        queueHarvest(oid, jsonFile, commit, HarvestQueueConsumer.HARVEST_QUEUE);
+        queueHarvest(oid, jsonFile, commit, toolChainEntry);
     }
 
     /**
@@ -466,7 +476,7 @@ public class HarvestClient {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
             json.put("deleted", "true");
-            messaging.queueMessage(HarvestQueueConsumer.HARVEST_QUEUE,
+            messaging.queueMessage(toolChainEntry,
                     json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());

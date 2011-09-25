@@ -63,6 +63,10 @@ public class ReIndexClient {
     /** The name of the activation method required on instantiated classes */
     private static String SCRIPT_ACTIVATE_METHOD = "__activate__";
 
+    /** Default tool chain queue */
+    private static final String DEFAULT_TOOL_CHAIN_QUEUE =
+            HarvestQueueConsumer.HARVEST_QUEUE;
+
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(ReIndexClient.class);
 
@@ -87,6 +91,9 @@ public class ReIndexClient {
     /** Migration Script */
     private PyObject migrationScript;
 
+    /** Tool Chain entry queue */
+    private String toolChainEntry;
+
     /**
      * ReIndex Client Constructor
      * 
@@ -103,6 +110,10 @@ public class ReIndexClient {
             log.error("Error accessing System Configuration: ", ex);
             return;
         }
+
+        // Where are we going to send our messages?
+        toolChainEntry = systemConfig.getString(DEFAULT_TOOL_CHAIN_QUEUE,
+                "messaging", "toolChainQueue");
 
         // Find and boot our storage layer
         String storageType = systemConfig.getString(null, "storage", "type");
@@ -641,8 +652,7 @@ public class ReIndexClient {
         JsonObject json = config.getJsonObject();
         json.put("oid", oid);
         try {
-            messaging.queueMessage(HarvestQueueConsumer.HARVEST_QUEUE,
-                    json.toString());
+            messaging.queueMessage(toolChainEntry, json.toString());
         } catch(Exception ex) {
             log.error("Failed sending OID '{}' to the harvest message queue!",
                     oid);

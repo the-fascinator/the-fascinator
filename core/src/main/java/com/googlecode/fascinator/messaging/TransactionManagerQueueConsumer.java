@@ -194,7 +194,7 @@ public class TransactionManagerQueueConsumer implements GenericListener {
             }
             indexer.init(sysFile);
 
-            // Load the indexer plugin
+            // Load the storage plugin
             String storageId = globalConfig.getString(
                     "file-system", "storage", "type");
             if (storageId == null) {
