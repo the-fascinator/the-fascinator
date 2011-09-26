@@ -8,12 +8,15 @@ from java.util import HashSet
 class ReharvestData:
     def __activate__(self, context):
         response = context["response"]
+        log = context["log"]
         writer = response.getPrintWriter("text/plain; charset=UTF-8")
         auth = context["page"].authentication
         sessionState = context["sessionState"]
+
         result = JsonObject()
         result.put("status", "error")
         result.put("message", "An unknown error has occurred")
+
         if auth.is_admin():
             services = context["Services"]
             formData = context["formData"]
@@ -21,14 +24,18 @@ class ReharvestData:
             oid = formData.get("oid")
             portalId = formData.get("portalId")
             portalManager = services.portalManager
+
             if func == "reharvest":
+                # One object
                 if oid:
-                    print "Reharvesting object '%s'" % oid
+                    log.info(" * Reharvesting object '{}'", oid)
                     portalManager.reharvest(oid)
                     result.put("status", "ok")
                     result.put("message", "Object '%s' queued for reharvest")
+
+                # The whole portal
                 elif portalId:
-                    print " Reharvesting view '%s'" % portalId
+                    log.info(" * Reharvesting view '{}'", portalId)
                     sessionState.set("reharvest/running/" + portalId, "true")
                     # TODO security filter - not necessary because this requires admin anyway?
                     portal = portalManager.get(portalId)
@@ -58,7 +65,7 @@ class ReharvestData:
                             portalManager.reharvest(objectIds)
                         count = count + rows
                         total = json.getNumFound()
-                        print "Queued %s of %s..." % (min(count, total), total)
+                        log.info(" * Queued {} of {}...", (min(count, total), total))
                         done = (count >= total)
                     sessionState.remove("reharvest/running/" + portalId)
                     result.put("status", "ok")
@@ -66,9 +73,10 @@ class ReharvestData:
                 else:
                     response.setStatus(500)
                     result.put("message", "No object or view specified for reharvest")
+
             elif func == "reindex":
                 if oid:
-                    print "Reindexing object '%s'" % oid
+                    log.info(" * Reindexing object '{}'", oid)
                     services.indexer.index(oid)
                     services.indexer.commit()
                     result.put("status", "ok")
