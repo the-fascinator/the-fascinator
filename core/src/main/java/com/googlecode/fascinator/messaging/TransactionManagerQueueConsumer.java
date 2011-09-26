@@ -550,7 +550,7 @@ public class TransactionManagerQueueConsumer implements GenericListener {
 
         // Let the indexer do its thing
         try {
-            indexer.index(name);
+            indexer.index(oid);
             return true;
         } catch (IndexerException ex) {
             log.error("Error indexing OID '{}'", oid, ex);
