@@ -286,11 +286,13 @@ public class EmailNotificationConsumer implements GenericListener {
                     + ") Email notification sent : '" + oid + "'");
 
         } catch (JMSException jmse) {
-            log.error("Failed to send/receive message: {}", jmse.getMessage());
+            log.error("Failed to send/receive message: {}", jmse);
         } catch (IOException ioe) {
-            log.error("Failed to parse message: {}", ioe.getMessage());
+            log.error("Failed to parse message: {}", ioe);
         } catch (EmailException ee) {
-            log.error("Failed to send emails: {}", ee.getMessage());
+            log.error("Failed to send emails: {}", ee);
+        } catch (Exception ex) {
+            log.error("Unknown error: {}", ex);
         }
     }
 
@@ -311,8 +313,10 @@ public class EmailNotificationConsumer implements GenericListener {
         for (String to : toList) {
             email.addTo(to);
         }
-        for (String cc : ccList) {
-            email.addCc(cc);
+        if (ccList != null) {
+            for (String cc : ccList) {
+                email.addCc(cc);
+            }
         }
         email.setFrom(fromAddress, fromName);
         email.send();
