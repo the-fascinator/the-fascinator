@@ -20,30 +20,39 @@ class DeleteData:
             self.throw_error("Record ID required")
 
         errors = False
+        storage = self.vc["Services"].getStorage();
+        indexer = self.vc["Services"].getIndexer();
 
         # Delete from storage
         try:
-            Services.storage.removeObject(record)
+            storage.removeObject(record)
         except Exception, e:
             self.vc["log"].error("Error deleting object from storage: ", e)
             errors = True
 
         # Delete from Solr
         try:
-            Services.indexer.remove(record)
+            indexer.remove(record)
         except Exception, e:
             self.vc["log"].error("Error deleting Solr entry: ", e)
             errors = True
 
         # Delete annotations
         try:
-            Services.indexer.annotateRemove(record)
+            indexer.annotateRemove(record)
         except Exception, e:
             self.vc["log"].error("Error deleting annotations: ", e)
             errors = True
 
+        # Solr commit
+        try:
+            indexer.commit()
+        except Exception, e:
+            self.vc["log"].error("Error during Solr commit: ", e)
+            errors = True
+
         if errors:
-            self.throw_error("Error deleting object!")
+            self.throw_error("Error deleting object! Please see system logs.")
         else:
             self.writer.println(record)
             self.writer.close()
