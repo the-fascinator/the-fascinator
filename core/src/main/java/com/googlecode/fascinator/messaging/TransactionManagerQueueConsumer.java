@@ -418,7 +418,7 @@ public class TransactionManagerQueueConsumer implements GenericListener {
     private void processOrders(JsonSimple orders) throws Exception {
         List<JsonSimple> orderList = orders.getJsonSimpleList("orders");
         if (orderList == null || orderList.isEmpty()) {
-            log.info("No orders provided... nothing to do.");
+            log.debug("No orders provided... nothing to do.");
             return;
         }
         for (JsonSimple order : orderList) {
