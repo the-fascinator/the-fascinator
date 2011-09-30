@@ -153,8 +153,17 @@ public class MessagingServices {
             connections.put(brokerUrl,
                     connectors.get(brokerUrl).createConnection());
         } catch (JMSException ex) {
-            log.error("Error creating: ", ex);
-            throw new MessagingException(ex);
+            // Ignore the first error, in case it is just a dead connection
+            try {
+                log.warn("Failed to create Connection! Try new connector.");
+                connectors.put(brokerUrl,
+                        new ActiveMQConnectionFactory(brokerUrl));
+                connections.put(brokerUrl,
+                        connectors.get(brokerUrl).createConnection());
+            } catch (JMSException ex1) {
+                log.error("Error creating connection: ", ex1);
+                throw new MessagingException(ex1);
+            }
         }
 
         // Start and return the new connection
@@ -197,8 +206,16 @@ public class MessagingServices {
             sessions.put(brokerUrl, connections.get(brokerUrl)
                     .createSession(false, Session.AUTO_ACKNOWLEDGE));
         } catch (JMSException ex) {
-            log.error("Error establishing a new session: ", ex);
-            throw new MessagingException(ex);
+            // Ignore the first error, in case it is just an expired session
+            try {
+                log.warn("Failed to create Session! Trying a new connection.");
+                newConnection(brokerUrl);
+                sessions.put(brokerUrl, connections.get(brokerUrl)
+                        .createSession(false, Session.AUTO_ACKNOWLEDGE));
+            } catch (JMSException ex1) {
+                log.error("Error establishing a new session: ", ex1);
+                throw new MessagingException(ex1);
+            }
         }
 
         return sessions.get(brokerUrl);
