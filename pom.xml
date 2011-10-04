@@ -5,7 +5,7 @@
     <artifactId>the-fascinator</artifactId>
     <packaging>pom</packaging>
     <name>The Fascinator</name>
-    <version>1.0.5</version>
+    <version>1.0.6-SNAPSHOT</version>
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>organisation</artifactId>
@@ -23,9 +23,9 @@
         <url>https://redbox-build.cqu.edu.au/jenkins/job/Fascinator%20SVN%20Build/</url>
     </ciManagement>
     <scm>
-        <url>http://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.5</url> 
-        <connection>scm:svn:http://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.5</connection> 
-        <developerConnection>scm:svn:https://the-fascinator.googlecode.com/svn/the-fascinator/tags/the-fascinator-1.0.5</developerConnection> 
+        <url>http://the-fascinator.googlecode.com/svn/the-fascinator/trunk</url> 
+        <connection>scm:svn:http://the-fascinator.googlecode.com/svn/the-fascinator/trunk</connection> 
+        <developerConnection>scm:svn:https://the-fascinator.googlecode.com/svn/the-fascinator/trunk</developerConnection> 
     </scm>
     <modules>
         <module>common</module>
