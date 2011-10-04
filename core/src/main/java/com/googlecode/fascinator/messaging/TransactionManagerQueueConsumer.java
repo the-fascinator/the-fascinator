@@ -551,6 +551,9 @@ public class TransactionManagerQueueConsumer implements GenericListener {
         // Let the indexer do its thing
         try {
             indexer.index(oid);
+            if (order.getBoolean(false, "forceCommit")) {
+                indexer.commit();
+            }
             return true;
         } catch (IndexerException ex) {
             log.error("Error indexing OID '{}'", oid, ex);

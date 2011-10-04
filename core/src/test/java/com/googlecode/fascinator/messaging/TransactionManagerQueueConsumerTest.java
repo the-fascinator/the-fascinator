@@ -83,6 +83,18 @@ public class TransactionManagerQueueConsumerTest {
         }
     }
 
+    // Recursive delete of folder/file
+    public static void delete(File file) {
+        // Directories
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                delete(child);
+            }
+        }
+        // Files / top-level directories (after children)
+        file.delete();
+    }
+
     @BeforeClass
     public static void startup() {
         // Find our resources directory
@@ -98,6 +110,17 @@ public class TransactionManagerQueueConsumerTest {
         String home = sysConfig.getParent();
         System.setProperty("fascinator.home", home);
         log("FASCINATOR HOME: "+home, "");
+
+        // Destroy any pre-existing storage
+        File oldHome = new File(home, "storage");
+        if (oldHome.exists() && oldHome.isDirectory()) {
+            log("DELETING OLD STORAGE:", oldHome.getPath());
+            delete(oldHome);
+            if (oldHome.exists()) {
+                log("FAILED TO DELETE OLD STORAGE:", oldHome.getPath());
+                Assert.fail();
+            }
+        }
 
         // Startup the message broker. It will start messaging queues itself
         try {
