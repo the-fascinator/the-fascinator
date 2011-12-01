@@ -85,6 +85,7 @@ class IndexData:
         if pid is not None:
             try:
                 payload = self.object.getPayload(pid)
+                return payload
             except Exception, e:
                 self.log.error("Source PID '{}' not accessible", pid, e)
                 return None
