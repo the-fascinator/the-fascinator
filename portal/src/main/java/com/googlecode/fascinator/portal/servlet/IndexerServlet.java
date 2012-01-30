@@ -18,47 +18,37 @@
  */
 package com.googlecode.fascinator.portal.servlet;
 
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.common.FascinatorHome;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.messaging.MessageBroker;
-import com.googlecode.fascinator.portal.BrokerMonitor;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerPlugin;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.plugin.StatisticsBrokerPlugin;
 import org.python.core.PySystemState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.messaging.MessageBroker;
+
 /**
  * <h3>Introduction</h3>
  * <p>
- * This Servlet is mainly just a shell, because its doGet() and doPost() methods are empty. We are relying on Tapestry to do the true web server work later. What we do want here however is to instantiate anything we require to start with the server. Because Tapestry services are instantiated and injected on demand, we can't rely on them for some of our system components.
+ * This Servlet is mainly just a shell, because its doGet() and doPost() methods
+ * are empty. We are relying on Tapestry to do the true web server work later.
+ * What we do want here however is to instantiate anything we require to start
+ * with the server. Because Tapestry services are instantiated and injected on
+ * demand, we can't rely on them for some of our system components.
  * </p>
- *
+ * 
  * <h3>Wiki Link</h3>
  * <p>
- * <b>https://fascinator.usq.edu.au/trac/wiki/Fascinator/Documents/Portal/JavaCore#OurWebServlet</b>
+ * <b>https://fascinator.usq.edu.au/trac/wiki/Fascinator/Documents/Portal/
+ * JavaCore#OurWebServlet</b>
  * </p>
- *
+ * 
  * @author Oliver Lucido
  */
 @SuppressWarnings("serial")
@@ -71,7 +61,7 @@ public class IndexerServlet extends HttpServlet {
 
     /**
      * Initialise the Servlet, called at Server startup
-     *
+     * 
      * @throws ServletException If it found errors during startup
      */
     @Override
@@ -103,9 +93,9 @@ public class IndexerServlet extends HttpServlet {
 
     /**
      * Empty method. Process an incoming GET request.
-     *
+     * 
      * We don't need to do anything as Tapestry will handle this.
-     *
+     * 
      * @param request The incoming request
      * @param response The response object
      * @throws ServletException If errors found
@@ -119,9 +109,9 @@ public class IndexerServlet extends HttpServlet {
 
     /**
      * Empty method. Process an incoming POST request.
-     *
+     * 
      * We don't need to do anything as Tapestry will handle this.
-     *
+     * 
      * @param request The incoming request
      * @param response The response object
      * @throws ServletException If errors found
@@ -135,7 +125,7 @@ public class IndexerServlet extends HttpServlet {
 
     /**
      * Shuts down any objects requiring such.
-     *
+     * 
      */
     @Override
     public void destroy() {

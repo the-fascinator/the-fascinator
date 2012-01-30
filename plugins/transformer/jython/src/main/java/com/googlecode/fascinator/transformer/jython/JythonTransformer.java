@@ -88,7 +88,8 @@ public class JythonTransformer implements Transformer {
             .getLogger(JythonTransformer.class);
 
     /** Json config file **/
-    private JsonSimpleConfig config;
+    @SuppressWarnings("unused")
+	private JsonSimpleConfig config;
 
     private JsonSimple itemConfig;
 

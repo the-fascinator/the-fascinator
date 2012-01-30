@@ -18,8 +18,6 @@
  */
 package com.googlecode.fascinator.portal;
 
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +25,11 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+
 public class JsonSessionState extends HashMap<String, Object> {
+    /** Serializable - required */
+    private static final long serialVersionUID = 1L;
 
     private Logger log = LoggerFactory.getLogger(JsonSessionState.class);
 

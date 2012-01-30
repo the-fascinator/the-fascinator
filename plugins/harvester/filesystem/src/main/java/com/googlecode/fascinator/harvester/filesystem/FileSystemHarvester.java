@@ -311,12 +311,12 @@ public class FileSystemHarvester extends GenericHarvester {
         }
 
         // Rendering: Order is significant
-        renderChains = new LinkedHashMap();
+        renderChains = new LinkedHashMap<String, Map<String, List<String>>>();
         Map<String, JsonSimple> renderTypes = getJsonConfig()
                 .getJsonSimpleMap("renderTypes");
         if (renderTypes != null) {
             for (String name : renderTypes.keySet()) {
-                Map<String, List<String>> details = new HashMap();
+                Map<String, List<String>> details = new HashMap<String, List<String>>();
                 details.put("fileTypes",
                         renderTypes.get(name).getStringList("fileTypes"));
                 details.put("harvestQueue",

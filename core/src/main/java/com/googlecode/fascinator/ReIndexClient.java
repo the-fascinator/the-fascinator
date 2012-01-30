@@ -99,7 +99,7 @@ public class ReIndexClient {
      * 
      */
     public ReIndexClient() {
-        harvestConfigs = new HashMap();
+        harvestConfigs = new HashMap<String, JsonSimple>();
 
         // Access Configuration
         try {
@@ -151,7 +151,7 @@ public class ReIndexClient {
                 "restoreTool", "harvestRemap", "allowOlder");
         failOnMissing = systemConfig.getBoolean(true,
                 "restoreTool", "harvestRemap", "failOnMissing");
-        harvestUpdates = new HashMap();
+        harvestUpdates = new HashMap<String, String>();
 
         // Migration Scripting?
         String scriptString = systemConfig.getString(null,
@@ -234,7 +234,7 @@ public class ReIndexClient {
      */
     private void logicLoop() {
         log.info("Rebuild commencing...");
-        Set objectList = storage.getObjectIdList();
+        Set<?> objectList = storage.getObjectIdList();
         if (objectList == null) {
             log.error("Unable to access objects in storage!");
             return;
@@ -251,7 +251,7 @@ public class ReIndexClient {
      * 
      * @param oids The set of OIDs to process
      */
-    private void firstPass(Set oids) {
+    private void firstPass(Set<?> oids) {
         int numObjects = oids.size();
         log.info("Found {} objects in storage. Assessing contents...",
                 numObjects);
@@ -261,8 +261,8 @@ public class ReIndexClient {
         }
 
         // Prepare some holding variables
-        List<String> harvestFiles = new ArrayList();
-        Map<String, String> usedHarvestFiles = new HashMap();
+        List<String> harvestFiles = new ArrayList<String>();
+        Map<String, String> usedHarvestFiles = new HashMap<String, String>();
 
         // Look through storage and populate them
         for (Object object : oids) {
@@ -316,7 +316,7 @@ public class ReIndexClient {
      * 
      * @param oids The set of OIDs to process
      */
-    private void processObjects(Set oids) {
+    private void processObjects(Set<?> oids) {
         int i = 0;
         for (Object object : oids) {
             if (object instanceof String) {
@@ -446,8 +446,8 @@ public class ReIndexClient {
         // Are we running a migration script?
         if (migrationScript != null) {
             // Prepare variables for access
-            Map<String, Object> bindings = new HashMap();
-            List<String> auditMessages = new ArrayList();
+            Map<String, Object> bindings = new HashMap<String, Object>();
+            List<String> auditMessages = new ArrayList<String>();
             bindings.put("systemConfig", systemConfig);
             bindings.put("object", digitalObject);
             bindings.put("log", log);

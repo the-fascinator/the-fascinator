@@ -32,6 +32,7 @@ public class InputGobbler extends Thread {
     @Override
     public void run() {
         try {
+            @SuppressWarnings("unused")
             int c;
             while ((c = in.read()) != -1) {
                 // That's it, gobbled

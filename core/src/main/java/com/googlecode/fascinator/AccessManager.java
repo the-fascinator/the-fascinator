@@ -18,19 +18,8 @@
  */
 package com.googlecode.fascinator;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.access.AccessControl;
-import com.googlecode.fascinator.api.access.AccessControlException;
-import com.googlecode.fascinator.api.access.AccessControlManager;
-import com.googlecode.fascinator.api.access.AccessControlSchema;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -40,12 +29,21 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.access.AccessControl;
+import com.googlecode.fascinator.api.access.AccessControlException;
+import com.googlecode.fascinator.api.access.AccessControlManager;
+import com.googlecode.fascinator.api.access.AccessControlSchema;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+
 /**
  * Management of security.
  * 
  * This object manages one or more access control plugins based on
- * configuration. The portal doesn't need to know the details of talking
- * to each data source.
+ * configuration. The portal doesn't need to know the details of talking to each
+ * data source.
  * 
  * @author Greg Pendlebury
  */
@@ -78,7 +76,7 @@ public class AccessManager implements AccessControlManager {
 
     /**
      * Gets a PluginDescription object relating to this plugin.
-     *
+     * 
      * @return a PluginDescription
      */
     @Override
@@ -139,7 +137,7 @@ public class AccessManager implements AccessControlManager {
 
     @Override
     public void shutdown() throws AccessControlException {
-        Iterator i = plugins.values().iterator();
+        Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (AccessControl) i.next();
             try {
@@ -175,7 +173,7 @@ public class AccessManager implements AccessControlManager {
     @Override
     public List<AccessControlSchema> getSchemas(String recordId)
             throws AccessControlException {
-        List<AccessControlSchema> found = new ArrayList();
+        List<AccessControlSchema> found = new ArrayList<AccessControlSchema>();
         if (active != null) {
             found = plugins.get(active).getSchemas(recordId);
         }
@@ -230,11 +228,11 @@ public class AccessManager implements AccessControlManager {
     public List<String> getRoles(String recordId) throws AccessControlException {
         // Test for actual return values found
         Boolean valid = false;
-        List<String> found = new ArrayList();
+        List<String> found = new ArrayList<String>();
         List<String> result;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (AccessControl) i.next();
             result = p.getRoles(recordId);
@@ -290,7 +288,7 @@ public class AccessManager implements AccessControlManager {
         }
 
         // Make sure it exists
-        Iterator i = plugins.values().iterator();
+        Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (AccessControl) i.next();
             if (pluginId.equals(p.getId())) {
@@ -316,12 +314,12 @@ public class AccessManager implements AccessControlManager {
      */
     @Override
     public List<PluginDescription> getPluginList() {
-        List<PluginDescription> found = new ArrayList();
+        List<PluginDescription> found = new ArrayList<PluginDescription>();
         PluginDescription result;
         AccessControlSchema schema;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (AccessControl) i.next();
             result = new PluginDescription(p);

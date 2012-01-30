@@ -18,20 +18,6 @@
  */
 package com.googlecode.fascinator.portal;
 
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.storage.StorageUtils;
-import com.googlecode.fascinator.portal.quartz.ExternalJob;
-import com.googlecode.fascinator.portal.quartz.HarvestJob;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,10 +63,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
+import com.googlecode.fascinator.common.storage.StorageUtils;
+import com.googlecode.fascinator.portal.quartz.ExternalJob;
+import com.googlecode.fascinator.portal.quartz.HarvestJob;
+
 /**
- * The House Keeper is a messaging object that periodically wakes itself
- * up to look for routine maintenance tasks requiring attention.
- *
+ * The House Keeper is a messaging object that periodically wakes itself up to
+ * look for routine maintenance tasks requiring attention.
+ * 
  * @author Greg Pendlebury
  */
 public class HouseKeeper implements GenericListener {
@@ -139,7 +139,7 @@ public class HouseKeeper implements GenericListener {
     /** Message Producer instance */
     private MessageProducer producer;
 
-    /** Message Destination - House Keeping*/
+    /** Message Destination - House Keeping */
     private Queue destHouseKeeping;
 
     /** Cached list of actions needing attention */
@@ -168,7 +168,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Switch log file
-     *
+     * 
      */
     private void openLog() {
         MDC.put("name", QUEUE_ID);
@@ -176,7 +176,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Revert log file
-     *
+     * 
      */
     private void closeLog() {
         MDC.remove("name");
@@ -184,7 +184,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Constructor required by ServiceLoader. Be sure to use init()
-     *
+     * 
      */
     public HouseKeeper() {
         thread = new Thread(this, QUEUE_ID);
@@ -192,7 +192,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Start thread running
-     *
+     * 
      */
     @Override
     public void run() {
@@ -203,14 +203,16 @@ public class HouseKeeper implements GenericListener {
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
                     "messaging", "url");
-            ActiveMQConnectionFactory connectionFactory =
-                    new ActiveMQConnectionFactory(brokerUrl);
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                    brokerUrl);
             connection = connectionFactory.createConnection();
 
             // Sessions are not thread safe, to send a message outside
-            //  of the onMessage() callback you need another session.
-            cSession = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
-            pSession = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+            // of the onMessage() callback you need another session.
+            cSession = connection
+                    .createSession(false, Session.AUTO_ACKNOWLEDGE);
+            pSession = connection
+                    .createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             Destination destination = cSession.createQueue(QUEUE_ID);
             consumer = cSession.createConsumer(destination);
@@ -291,23 +293,23 @@ public class HouseKeeper implements GenericListener {
             }
 
             // Establish a database connection
-            dbConnection = DriverManager.getConnection(DERBY_PROTOCOL +
-                    HK_DATABASE + ";create=true", props);
+            dbConnection = DriverManager.getConnection(DERBY_PROTOCOL
+                    + HK_DATABASE + ";create=true", props);
         }
         return dbConnection;
     }
 
     /**
      * Wrapper method to encapsulate the scheduling logic.
-     *
+     * 
      */
     private void quartzScheduling() {
         // Loop through each job
         for (JsonSimple thisJob : jobConfig) {
             String name = thisJob.getString(null, "name");
             if (name == null) {
-                log.error("Configuration error. " +
-                        "All jobs must have a 'name' value.");
+                log.error("Configuration error. "
+                        + "All jobs must have a 'name' value.");
                 continue;
             }
 
@@ -325,12 +327,12 @@ public class HouseKeeper implements GenericListener {
             // Step 2 - Do we have a valid trigger?
             CronTrigger trigger = null;
             try {
-                trigger = new CronTrigger(name, null,
+                trigger = new CronTrigger(name, null, thisJob.getString(null,
+                        "timing"));
+                log.info("Scheduling Job: '{}' => '{}'", name,
                         thisJob.getString(null, "timing"));
-                log.info("Scheduling Job: '{}' => '{}'",
-                        name, thisJob.getString(null, "timing"));
-                //log.debug("Job timing: \n===\n{}\n===\n",
-                //        trigger.getExpressionSummary());
+                // log.debug("Job timing: \n===\n{}\n===\n",
+                // trigger.getExpressionSummary());
             } catch (ParseException ex) {
                 log.error("Error in job timing ('{}')", name, ex);
                 continue;
@@ -349,6 +351,7 @@ public class HouseKeeper implements GenericListener {
                 }
                 try {
                     // Make sure the URL is valid... we don't need it though
+                    @SuppressWarnings("unused")
                     URL url = new URL(urlString);
                     job.getJobDataMap().put("url", urlString);
                     if (token != null) {
@@ -381,7 +384,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Initialization method
-     *
+     * 
      * @param config Configuration to use
      * @throws Exception for any failure
      */
@@ -396,23 +399,22 @@ public class HouseKeeper implements GenericListener {
             timeout = config.getInteger(DEFAULT_TIMEOUT, "config", "frequency");
 
             // Find data directory
-            derbyHome = config.getString(null,
-                    "database-service", "derbyHome");
+            derbyHome = config.getString(null, "database-service", "derbyHome");
             String oldHome = System.getProperty("derby.system.home");
 
             // Derby's data directory has already been configured
             if (oldHome != null) {
                 if (derbyHome != null) {
                     // Use the existing one, but throw a warning
-                    log.warn("Using previously specified data directory:" +
-                            " '{}', provided value has been ignored: '{}'",
+                    log.warn("Using previously specified data directory:"
+                            + " '{}', provided value has been ignored: '{}'",
                             oldHome, derbyHome);
                 } else {
                     // This is ok, no configuration conflicts
                     log.info("Using existing data directory: '{}'", oldHome);
                 }
 
-            // We don't have one, config MUST have one
+                // We don't have one, config MUST have one
             } else {
                 if (derbyHome == null) {
                     log.error("No database home directory configured!");
@@ -422,15 +424,16 @@ public class HouseKeeper implements GenericListener {
                     File file = new File(derbyHome);
                     if (file.exists()) {
                         if (!file.isDirectory()) {
-                            throw new Exception("Database home '" +
-                                    derbyHome + "' is not a directory!");
+                            throw new Exception("Database home '" + derbyHome
+                                    + "' is not a directory!");
                         }
                     } else {
                         file.mkdirs();
                         if (!file.exists()) {
-                            throw new Exception("Database home '" +
-                                    derbyHome +
-                                    "' does not exist and could not be created!");
+                            throw new Exception(
+                                    "Database home '"
+                                            + derbyHome
+                                            + "' does not exist and could not be created!");
                         }
                     }
                     System.setProperty("derby.system.home", derbyHome);
@@ -438,23 +441,25 @@ public class HouseKeeper implements GenericListener {
             }
 
             File sysFile = JsonSimpleConfig.getSystemFile();
-            stats = new LinkedHashMap();
+            stats = new LinkedHashMap<String, Map<String, String>>();
 
             // Quartz Scheduler properties file
-            String quartzConfig = config.getString(null,
-                    "config", "quartzConfig");
+            String quartzConfig = config.getString(null, "config",
+                    "quartzConfig");
             if (quartzConfig == null) {
                 throw new Exception(
-                    "No scheduling config provided: 'config/quartzConfig'!");
+                        "No scheduling config provided: 'config/quartzConfig'!");
             }
             File quartzProps = new File(quartzConfig);
             if (!quartzProps.exists()) {
-                log.warn("Quartz config file '{}' not found, deploying default",
+                log.warn(
+                        "Quartz config file '{}' not found, deploying default",
                         quartzConfig);
                 quartzProps.getParentFile().mkdirs();
                 OutputStream out = new FileOutputStream(quartzProps);
-                IOUtils.copy(getClass().getResourceAsStream("/" +
-                        DEFAULT_QUARTZ_FILE), out);
+                IOUtils.copy(
+                        getClass().getResourceAsStream(
+                                "/" + DEFAULT_QUARTZ_FILE), out);
                 out.close();
                 log.info("Default configuration copied to '{}'", quartzProps);
             }
@@ -464,15 +469,15 @@ public class HouseKeeper implements GenericListener {
             }
 
             /** Get the config for scheduled jobs */
-            jobConfig = JsonSimple.toJavaList(
-                    config.getArray("config", "jobs"));
+            jobConfig = JsonSimple
+                    .toJavaList(config.getArray("config", "jobs"));
 
             // Initialise plugins
-            indexer = PluginManager.getIndexer(
-                    globalConfig.getString("solr", "indexer", "type"));
+            indexer = PluginManager.getIndexer(globalConfig.getString("solr",
+                    "indexer", "type"));
             indexer.init(sysFile);
-            storage = PluginManager.getStorage(
-                    globalConfig.getString("file-system", "storage", "type"));
+            storage = PluginManager.getStorage(globalConfig.getString(
+                    "file-system", "storage", "type"));
             storage.init(sysFile);
 
         } catch (IOException ioe) {
@@ -488,7 +493,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Return the ID string for this listener
-     *
+     * 
      */
     @Override
     public String getId() {
@@ -497,7 +502,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Start the queue
-     *
+     * 
      * @throws Exception if an error occurred starting the JMS connections
      */
     @Override
@@ -506,8 +511,7 @@ public class HouseKeeper implements GenericListener {
     }
 
     /**
-     * Stop the House Keeper. Including stopping the storage and
-     * indexer
+     * Stop the House Keeper. Including stopping the storage and indexer
      */
     @Override
     public void stop() throws Exception {
@@ -564,24 +568,23 @@ public class HouseKeeper implements GenericListener {
         }
 
         // Derby can only be shutdown from one thread,
-        //    we'll catch errors from the rest.
+        // we'll catch errors from the rest.
         String threadedShutdownMessage = DERBY_DRIVER
                 + " is not registered with the JDBC driver manager";
         try {
             // Tell the database to close
             DriverManager.getConnection(DERBY_PROTOCOL + ";shutdown=true");
             // Shutdown just this database (but not the engine)
-            //DriverManager.getConnection(DERBY_PROTOCOL + SECURITY_DATABASE +
-            //        ";shutdown=true");
+            // DriverManager.getConnection(DERBY_PROTOCOL + SECURITY_DATABASE +
+            // ";shutdown=true");
         } catch (SQLException ex) {
             // These test values are used if the engine is NOT shutdown
-            //if (ex.getErrorCode() == 45000 &&
-            //        ex.getSQLState().equals("08006")) {
+            // if (ex.getErrorCode() == 45000 &&
+            // ex.getSQLState().equals("08006")) {
 
             // Valid response
-            if (ex.getErrorCode() == 50000 &&
-                    ex.getSQLState().equals("XJ015")) {
-            // Error response
+            if (ex.getErrorCode() == 50000 && ex.getSQLState().equals("XJ015")) {
+                // Error response
             } else {
                 // Make sure we ignore simple thread issues
                 if (!ex.getMessage().equals(threadedShutdownMessage)) {
@@ -614,7 +617,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Callback function for periodic house keeping.
-     *
+     * 
      */
     private void onTimeout() {
         openLog();
@@ -635,7 +638,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Callback function for incoming messages sent directly to housekeeping.
-     *
+     * 
      * @param message The incoming message
      */
     @Override
@@ -650,7 +653,7 @@ public class HouseKeeper implements GenericListener {
 
             String text = ((TextMessage) message).getText();
             JsonSimple msgJson = new JsonSimple(text);
-            //log.debug("Message\n{}", msgJson.toString());
+            // log.debug("Message\n{}", msgJson.toString());
 
             String msgType = msgJson.getString(null, "type");
             if (msgType == null) {
@@ -663,9 +666,9 @@ public class HouseKeeper implements GenericListener {
             if (msgType.equals("blocking-restart")) {
                 UserAction ua = new UserAction();
                 ua.block = true;
-                ua.message = "Changes made to the system require a restart. " +
-                        "Please restart the system before normal " +
-                        "functionality can resume.";
+                ua.message = "Changes made to the system require a restart. "
+                        + "Please restart the system before normal "
+                        + "functionality can resume.";
                 storeAction(ua);
             }
 
@@ -683,8 +686,7 @@ public class HouseKeeper implements GenericListener {
                 if (oid != null) {
                     UserAction ua = new UserAction();
                     ua.block = false;
-                    ua.message = ("A harvest file has been updated: '"
-                            + oid + "'");
+                    ua.message = ("A harvest file has been updated: '" + oid + "'");
                     storeAction(ua);
                 } else {
                     log.error("Invalid message, no harvest file OID provided!");
@@ -700,30 +702,30 @@ public class HouseKeeper implements GenericListener {
                     ua.message = messageText;
                     storeAction(ua);
                 } else {
-                    this.log.error("Invalid notice, no message text provided!");
+                    log.error("Invalid notice, no message text provided!");
                 }
             }
 
             // Statistics update from Broker Monitor
             if (msgType.equals("broker-update")) {
-                Map<String, JsonSimple> queues = JsonSimple.toJavaMap(
-                        msgJson.getObject("stats"));
+                Map<String, JsonSimple> queues = JsonSimple.toJavaMap(msgJson
+                        .getObject("stats"));
                 for (String q : queues.keySet()) {
                     JsonSimple qData = queues.get(q);
-                    Map<String, String> qStats = new HashMap();
-                    qStats.put("total",  qData.getString(null, "total"));
-                    qStats.put("lost",   qData.getString(null, "lost"));
+                    Map<String, String> qStats = new HashMap<String, String>();
+                    qStats.put("total", qData.getString(null, "total"));
+                    qStats.put("lost", qData.getString(null, "lost"));
                     qStats.put("memory", qData.getString(null, "memory"));
-                    qStats.put("size",   qData.getString(null, "size"));
+                    qStats.put("size", qData.getString(null, "size"));
                     // Round to an integer value
-                    int spd = Float.valueOf(
-                            qData.getString("0.0", "speed")).intValue();
-                    qStats.put("speed",   String.valueOf(spd));
+                    int spd = Float.valueOf(qData.getString("0.0", "speed"))
+                            .intValue();
+                    qStats.put("speed", String.valueOf(spd));
                     // Change from milliseconds to seconds
-                    float avg = Float.valueOf(
-                            qData.getString("0.0", "average")) / 1000;
+                    float avg = Float
+                            .valueOf(qData.getString("0.0", "average")) / 1000;
                     // Round to two digits
-                    avg = Math.round(avg * 100)/100;
+                    avg = Math.round(avg * 100) / 100;
                     qStats.put("average", String.valueOf(avg));
                     stats.put(q, qStats);
                 }
@@ -733,8 +735,8 @@ public class HouseKeeper implements GenericListener {
             if (msgType.equals("refresh")) {
                 log.info("Refreshing House Keeping");
                 globalConfig = new JsonSimpleConfig();
-                timeout = globalConfig.getInteger(DEFAULT_TIMEOUT,
-                        "portal", "houseKeeping", "config", "frequency");
+                timeout = globalConfig.getInteger(DEFAULT_TIMEOUT, "portal",
+                        "houseKeeping", "config", "frequency");
                 log.info("Starting callback timer. Timeout = {}s", timeout);
                 timer.cancel();
                 timer = new Timer("HouseKeeping", true);
@@ -748,8 +750,8 @@ public class HouseKeeper implements GenericListener {
                 // Show a message for the user
                 UserAction ua = new UserAction();
                 ua.block = false;
-                ua.message = ("House Keeping is restarting. Frequency = " +
-                        timeout + "s");
+                ua.message = ("House Keeping is restarting. Frequency = "
+                        + timeout + "s");
                 storeAction(ua);
             }
         } catch (JMSException jmse) {
@@ -762,12 +764,12 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Get the messages to display for the user
-     *
+     * 
      * @returns List<UserAction> The current list of message
      */
     public List<UserAction> getUserMessages() {
         // Only runs on the first page load after server start. Make sure
-        //  house keeping has run once before returning
+        // house keeping has run once before returning
         if (!renderReady) {
             openLog();
             log.debug("Holding page render until first house keeping completes.");
@@ -782,13 +784,13 @@ public class HouseKeeper implements GenericListener {
             }
 
             // We need to make sure problems in house keeping don't
-            //   cause larger problems though
+            // cause larger problems though
             if (renderReady) {
                 log.debug("Resuming page render (after {} sleeps).", i);
             } else {
-                log.error("House keeping has been holding page render for " +
-                        "more than 20s and still has not completed. There " +
-                        "are likely house keeping errors to address.");
+                log.error("House keeping has been holding page render for "
+                        + "more than 20s and still has not completed. There "
+                        + "are likely house keeping errors to address.");
                 renderReady = true;
             }
             closeLog();
@@ -799,7 +801,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Confirm and remove a message/action
-     *
+     * 
      * @param actionId The ID of the action to remove
      */
     public void confirmMessage(String actionId) throws Exception {
@@ -822,8 +824,8 @@ public class HouseKeeper implements GenericListener {
                     closeLog();
                     log.error("Trying to delete a blocked message! '{}'",
                             actionId);
-                    throw new Exception("Sorry, but you can't delete that" +
-                            " message. A restart is required!");
+                    throw new Exception("Sorry, but you can't delete that"
+                            + " message. A restart is required!");
                 }
             }
         }
@@ -839,15 +841,15 @@ public class HouseKeeper implements GenericListener {
         } catch (SQLException ex) {
             closeLog();
             log.error("Databases access error: ", ex);
-            throw new Exception("Error deleting message, " +
-                    "please check administration log files.");
+            throw new Exception("Error deleting message, "
+                    + "please check administration log files.");
         }
         closeLog();
     }
 
     /**
      * During portal startup, make sure the system config file is up-to-date.
-     *
+     * 
      */
     private void checkSystemConfig() {
         log.info("Checking system config files ...");
@@ -880,14 +882,14 @@ public class HouseKeeper implements GenericListener {
     }
 
     /**
-     * During portal startup, we should check to ensure our harvest files
-     * are up-to-date with those in storage.
-     *
+     * During portal startup, we should check to ensure our harvest files are
+     * up-to-date with those in storage.
+     * 
      */
     private void syncHarvestFiles() {
         // Get the harvest files directory
-        String harvestPath = globalConfig.getString(null,
-                "portal", "harvestFiles");
+        String harvestPath = globalConfig.getString(null, "portal",
+                "harvestFiles");
         if (harvestPath == null) {
             return;
         }
@@ -910,11 +912,11 @@ public class HouseKeeper implements GenericListener {
 
             if (object != null) {
                 // Generate a message to ourself. This merges with other places
-                //   where the update occurs (like the HarvestClient).
+                // where the update occurs (like the HarvestClient).
                 log.debug("Harvest file updated: '{}'", file.getAbsolutePath());
                 JsonObject message = new JsonObject();
                 message.put("type", "harvest-update");
-                message.put("oid",  object.getId());
+                message.put("oid", object.getId());
                 try {
                     sendMessage(destHouseKeeping, message.toString());
                 } catch (JMSException ex) {
@@ -926,12 +928,12 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Recursively generate a list of file in directory and sub-directories.
-     *
+     * 
      * @param dir The directory to list
      * @return List<File> The list of files
      */
     private List<File> getFiles(File dir) {
-        List files = new ArrayList();
+        List<File> files = new ArrayList<File>();
         for (File file : dir.listFiles()) {
             if (file.isDirectory()) {
                 files.addAll(getFiles(file));
@@ -944,7 +946,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Send an update to House Keeping
-     *
+     * 
      * @param message Message to be sent
      */
     private void sendMessage(Destination destination, String message)
@@ -955,21 +957,22 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Sets the priority level for the thread. Used by the OS.
-     *
+     * 
      * @param newPriority The priority level to set the thread at
      */
     @Override
     public void setPriority(int newPriority) {
-        if (newPriority >= Thread.MIN_PRIORITY &&
-            newPriority <= Thread.MAX_PRIORITY) {
+        if (newPriority >= Thread.MIN_PRIORITY
+                && newPriority <= Thread.MAX_PRIORITY) {
             thread.setPriority(newPriority);
         }
     }
 
     /**
      * Get the latest statistics on message queues.
-     *
-     * @return Map<String, Map<String, String>> of all queues and their statistics
+     * 
+     * @return Map<String, Map<String, String>> of all queues and their
+     *         statistics
      */
     public Map<String, Map<String, String>> getQueueStats() {
         return stats;
@@ -977,7 +980,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Check if the message provided is already in the list of current actions
-     *
+     * 
      * @param message The message to look for
      * @param boolean Flag set if the message is found
      */
@@ -992,7 +995,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Remove an old action from the database and update the action queue.
-     *
+     * 
      * @param action The User action to store
      */
     private void removeAction(int id) throws SQLException {
@@ -1010,7 +1013,7 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Store a new action in the database and update the action queue.
-     *
+     * 
      * @param action The User action to store
      */
     private void storeAction(UserAction action) {
@@ -1027,8 +1030,8 @@ public class HouseKeeper implements GenericListener {
             log.debug("Storing action: '{}'", action.message);
             // Prepare our query
             PreparedStatement sql = dbConnection().prepareCall(
-                    "INSERT INTO " + NOTIFICATIONS_TABLE +
-                    " (block, message, datetime) VALUES (?, ?, ?)");
+                    "INSERT INTO " + NOTIFICATIONS_TABLE
+                            + " (block, message, datetime) VALUES (?, ?, ?)");
             // Run the query
             sql.setBoolean(1, action.block);
             sql.setString(2, action.message);
@@ -1044,16 +1047,16 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Rebuild the in-memory list of actions from the database.
-     *
+     * 
      */
     private void syncActionList() {
         // Purge current list
-        actions = new ArrayList();
+        actions = new ArrayList<UserAction>();
         try {
             // Prepare our query
             PreparedStatement sql = dbConnection().prepareCall(
-                    "SELECT * FROM " + NOTIFICATIONS_TABLE +
-                    " ORDER BY block DESC, id");
+                    "SELECT * FROM " + NOTIFICATIONS_TABLE
+                            + " ORDER BY block DESC, id");
             // Run the query
             ResultSet result = sql.executeQuery();
             // Build our list
@@ -1074,9 +1077,9 @@ public class HouseKeeper implements GenericListener {
     }
 
     /**
-     * Check for the existence of a table and arrange for its creation if
-     * not found.
-     *
+     * Check for the existence of a table and arrange for its creation if not
+     * found.
+     * 
      * @param table The table to look for and create.
      * @throws SQLException if there was an error.
      */
@@ -1091,15 +1094,15 @@ public class HouseKeeper implements GenericListener {
             // Double check it was created
             if (!findTable(table)) {
                 log.error("Unknown error creating table '{}'", table);
-                throw new SQLException(
-                        "Could not find or create table '" + table + "'");
+                throw new SQLException("Could not find or create table '"
+                        + table + "'");
             }
         }
     }
 
     /**
      * Check if the given table exists in the database.
-     *
+     * 
      * @param table The table to look for
      * @return boolean flag if the table was found or not
      * @throws SQLException if there was an error accessing the database
@@ -1107,7 +1110,7 @@ public class HouseKeeper implements GenericListener {
     private boolean findTable(String table) throws SQLException {
         boolean tableFound = false;
         DatabaseMetaData meta = dbConnection().getMetaData();
-        ResultSet result = (ResultSet) meta.getTables(null, null, null, null);
+        ResultSet result = meta.getTables(null, null, null, null);
         while (result.next() && !tableFound) {
             if (result.getString("TABLE_NAME").equalsIgnoreCase(table)) {
                 tableFound = true;
@@ -1119,22 +1122,20 @@ public class HouseKeeper implements GenericListener {
 
     /**
      * Create the given table in the database.
-     *
+     * 
      * @param table The table to create
-     * @throws SQLException if there was an error during creation,
-     *                      or an unknown table was specified.
+     * @throws SQLException if there was an error during creation, or an unknown
+     *             table was specified.
      */
     private void createTable(String table) throws SQLException {
         if (table.equals(NOTIFICATIONS_TABLE)) {
             Statement sql = dbConnection().createStatement();
-            sql.execute(
-                    "CREATE TABLE " + NOTIFICATIONS_TABLE +
-                    "(id INTEGER NOT NULL GENERATED ALWAYS AS " +
-                    "IDENTITY (START WITH 1, INCREMENT BY 1), " +
-                    "block CHAR(1) NOT NULL, " +
-                    "message VARCHAR(4000) NOT NULL, " +
-                    "datetime TIMESTAMP NOT NULL, " +
-                    "PRIMARY KEY (id))");
+            sql.execute("CREATE TABLE " + NOTIFICATIONS_TABLE
+                    + "(id INTEGER NOT NULL GENERATED ALWAYS AS "
+                    + "IDENTITY (START WITH 1, INCREMENT BY 1), "
+                    + "block CHAR(1) NOT NULL, "
+                    + "message VARCHAR(4000) NOT NULL, "
+                    + "datetime TIMESTAMP NOT NULL, " + "PRIMARY KEY (id))");
             close(sql);
             return;
         }
@@ -1142,9 +1143,9 @@ public class HouseKeeper implements GenericListener {
     }
 
     /**
-     * Attempt to close a ResultSet. Basic wrapper for exception
-     * catching and logging
-     *
+     * Attempt to close a ResultSet. Basic wrapper for exception catching and
+     * logging
+     * 
      * @param resultSet The ResultSet to try and close.
      */
     private void close(ResultSet resultSet) {
@@ -1159,9 +1160,9 @@ public class HouseKeeper implements GenericListener {
     }
 
     /**
-     * Attempt to close a Statement. Basic wrapper for exception
-     * catching and logging
-     *
+     * Attempt to close a Statement. Basic wrapper for exception catching and
+     * logging
+     * 
      * @param statement The Statement to try and close.
      */
     private void close(Statement statement) {

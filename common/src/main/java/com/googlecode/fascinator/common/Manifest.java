@@ -144,7 +144,7 @@ public class Manifest extends JsonSimple {
      * @return ManifestNode : The retrieved node, null if not found
      */
     public List<ManifestNode> getTopNodes() {
-        List<ManifestNode> nodes = new ArrayList();
+        List<ManifestNode> nodes = new ArrayList<ManifestNode>();
         Map<String, JsonSimple> manifest = getJsonSimpleMap("manifest");
         if (manifest == null) {
             return nodes;

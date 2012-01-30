@@ -18,9 +18,6 @@
  */
 package com.googlecode.fascinator.portal;
 
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +28,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+
 /**
  * Portal configuration
  * 
@@ -40,6 +40,7 @@ public class Portal extends JsonSimple {
 
     public static final String PORTAL_JSON = "portal.json";
 
+    @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(Portal.class);
 
     /**

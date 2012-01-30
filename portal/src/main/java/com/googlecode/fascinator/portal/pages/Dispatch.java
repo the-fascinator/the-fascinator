@@ -18,22 +18,6 @@
  */
 package com.googlecode.fascinator.portal.pages;
 
-import com.googlecode.fascinator.HarvestClient;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.authentication.AuthenticationException;
-import com.googlecode.fascinator.api.authentication.User;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MimeTypeUtil;
-import com.googlecode.fascinator.portal.FormData;
-import com.googlecode.fascinator.portal.JsonSessionState;
-import com.googlecode.fascinator.portal.services.DynamicPageService;
-import com.googlecode.fascinator.portal.services.GenericStreamResponse;
-import com.googlecode.fascinator.portal.services.HttpStatusCodeResponse;
-import com.googlecode.fascinator.portal.services.PortalManager;
-import com.googlecode.fascinator.portal.services.PortalSecurityManager;
-import com.googlecode.fascinator.portal.services.VelocityService;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,6 +44,22 @@ import org.apache.tapestry5.services.Response;
 import org.apache.tapestry5.upload.services.MultipartDecoder;
 import org.apache.tapestry5.upload.services.UploadedFile;
 import org.slf4j.Logger;
+
+import com.googlecode.fascinator.HarvestClient;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.authentication.AuthenticationException;
+import com.googlecode.fascinator.api.authentication.User;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.MimeTypeUtil;
+import com.googlecode.fascinator.portal.FormData;
+import com.googlecode.fascinator.portal.JsonSessionState;
+import com.googlecode.fascinator.portal.services.DynamicPageService;
+import com.googlecode.fascinator.portal.services.GenericStreamResponse;
+import com.googlecode.fascinator.portal.services.HttpStatusCodeResponse;
+import com.googlecode.fascinator.portal.services.PortalManager;
+import com.googlecode.fascinator.portal.services.PortalSecurityManager;
+import com.googlecode.fascinator.portal.services.VelocityService;
 
 /**
  * <h3>Introduction</h3>
@@ -89,6 +89,7 @@ public class Dispatch {
 
     private static final String AJAX_EXT = ".ajax";
 
+    @SuppressWarnings("unused")
     private static final String POST_EXT = ".post";
 
     private static final String SCRIPT_EXT = ".script";
@@ -189,7 +190,8 @@ public class Dispatch {
             // Make sure it's not a static resource
             if (security.testForSso(sessionState, resourceName, requestUri)) {
                 // Run SSO
-                boolean redirected = security.runSsoIntegration(sessionState, formData);
+                boolean redirected = security.runSsoIntegration(sessionState,
+                        formData);
                 // Finish here if SSO redirected
                 if (redirected) {
                     return GenericStreamResponse.noResponse();
@@ -256,7 +258,6 @@ public class Dispatch {
             return;
         }
 
-		
         JsonSimple workflowConfig = sysConfig.getJsonSimpleMap("uploader").get(
                 workflowId);
 

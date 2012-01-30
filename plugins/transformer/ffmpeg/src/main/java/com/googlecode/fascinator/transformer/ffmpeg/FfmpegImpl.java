@@ -74,7 +74,7 @@ public class FfmpegImpl implements Ffmpeg {
         this.extraction = false;
         this.executable = executable == null ? DEFAULT_BIN_TRANSCODE : executable;
         this.metadata   = metadata   == null ? DEFAULT_BIN_METADATA  : metadata;
-        env = new HashMap();
+        env = new HashMap<String, String>();
     }
 
     /**

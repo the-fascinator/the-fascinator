@@ -118,7 +118,8 @@ import org.slf4j.LoggerFactory;
 public class WorkflowHarvester extends GenericHarvester {
 
     /** logging */
-    private Logger log = LoggerFactory.getLogger(WorkflowHarvester.class);
+    @SuppressWarnings("unused")
+	private Logger log = LoggerFactory.getLogger(WorkflowHarvester.class);
 
     /** flag for forcing local storage */
     private boolean forceLocalStorage;
@@ -153,11 +154,11 @@ public class WorkflowHarvester extends GenericHarvester {
                 "harvester", "workflow-harvester", "force-update");
 
         // Order is significant
-        renderChains = new LinkedHashMap();
+        renderChains = new LinkedHashMap<String, Map<String, List<String>>>();
         JsonObject renderTypes = getJsonConfig().getObject("renderTypes");
         if (renderTypes != null) {
             for (Object name : renderTypes.keySet()) {
-                Map<String, List<String>> details = new HashMap();
+                Map<String, List<String>> details = new HashMap<String, List<String>>();
                 JsonObject chain = (JsonObject) renderTypes.get(name);
                 details.put("fileTypes",
                         JsonSimple.getStringList(chain, "fileTypes"));

@@ -320,6 +320,6 @@ public class OpenID implements SSOInterface {
     @Override
     public List<String> getRolesList(JsonSessionState session) {
         // Not supported by this provider
-        return new ArrayList();
+        return new ArrayList<String>();
     }
 }

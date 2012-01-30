@@ -53,7 +53,7 @@ public class JythonUberspect extends UberspectImpl {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Iterator getIterator(Object obj, Info i) throws Exception {
+    public Iterator<?> getIterator(Object obj, Info i) throws Exception {
         log.trace("getIterator obj:" + obj + " i:" + i);
 
         if (obj instanceof PyObject) {
@@ -64,7 +64,7 @@ public class JythonUberspect extends UberspectImpl {
             } else if (pyObject instanceof PyDictionary) {
                 return ((PyDictionary) pyObject).values().iterator();
             } else if (pyType instanceof PyJavaType) {
-                Class cls = ((PyJavaType) pyType).getProxyType();
+                Class<?> cls = ((PyJavaType) pyType).getProxyType();
                 return super.getIterator(pyObject.__tojava__(cls), i);
             } else {
                 log.trace("Unsupported class:{} type:{}", pyObject.getClass(),
@@ -132,7 +132,7 @@ public class JythonUberspect extends UberspectImpl {
                 return new String(((PyUnicode) pyObject).encode("UTF-8"));
             } else if (pyObject instanceof PyObjectDerived) {
                 PyType pyType = pyObject.getType();
-                Class cls = ((PyJavaType) pyType).getProxyType();
+                Class<?> cls = ((PyJavaType) pyType).getProxyType();
                 return ((PyObjectDerived) pyObject).__tojava__(cls);
             } else if (pyObject instanceof PyList
                     || pyObject instanceof PyDictionary) {

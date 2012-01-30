@@ -18,6 +18,17 @@
  */
 package com.googlecode.fascinator;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.googlecode.fascinator.api.PluginDescription;
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
@@ -28,19 +39,6 @@ import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.User;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.authentication.GenericUser;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Authentication and management of users.
@@ -57,10 +55,12 @@ public class AuthenticationManager implements AuthManager {
     private static final String INTERNAL_AUTH_PLUGIN = "internal";
 
     /** Logging */
+    @SuppressWarnings("unused")
     private final Logger log = LoggerFactory
             .getLogger(AuthenticationManager.class);
 
     /** User */
+    @SuppressWarnings("unused")
     private GenericUser user_object;
 
     /** List of plugins */
@@ -84,7 +84,7 @@ public class AuthenticationManager implements AuthManager {
 
     /**
      * Gets a PluginDescription object relating to this plugin.
-     *
+     * 
      * @return a PluginDescription
      */
     @Override
@@ -145,9 +145,9 @@ public class AuthenticationManager implements AuthManager {
         // to create/modify users. The first non-internal
         // plugin is the default, but admins can also
         // request one.
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext() && active == null) {
-            p = (Authentication) i.next();
+            p = i.next();
             if (p.getId().equals(INTERNAL_AUTH_PLUGIN)) {
                 // Skip internal
             } else {
@@ -162,9 +162,9 @@ public class AuthenticationManager implements AuthManager {
 
     @Override
     public void shutdown() throws AuthenticationException {
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             try {
                 p.shutdown();
             } catch (PluginException e) {
@@ -184,9 +184,9 @@ public class AuthenticationManager implements AuthManager {
     @Override
     public User logIn(String username, String password)
             throws AuthenticationException {
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             try {
                 User user = p.logIn(username, password);
                 user.setSource(p.getId());
@@ -224,9 +224,9 @@ public class AuthenticationManager implements AuthManager {
      */
     @Override
     public boolean supportsUserManagement() {
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             // Return true as soon as we
             // find one plugin
             if (p.supportsUserManagement()) {
@@ -247,9 +247,9 @@ public class AuthenticationManager implements AuthManager {
     @Override
     public String describeUser() {
         String response = "{";
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             response += "\"" + p.getId() + "\" : {";
             response += "\"name\": \"" + p.getName() + "\", ";
             response += "\"metadata\": " + p.describeUser();
@@ -369,9 +369,9 @@ public class AuthenticationManager implements AuthManager {
         }
 
         // Now try looking everywhere
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             try {
                 // Retrieve the user
                 User user = p.getUser(username);
@@ -398,13 +398,14 @@ public class AuthenticationManager implements AuthManager {
      */
     @Override
     public List<User> searchUsers(String search) throws AuthenticationException {
-        List<User> found = new ArrayList();
+        List<User> found = new ArrayList<User>();
         User user;
 
         // Try the active plugin first
         if (active != null) {
             try {
-                Iterator i = plugins.get(active).searchUsers(search).iterator();
+                Iterator<?> i = plugins.get(active).searchUsers(search)
+                        .iterator();
                 // Now loop through those
                 while (i.hasNext()) {
                     user = (User) i.next();
@@ -421,12 +422,12 @@ public class AuthenticationManager implements AuthManager {
         }
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             try {
                 // Get the mathing users in this plugin
-                Iterator j = p.searchUsers(search).iterator();
+                Iterator<?> j = p.searchUsers(search).iterator();
                 // Now loop through those
                 while (j.hasNext()) {
                     user = (User) j.next();
@@ -457,9 +458,9 @@ public class AuthenticationManager implements AuthManager {
         }
 
         // Make sure it exists
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             if (pluginId.equals(p.getId())) {
                 active = pluginId;
             }
@@ -483,13 +484,13 @@ public class AuthenticationManager implements AuthManager {
      */
     @Override
     public List<PluginDescription> getPluginList() {
-        List<PluginDescription> found = new ArrayList();
+        List<PluginDescription> found = new ArrayList<PluginDescription>();
         PluginDescription result;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Authentication> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Authentication) i.next();
+            p = i.next();
             result = new PluginDescription(p);
             result.setMetadata(p.describeUser());
             found.add(result);

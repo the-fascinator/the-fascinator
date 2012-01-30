@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 public class JsonConfigHelper {
 
     /** Logging */
+    @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(JsonConfigHelper.class);
 
     /** JXPath factory for creating JSON nodes */
@@ -200,7 +201,7 @@ public class JsonConfigHelper {
      */
     public List<Object> getList(String path) {
         List<Object> valueList = new ArrayList<Object>();
-        Iterator valueIterator = getJXPath().iterate(path);
+        Iterator<?> valueIterator = getJXPath().iterate(path);
         while (valueIterator.hasNext()) {
             Object value = valueIterator.next();
             valueList.add(value instanceof String ? StrSubstitutor

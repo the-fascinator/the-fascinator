@@ -18,19 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.solr.SolrDoc;
-import com.googlecode.fascinator.portal.FormData;
-import com.googlecode.fascinator.portal.JsonSessionState;
-import com.googlecode.fascinator.portal.guitoolkit.GUIToolkit;
-import com.googlecode.fascinator.portal.services.DynamicPageService;
-import com.googlecode.fascinator.portal.services.HouseKeepingManager;
-import com.googlecode.fascinator.portal.services.DynamicPageCache;
-import com.googlecode.fascinator.portal.services.PortalManager;
-import com.googlecode.fascinator.portal.services.PortalSecurityManager;
-import com.googlecode.fascinator.portal.services.ScriptingServices;
-import com.googlecode.fascinator.portal.services.VelocityService;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,7 +32,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.services.ApplicationStateManager;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
@@ -56,9 +42,22 @@ import org.python.core.PyObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.solr.SolrDoc;
+import com.googlecode.fascinator.portal.FormData;
+import com.googlecode.fascinator.portal.JsonSessionState;
+import com.googlecode.fascinator.portal.guitoolkit.GUIToolkit;
+import com.googlecode.fascinator.portal.services.DynamicPageCache;
+import com.googlecode.fascinator.portal.services.DynamicPageService;
+import com.googlecode.fascinator.portal.services.HouseKeepingManager;
+import com.googlecode.fascinator.portal.services.PortalManager;
+import com.googlecode.fascinator.portal.services.PortalSecurityManager;
+import com.googlecode.fascinator.portal.services.ScriptingServices;
+import com.googlecode.fascinator.portal.services.VelocityService;
+
 /**
- *
- *
+ * 
+ * 
  * @author Oliver Lucido
  */
 public class CachingDynamicPageServiceImpl implements DynamicPageService {
@@ -76,7 +75,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     private static final String SCRIPT_ACTIVATE_METHOD = "__activate__";
 
     /** Logging */
-    private Logger log = LoggerFactory.getLogger(CachingDynamicPageServiceImpl.class);
+    private Logger log = LoggerFactory
+            .getLogger(CachingDynamicPageServiceImpl.class);
 
     /** Tapestry HTTP servlet request support */
     @Inject
@@ -132,7 +132,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
 
     /**
      * Constructs and configures the service.
-     *
+     * 
      * @param portalManager PortalManager instance
      * @param velocityService VelocityService instance
      */
@@ -155,14 +155,15 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     /**
      * Gets a Velocity resource. This method is deprecated, please use
      * VelocityService.getResource() instead.
-     *
+     * 
      * @param resourcePath valid Velocity resource path
      * @return resource stream or null if not found
      */
     @Override
     @Deprecated
     public InputStream getResource(String resourcePath) {
-        log.warn("getResource() is deprecated, use VelocityService.getResource()  ({})",
+        log.warn(
+                "getResource() is deprecated, use VelocityService.getResource()  ({})",
                 resourcePath);
         return velocityService.getResource(resourcePath);
     }
@@ -178,7 +179,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     @Override
     @Deprecated
     public InputStream getResource(String portalId, String resourceName) {
-        log.warn("getResource() is deprecated, use VelocityService.getResource()  ({}/{})",
+        log.warn(
+                "getResource() is deprecated, use VelocityService.getResource()  ({}/{})",
                 portalId, resourceName);
         return velocityService.getResource(portalId, resourceName);
     }
@@ -187,7 +189,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
      * Resolves the given resource to a valid Velocity resource if possible.
      * This method is deprecated, please use VelocityService.resourceExists()
      * instead.
-     *
+     * 
      * @param portalId the portal to get the resource from
      * @param resourceName the resource to check
      * @return a valid Velocity resource path or null if not found
@@ -195,15 +197,17 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     @Override
     @Deprecated
     public String resourceExists(String portalId, String resourceName) {
-        String resourcePath = velocityService.resourceExists(portalId, resourceName);
-        log.warn("resourceExists() is deprecated, use VelocityService.resourceExists() ({})",
+        String resourcePath = velocityService.resourceExists(portalId,
+                resourceName);
+        log.warn(
+                "resourceExists() is deprecated, use VelocityService.resourceExists() ({})",
                 resourcePath);
         return resourcePath;
     }
 
     /**
      * Renders the Velocity template with the specified form data.
-     *
+     * 
      * @param portalId the portal to get the template from
      * @param pageName the page template to render
      * @param out render results will be written to this output stream
@@ -251,10 +255,9 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
 
         // run page and template scripts
         Set<String> messages = new HashSet<String>();
-        bindings.put("page", evalScript(portalId, layoutName, bindings,
-                messages));
-        bindings.put("self", evalScript(portalId, pageName, bindings,
-                messages));
+        bindings.put("page",
+                evalScript(portalId, layoutName, bindings, messages));
+        bindings.put("self", evalScript(portalId, pageName, bindings, messages));
 
         // try to return the proper MIME type
         String mimeType = "text/html";
@@ -266,7 +269,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         // stop here if the scripts have already sent a response
         boolean committed = response.isCommitted();
         if (committed) {
-            //log.debug("Response has been sent or redirected");
+            // log.debug("Response has been sent or redirected");
             return mimeType;
         }
 
@@ -315,7 +318,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
                 try {
                     // render the page using the layout template
                     log.debug("Rendering layout {}/{}.vm for page {}.vm...",
-                            new Object[]{portalId, layoutName, pageName});
+                            new Object[] { portalId, layoutName, pageName });
                     Writer pageWriter = new OutputStreamWriter(out, "UTF-8");
                     velocityService.renderTemplate(portalId, layoutName, vc,
                             pageWriter);
@@ -384,10 +387,11 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
             messages = new HashSet<String>();
             context.put("renderMessages", messages);
         }
-        Map<String, Object> bindings = (Map<String, Object>) objectContext.get("bindings");
+        Map<String, Object> bindings = (Map<String, Object>) objectContext
+                .get("bindings");
         bindings.put("metadata", metadata);
-        objectContext.put("self", evalScript(portalId, templateName, bindings,
-                messages));
+        objectContext.put("self",
+                evalScript(portalId, templateName, bindings, messages));
 
         String content = "";
         try {
@@ -412,10 +416,10 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     }
 
     /**
-     * Run the jython script with the given context. This method only calls
-     * the activation method on the jython script objects which are retrieved
-     * from the page cache.
-     *
+     * Run the jython script with the given context. This method only calls the
+     * activation method on the jython script objects which are retrieved from
+     * the page cache.
+     * 
      * @param portalId portal to get the script from
      * @param pageName page name that the script is supporting
      * @param context context for the script
@@ -434,7 +438,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
             } else {
                 scriptObject = pageCache.getScriptObject(path);
                 if (scriptObject.__findattr__(SCRIPT_ACTIVATE_METHOD) != null) {
-                    //log.debug("activating '{}' within thread '{}'", scriptObject, Thread.currentThread().getId());
+                    // log.debug("activating '{}' within thread '{}'",
+                    // scriptObject, Thread.currentThread().getId());
                     scriptObject.invoke(SCRIPT_ACTIVATE_METHOD,
                             Py.java2py(context));
                 } else {

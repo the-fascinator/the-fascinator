@@ -369,7 +369,7 @@ public class ApertureTransformer implements Transformer {
         ExtractorRegistry extractorRegistry = new DefaultExtractorRegistry();
 
         // determine and apply an Extractor that can handle this MIME type
-        Set factories = extractorRegistry.getExtractorFactories(mimeType);
+        Set<?> factories = extractorRegistry.getExtractorFactories(mimeType);
         if (factories == null || factories.isEmpty()) {
             factories = extractorRegistry.getFileExtractorFactories(mimeType);
         }

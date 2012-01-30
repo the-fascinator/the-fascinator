@@ -289,7 +289,7 @@ public class OaiPmhHarvester extends GenericHarvester {
         metadataPrefixes = JsonSimple.getStringList(configNode,
                 "metadataPrefix");
         if (metadataPrefixes == null || metadataPrefixes.isEmpty()) {
-            metadataPrefixes = new ArrayList();
+            metadataPrefixes = new ArrayList<String>();
             metadataPrefixes.add(DEFAULT_METADATA_PREFIX);
         }
 

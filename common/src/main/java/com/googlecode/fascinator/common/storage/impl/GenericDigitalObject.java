@@ -18,11 +18,6 @@
  */
 package com.googlecode.fascinator.common.storage.impl;
 
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.PayloadType;
-import com.googlecode.fascinator.api.storage.StorageException;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,6 +32,11 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.PayloadType;
+import com.googlecode.fascinator.api.storage.StorageException;
+
 /**
  * Generic DigitalObject implementation
  * 
@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 public class GenericDigitalObject implements DigitalObject {
 
     /** Logging */
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory
             .getLogger(GenericDigitalObject.class);
 

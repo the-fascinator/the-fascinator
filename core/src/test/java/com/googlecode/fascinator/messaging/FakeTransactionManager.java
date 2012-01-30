@@ -18,6 +18,7 @@
  */
 package com.googlecode.fascinator.messaging;
 
+import com.googlecode.fascinator.api.harvester.HarvesterException;
 import com.googlecode.fascinator.api.transaction.TransactionException;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
@@ -32,10 +33,11 @@ public class FakeTransactionManager extends GenericTransactionManager {
     public void log(String message) {
         log(null, message);
     }
+
     public void log(String title, String message) {
         String titleLog = "";
         if (title != null) {
-            titleLog += "===\n"+title+"\n===\n";
+            titleLog += "===\n" + title + "\n===\n";
         }
         System.err.println(titleLog + message);
     }
@@ -120,10 +122,10 @@ public class FakeTransactionManager extends GenericTransactionManager {
             JsonObject order = newMessage(response,
                     TransactionManagerQueueConsumer.LISTENER_ID);
 
-            String broker = this.getJsonConfig().getString(null,
-                    "messaging", "testingUrl");
+            String broker = getJsonConfig().getString(null, "messaging",
+                    "testingUrl");
             order.put("broker", broker);
-            log("{Sending message to another broker: '"+broker+"'}");
+            log("{Sending message to another broker: '" + broker + "'}");
 
             JsonObject messageObject = (JsonObject) order.get("message");
             messageObject.put("oid", "testMultiBrokerSecondObject");
@@ -153,7 +155,9 @@ public class FakeTransactionManager extends GenericTransactionManager {
             JsonObject config2 = (JsonObject) order2.get("config");
             config2.put("flag", "ORDER2");
 
+            @SuppressWarnings("unused")
             JsonObject order3 = newIndex(response, oid);
+            @SuppressWarnings("unused")
             JsonObject order4 = newSubscription(response, oid);
 
             JsonObject order5 = newTransform(response, "fake", oid);
@@ -185,6 +189,7 @@ public class FakeTransactionManager extends GenericTransactionManager {
         order.put("oid", oid);
         return order;
     }
+
     private JsonObject newMessage(JsonSimple response, String target) {
         JsonObject order = createNewOrder(response,
                 TransactionManagerQueueConsumer.OrderType.MESSAGE.toString());
@@ -192,10 +197,10 @@ public class FakeTransactionManager extends GenericTransactionManager {
         order.put("message", new JsonObject());
         return order;
     }
+
     private JsonObject newSubscription(JsonSimple response, String oid) {
         JsonObject order = createNewOrder(response,
-                TransactionManagerQueueConsumer.OrderType.
-                SUBSCRIBER.toString());
+                TransactionManagerQueueConsumer.OrderType.SUBSCRIBER.toString());
         order.put("oid", oid);
         JsonObject message = new JsonObject();
         message.put("oid", oid);
@@ -205,16 +210,18 @@ public class FakeTransactionManager extends GenericTransactionManager {
         order.put("message", message);
         return order;
     }
-    private JsonObject newTransform(
-            JsonSimple response, String target, String oid) {
+
+    private JsonObject newTransform(JsonSimple response, String target,
+            String oid) {
         JsonObject order = createNewOrder(response,
-                TransactionManagerQueueConsumer.OrderType.
-                TRANSFORMER.toString());
+                TransactionManagerQueueConsumer.OrderType.TRANSFORMER
+                        .toString());
         order.put("target", target);
         order.put("oid", oid);
         order.put("config", new JsonObject());
         return order;
     }
+
     private JsonObject createNewOrder(JsonSimple response, String type) {
         JsonObject order = response.writeObject("orders", -1);
         order.put("type", type);

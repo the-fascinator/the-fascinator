@@ -18,15 +18,6 @@
  */
 package com.googlecode.fascinator.messaging;
 
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.api.transformer.Transformer;
-import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -37,6 +28,15 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.Transformer;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 /**
  * ConveyerBelt class to handle transformation of an object
@@ -68,20 +68,20 @@ public class ConveyerBelt {
     private Map<String, Transformer> transformers;
 
     /**
-     * Find out what transformers are required to run for
-     *  a particular render step.
-     *
+     * Find out what transformers are required to run for a particular render
+     * step.
+     * 
      * @param object The digital object to transform.
      * @param config The configuration for the particular harvester.
      * @param thisType The type of render chain (step).
      * @param routing Flag if query is for routing. Set this value will force a
-     * check for user priority, and then clear the flag if found.
+     *            check for user priority, and then clear the flag if found.
      * @return List<String> A list of names for instantiated transformers.
      */
     public static List<String> getTransformList(DigitalObject object,
             JsonSimpleConfig config, String thisType, boolean routing)
             throws StorageException {
-        List<String> plugins = new ArrayList();
+        List<String> plugins = new ArrayList<String>();
         Properties props = object.getMetadata();
 
         // User initiated event
@@ -105,8 +105,9 @@ public class ConveyerBelt {
 
         } else {
             // The harvester specified none, fallback to the
-            //  default list for this harvest source.
-            List<String> transformerList = config.getStringList("transformer", thisType);
+            // default list for this harvest source.
+            List<String> transformerList = config.getStringList("transformer",
+                    thisType);
             if (transformerList != null) {
                 for (String entry : transformerList) {
                     plugins.add(StringUtils.trim(entry));
@@ -120,7 +121,7 @@ public class ConveyerBelt {
 
     /**
      * Conveyer Belt Constructor
-     *
+     * 
      * @param jsonFile configuration file
      * @param type of transformer
      */
@@ -129,24 +130,24 @@ public class ConveyerBelt {
             sysConfig = new JsonSimpleConfig();
             type = newType;
             // More than meets the eye
-            transformers = new LinkedHashMap();
+            transformers = new LinkedHashMap<String, Transformer>();
             // Loop through all the system's transformers
-            Map<String, JsonSimple> map = sysConfig.getJsonSimpleMap(
-                    "transformerDefaults");
+            Map<String, JsonSimple> map = sysConfig
+                    .getJsonSimpleMap("transformerDefaults");
             if (map != null && map.size() > 0) {
                 for (String name : map.keySet()) {
                     String id = map.get(name).getString(null, "id");
                     if (id != null) {
                         // Instantiate the transformer
-                        Transformer transformer =
-                                PluginManager.getTransformer(id);
+                        Transformer transformer = PluginManager
+                                .getTransformer(id);
                         if (transformer != null) {
                             try {
                                 transformer.init(map.get(name).toString());
                                 // Finally, store it for use later
                                 transformers.put(name, transformer);
                                 log.info("Transformer warmed: '{}'", name);
-    
+
                             } catch (PluginException ex) {
                                 throw new TransformerException(ex);
                             }
@@ -167,14 +168,14 @@ public class ConveyerBelt {
 
     /**
      * Transform digital object based on transformer type
-     *
+     * 
      * @param object The object to be transformed
      * @param config Configuration for this item transformation
      * @return DigitalObject Transformed obect
      * @throws TransformerException if transformation fails
      */
-    public DigitalObject transform(DigitalObject object,
-            JsonSimpleConfig config) throws TransformerException {
+    public DigitalObject transform(DigitalObject object, JsonSimpleConfig config)
+            throws TransformerException {
         Map<String, JsonSimple> itemConfigs;
         JsonSimple itemConfig;
 
@@ -193,8 +194,8 @@ public class ConveyerBelt {
                     log.info("Starting '{}' on '{}'...", name, object.getId());
 
                     // Grab any overriding transformer config this item has
-                    itemConfigs = config.getJsonSimpleMap(
-                            "transformerOverrides");
+                    itemConfigs = config
+                            .getJsonSimpleMap("transformerOverrides");
                     if (itemConfigs != null && itemConfigs.containsKey(name)) {
                         itemConfig = itemConfigs.get(name);
                     } else {
@@ -203,12 +204,12 @@ public class ConveyerBelt {
 
                     // Perform the transformation
                     try {
-                        object = transformers.get(name).
-                                transform(object, itemConfig.toString());
+                        object = transformers.get(name).transform(object,
+                                itemConfig.toString());
                         log.info("Finished '{}' on '{}'", name, object.getId());
                     } catch (Exception ex) {
-                        log.error("Error during transformer '" + name +
-                                "' on object '" + object.getId() + "'", ex);
+                        log.error("Error during transformer '" + name
+                                + "' on object '" + object.getId() + "'", ex);
                     }
 
                 } else {

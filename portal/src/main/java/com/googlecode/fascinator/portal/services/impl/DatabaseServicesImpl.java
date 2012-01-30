@@ -18,9 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.portal.services.DatabaseServices;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -40,10 +37,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.portal.services.DatabaseServices;
+
 /**
- * Instantiates a database used for persistence of generic data in the
- * scripting layer, and offers utility functions for same.
- *
+ * Instantiates a database used for persistence of generic data in the scripting
+ * layer, and offers utility functions for same.
+ * 
  * @author Greg Pendlebury
  */
 public class DatabaseServicesImpl implements DatabaseServices {
@@ -63,9 +63,6 @@ public class DatabaseServicesImpl implements DatabaseServices {
     /** Database data directory */
     private String derbyHome;
 
-    /** Flag to halt usage later */
-    private boolean hasErrors;
-
     /** List of databases opened */
     private Map<String, Connection> dbConnections;
 
@@ -74,53 +71,50 @@ public class DatabaseServicesImpl implements DatabaseServices {
 
     /**
      * Basic constructor, run by Tapestry through injection.
-     *
+     * 
      */
     public DatabaseServicesImpl() {
         log.info("Database services starting...");
-        hasErrors = false;
 
         try {
             sysConfig = new JsonSimpleConfig();
             // Find data directory
-            derbyHome = sysConfig.getString(null,
-                    "database-service", "derbyHome");
+            derbyHome = sysConfig.getString(null, "database-service",
+                    "derbyHome");
             String oldHome = System.getProperty("derby.system.home");
 
             // Derby's data directory has already been configured
             if (oldHome != null) {
                 if (derbyHome != null) {
                     // Use the existing one, but throw a warning
-                    log.warn("Using previously specified data directory:" +
-                            " '{}', provided value has been ignored: '{}'",
+                    log.warn("Using previously specified data directory:"
+                            + " '{}', provided value has been ignored: '{}'",
                             oldHome, derbyHome);
                 } else {
                     // This is ok, no configuration conflicts
                     log.info("Using existing data directory: '{}'", oldHome);
                 }
 
-            // We don't have one, config MUST have one
+                // We don't have one, config MUST have one
             } else {
                 if (derbyHome == null) {
                     log.error("No database home directory configured!");
-                    hasErrors = true;
                     return;
                 } else {
                     // Establish its validity and existance, create if necessary
                     File file = new File(derbyHome);
                     if (file.exists()) {
                         if (!file.isDirectory()) {
-                            log.error("Database home '" +
-                                    derbyHome + "' is not a directory!");
-                            hasErrors = true;
+                            log.error("Database home '" + derbyHome
+                                    + "' is not a directory!");
                             return;
                         }
                     } else {
                         file.mkdirs();
                         if (!file.exists()) {
-                            log.error("Database home '" + derbyHome +
-                                 "' does not exist and could not be created!");
-                            hasErrors = true;
+                            log.error("Database home '"
+                                    + derbyHome
+                                    + "' does not exist and could not be created!");
                             return;
                         }
                     }
@@ -133,13 +127,12 @@ public class DatabaseServicesImpl implements DatabaseServices {
                 Class.forName(DERBY_DRIVER).newInstance();
             } catch (Exception ex) {
                 log.error("JDBC Driver load failed: ", ex);
-                hasErrors = true;
                 return;
             }
 
             // Instantiate holding maps
-            dbConnections = new HashMap();
-            statements = new HashMap();
+            dbConnections = new HashMap<String, Connection>();
+            statements = new HashMap<String, PreparedStatement>();
 
         } catch (IOException ex) {
             log.error("Failed to access system config", ex);
@@ -168,8 +161,6 @@ public class DatabaseServicesImpl implements DatabaseServices {
                 }
             }
 
-            // Open a new connection
-            Properties props = new Properties();
             // Load the JDBC driver
             try {
                 Class.forName(DERBY_DRIVER).newInstance();
@@ -181,13 +172,13 @@ public class DatabaseServicesImpl implements DatabaseServices {
             // Connection string
             String connection = DERBY_PROTOCOL + database;
             if (create) {
-                //log.debug("connect() '{}' SETTING CREATION FLAG", database);
+                // log.debug("connect() '{}' SETTING CREATION FLAG", database);
                 connection += ";create=true";
             }
             // Try to connect
-            //log.debug("connect() '{}' ATTEMPTING CONNECTION", connection);
-            thisDatabase = DriverManager.getConnection(
-                    connection, new Properties());
+            // log.debug("connect() '{}' ATTEMPTING CONNECTION", connection);
+            thisDatabase = DriverManager.getConnection(connection,
+                    new Properties());
             dbConnections.put(database, thisDatabase);
         }
 
@@ -196,7 +187,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
 
     /**
      * Tapestry notification that server is shutting down
-     *
+     * 
      */
     @Override
     public void registryDidShutdown() {
@@ -218,7 +209,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
 
         // Shutdown database engine
         // Derby can only be shutdown from one thread,
-        //    we'll catch errors from the rest.
+        // we'll catch errors from the rest.
         String threadedShutdownMessage = DERBY_DRIVER
                 + " is not registered with the JDBC driver manager";
         try {
@@ -226,9 +217,8 @@ public class DatabaseServicesImpl implements DatabaseServices {
             DriverManager.getConnection(DERBY_PROTOCOL + ";shutdown=true");
         } catch (SQLException ex) {
             // Valid response
-            if (ex.getErrorCode() == 50000 &&
-                    ex.getSQLState().equals("XJ015")) {
-            // Error response
+            if (ex.getErrorCode() == 50000 && ex.getSQLState().equals("XJ015")) {
+                // Error response
             } else {
                 // Make sure we ignore simple thread issues
                 if (!ex.getMessage().equals(threadedShutdownMessage)) {
@@ -241,7 +231,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
     /**
      * Return a connection to the specified database, failing if it does not
      * exist.
-     *
+     * 
      * @param database The name of the database to connect to.
      * @return Connection The instantiated database connection or NULL.
      * @throws Exception if there is a connection error.
@@ -249,10 +239,10 @@ public class DatabaseServicesImpl implements DatabaseServices {
     @Override
     public Connection checkConnection(String database) throws Exception {
         try {
-            //log.debug("checkConnection() '{}'", database);
+            // log.debug("checkConnection() '{}'", database);
             return connection(database, false);
         } catch (Exception ex) {
-            //log.debug("checkConnection() '{}' FAIL", database);
+            // log.debug("checkConnection() '{}' FAIL", database);
             throw new Exception("Database does not exist", ex);
         }
     }
@@ -260,18 +250,19 @@ public class DatabaseServicesImpl implements DatabaseServices {
     /**
      * Return a connection to the specified database. The database will be
      * created if it does not exist.
-     *
+     * 
      * @param database The name of the database to connect to.
-     * @return Connection The instantiated database connection, NULL if an error occurs.
+     * @return Connection The instantiated database connection, NULL if an error
+     *         occurs.
      * @throws Exception if there is a connection error.
      */
     @Override
     public Connection getConnection(String database) throws Exception {
         try {
-            //log.debug("getConnection() '{}'", database);
+            // log.debug("getConnection() '{}'", database);
             return connection(database, true);
         } catch (Exception ex) {
-            //log.debug("getConnection() '{}' FAIL", database);
+            // log.debug("getConnection() '{}' FAIL", database);
             log.error("Error during database creation:", ex);
             throw ex;
         }
@@ -281,7 +272,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
      * Prepare and return an SQL statement, filing it under the provided index.
      * Subsequent calls to this function using the same index will return the
      * previously prepared statement.
-     *
+     * 
      * @param db The database connection to use.
      * @param index The index to store the statement under.
      * @param sql The SQL statement to prepare.
@@ -291,13 +282,13 @@ public class DatabaseServicesImpl implements DatabaseServices {
     @Override
     public PreparedStatement prepare(Connection db, String index, String sql)
             throws Exception {
-        //log.debug("prepare() '{}' SQL: \n===\n{}\n===", index, sql);
+        // log.debug("prepare() '{}' SQL: \n===\n{}\n===", index, sql);
         PreparedStatement statement = statements.get(index);
         if (statement == null) {
             try {
                 statement = db.prepareStatement(sql);
                 statements.put(index, statement);
-                //log.debug("prepare() '{}' SUCCESS", index);
+                // log.debug("prepare() '{}' SUCCESS", index);
             } catch (SQLException ex) {
                 log.error("Error preparing statement:", ex);
                 throw new Exception("Error preparing statement:", ex);
@@ -309,7 +300,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
     /**
      * Bind a parameter to a SQL statement. All Java types should be acceptable,
      * except NULL. Use 'IS NULL' in your SQL for this.
-     *
+     * 
      * @param sql The prepared statement to bind to.
      * @param index Specifies which placeholder to bind to (starts at 1).
      * @param data The data to bind to that placeholder.
@@ -319,13 +310,13 @@ public class DatabaseServicesImpl implements DatabaseServices {
     public void bindParam(PreparedStatement sql, int index, Object data)
             throws Exception {
         try {
-            //log.debug("bindParam() ({}) => '{}'", index, data);
+            // log.debug("bindParam() ({}) => '{}'", index, data);
             if (data == null) {
                 throw new Exception(
-                    "NULL values are not accepted. Use 'IS NULL' or similar!");
+                        "NULL values are not accepted. Use 'IS NULL' or similar!");
             } else {
                 sql.setObject(index, data);
-                //log.debug("bindParam() ({}) SUCCESS", index);
+                // log.debug("bindParam() ({}) SUCCESS", index);
             }
         } catch (SQLException ex) {
             log.error("Error binding parameter:", ex);
@@ -338,7 +329,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
      * statements this is not necessarily advised since DatabaseServices tracks
      * all statements and will free them at server shutdown. The performance
      * gains are useful from this approach IF you use the same query routinely.
-     *
+     * 
      * @param sql The prepared statement to release.
      * @throws Exception if there is an error.
      */
@@ -351,16 +342,17 @@ public class DatabaseServicesImpl implements DatabaseServices {
      * Parse the results of the query into a basic Java data structure. Users
      * wanting the original result set should call getResultSet() directly
      * against the prepared statement.
-     *
+     * 
      * @param sql The prepared statement to get the results from.
-     * @return List<Map<String, String>> A list of result rows as key/value pairs in HashMaps
+     * @return List<Map<String, String>> A list of result rows as key/value
+     *         pairs in HashMaps
      * @throws Exception if there is an error.
      */
     @Override
     public List<Map<String, String>> getResults(PreparedStatement sql)
             throws Exception {
         // Prepare variables
-        List<Map<String, String>> response = new ArrayList();
+        List<Map<String, String>> response = new ArrayList<Map<String, String>>();
         ResultSet results = null;
         ResultSetMetaData columns = null;
 
@@ -374,11 +366,11 @@ public class DatabaseServicesImpl implements DatabaseServices {
                 return response;
             }
             while (results.next()) {
-                Map<String, String> row = new HashMap();
+                Map<String, String> row = new HashMap<String, String>();
                 for (int i = 1; i <= columns.getColumnCount(); i++) {
-                    //log.debug("getResults(): Storing '{}' ({}) => " +
-                    //        results.getString(i), columns.getColumnName(i),
-                    //        columns.getColumnLabel(i));
+                    // log.debug("getResults(): Storing '{}' ({}) => " +
+                    // results.getString(i), columns.getColumnName(i),
+                    // columns.getColumnLabel(i));
                     row.put(columns.getColumnName(i), results.getString(i));
                 }
                 response.add(row);
@@ -394,17 +386,18 @@ public class DatabaseServicesImpl implements DatabaseServices {
 
     /**
      * Top level wrapper for a select statement.
-     *
+     * 
      * @param db The database connection to use.
      * @param index The index to file this statement under for caching.
      * @param sql The sql string to execute.
      * @param fields The data to bind against placeholders. NULL is valid.
-     * @return List<Map<String, String>> A list of result rows as key/value pairs in HashMaps
+     * @return List<Map<String, String>> A list of result rows as key/value
+     *         pairs in HashMaps
      * @throws Exception if there is an error.
      */
     @Override
-    public List<Map<String, String>> select(String db, String index, String sql,
-            List<Object> fields) throws Exception {
+    public List<Map<String, String>> select(String db, String index,
+            String sql, List<Object> fields) throws Exception {
         // Sanity checks
         if (db == null) {
             throw new Exception("Database cannot be NULL!");
@@ -420,19 +413,19 @@ public class DatabaseServicesImpl implements DatabaseServices {
         }
 
         // Build our query
-        //PreparedStatement statement = prepare(database, index, sql);
+        // PreparedStatement statement = prepare(database, index, sql);
         PreparedStatement statement = null;
-        //*********************
+        // *********************
         try {
             statement = database.prepareStatement(sql);
         } catch (SQLException ex) {
             log.error("Error preparing statement:", ex);
             throw new Exception("Error preparing statement:", ex);
         }
-        //*********************
+        // *********************
         if (fields != null) {
             for (int i = 1; i <= fields.size(); i++) {
-                bindParam(statement, i, fields.get(i-1));
+                bindParam(statement, i, fields.get(i - 1));
             }
         }
 
@@ -440,12 +433,12 @@ public class DatabaseServicesImpl implements DatabaseServices {
         List<Map<String, String>> response = getResults(statement);
         close(statement);
         return response;
-        //return getResults(statement);
+        // return getResults(statement);
     }
 
     /**
      * Top level wrapper for an insert statement.
-     *
+     * 
      * @param db The database connection to use.
      * @param index The index to file this statement under for caching.
      * @param table The name of the table to insert into.
@@ -473,22 +466,22 @@ public class DatabaseServicesImpl implements DatabaseServices {
         }
 
         // Build our query string
-        List<String> columns = new ArrayList();
-        List<String> placeHolders = new ArrayList();
-        List<Object> data = new ArrayList();
+        List<String> columns = new ArrayList<String>();
+        List<String> placeHolders = new ArrayList<String>();
+        List<Object> data = new ArrayList<Object>();
         for (String key : fields.keySet()) {
             columns.add(key);
             placeHolders.add("?");
             data.add(fields.get(key));
         }
-        String sql = "INSERT INTO " + table + " (" +
-                StringUtils.join(columns, ",") + ") VALUES (" +
-                StringUtils.join(placeHolders, ",") + ")";
+        String sql = "INSERT INTO " + table + " ("
+                + StringUtils.join(columns, ",") + ") VALUES ("
+                + StringUtils.join(placeHolders, ",") + ")";
 
         // Build our query
         PreparedStatement statement = prepare(database, index, sql);
         for (int i = 1; i <= data.size(); i++) {
-            bindParam(statement, i, data.get(i-1));
+            bindParam(statement, i, data.get(i - 1));
         }
 
         // Run query
@@ -499,7 +492,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
             if (ex.getMessage().contains("duplicate key value")) {
                 throw new Exception("Duplicate record!");
 
-            // Log anything else
+                // Log anything else
             } else {
                 log.error("Error during insert:", ex);
                 throw new Exception("Error during insert:", ex);
@@ -510,7 +503,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
     /**
      * Top level wrapper for a delete statement. Simple equality tests are
      * possible for the where clause.
-     *
+     * 
      * @param db The database connection to use.
      * @param index The index to file this statement under for caching.
      * @param table The name of the table to delete.
@@ -535,8 +528,8 @@ public class DatabaseServicesImpl implements DatabaseServices {
         }
 
         // Build our query string
-        List<String> columns = new ArrayList();
-        List<Object> data = new ArrayList();
+        List<String> columns = new ArrayList<String>();
+        List<Object> data = new ArrayList<Object>();
         if (where != null) {
             for (String key : where.keySet()) {
                 columns.add(key + " = ?");
@@ -547,15 +540,15 @@ public class DatabaseServicesImpl implements DatabaseServices {
         if (columns.isEmpty()) {
             sql = "DELETE FROM " + table;
         } else {
-            sql = "DELETE FROM " + table + " WHERE " +
-                    StringUtils.join(columns, " AND ");
+            sql = "DELETE FROM " + table + " WHERE "
+                    + StringUtils.join(columns, " AND ");
         }
 
         // Build our query
         PreparedStatement statement = prepare(database, index, sql);
         if (!data.isEmpty()) {
             for (int i = 1; i <= data.size(); i++) {
-                bindParam(statement, i, data.get(i-1));
+                bindParam(statement, i, data.get(i - 1));
             }
         }
 
@@ -568,9 +561,9 @@ public class DatabaseServicesImpl implements DatabaseServices {
     }
 
     /**
-     * Top level wrapper to execute simple non-returning SQL, such as create
-     * or update statements.
-     *
+     * Top level wrapper to execute simple non-returning SQL, such as create or
+     * update statements.
+     * 
      * @param db The database connection to use.
      * @param index The index to file this statement under for caching.
      * @param sql The sql string to execute.
@@ -578,8 +571,8 @@ public class DatabaseServicesImpl implements DatabaseServices {
      * @throws Exception if there is an error.
      */
     @Override
-    public void execute(String db, String index, String sql,
-            List<Object> fields) throws Exception {
+    public void execute(String db, String index, String sql, List<Object> fields)
+            throws Exception {
         // Sanity checks
         if (db == null) {
             throw new Exception("Database cannot be NULL!");
@@ -598,7 +591,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
         PreparedStatement statement = prepare(database, index, sql);
         if (fields != null) {
             for (int i = 1; i <= fields.size(); i++) {
-                bindParam(statement, i, fields.get(i-1));
+                bindParam(statement, i, fields.get(i - 1));
             }
         }
 
@@ -607,9 +600,9 @@ public class DatabaseServicesImpl implements DatabaseServices {
     }
 
     /**
-     * Attempt to close a Statement. Basic wrapper for exception
-     * catching and logging
-     *
+     * Attempt to close a Statement. Basic wrapper for exception catching and
+     * logging
+     * 
      * @param statement The Statement to try and close.
      */
     private void close(Statement statement) {

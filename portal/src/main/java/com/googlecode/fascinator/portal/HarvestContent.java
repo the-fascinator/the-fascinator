@@ -32,7 +32,7 @@ public class HarvestContent extends JsonSimpleConfig {
     }
 
     public Map<String, Object> getIndexerParams() {
-        Map<String, Object> response = new LinkedHashMap();
+        Map<String, Object> response = new LinkedHashMap<String, Object>();
         JsonObject object = getObject("indexer", "params");
         for (Object key : object.keySet()) {
             response.put(key.toString(), object.get(key));

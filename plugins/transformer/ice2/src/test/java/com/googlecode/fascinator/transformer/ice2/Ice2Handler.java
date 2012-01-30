@@ -75,8 +75,8 @@ public class Ice2Handler extends AbstractHandler {
             try {
                 FileItemFactory factory = new DiskFileItemFactory();
                 ServletFileUpload upload = new ServletFileUpload(factory);
-                List items = upload.parseRequest(request);
-                Iterator iter = items.iterator();
+                List<?> items = upload.parseRequest(request);
+                Iterator<?> iter = items.iterator();
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
                     if (item != null && item.getName() != null &&

@@ -18,15 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.common.messaging.MessagingServices;
-import com.googlecode.fascinator.portal.HouseKeeper;
-import com.googlecode.fascinator.portal.UserAction;
-import com.googlecode.fascinator.portal.services.HouseKeepingManager;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,10 +27,19 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.portal.HouseKeeper;
+import com.googlecode.fascinator.portal.UserAction;
+import com.googlecode.fascinator.portal.services.HouseKeepingManager;
+
 /**
- * Implements the House Keeping Manager interface, providing access to
- * the housekeeping message queue and its outputs.
- *
+ * Implements the House Keeping Manager interface, providing access to the
+ * housekeeping message queue and its outputs.
+ * 
  * @author Greg Pendlebury
  */
 public class HouseKeepingManagerImpl implements HouseKeepingManager {
@@ -58,7 +58,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Basic constructor, run by Tapestry through injection.
-     *
+     * 
      */
     public HouseKeepingManagerImpl() {
         try {
@@ -69,7 +69,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
             JsonSimpleConfig config = new JsonSimpleConfig();
             if (object != null) {
                 // We need a JsonSimpleConfig Object to instantiate
-                //  HouseKeeping and it lacks a JsonObject constructor
+                // HouseKeeping and it lacks a JsonObject constructor
                 JsonSimple json = new JsonSimple(object);
                 config = new JsonSimpleConfig(json.toString());
             } else {
@@ -95,7 +95,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Tapestry notification that server is shutting down
-     *
+     * 
      */
     @Override
     public void registryDidShutdown() {
@@ -111,13 +111,13 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Get the messages to display for the user
-     *
+     * 
      * @returns List<UserAction> The current list of message
      */
     @Override
     public List<UserAction> getUserMessages() {
         if (houseKeeper == null) {
-            return new ArrayList();
+            return new ArrayList<UserAction>();
         } else {
             return houseKeeper.getUserMessages();
         }
@@ -125,7 +125,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Confirm and remove a message/action
-     *
+     * 
      * @param actionId The ID of the action to remove
      */
     @Override
@@ -137,7 +137,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Send a message to HouseKeeping.
-     *
+     * 
      */
     @Override
     @SuppressWarnings("static-access")
@@ -147,7 +147,7 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Request a low priority restart from HouseKeeping.
-     *
+     * 
      */
     @Override
     public void requestRestart() throws MessagingException {
@@ -158,10 +158,9 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
     }
 
     /**
-     * Request a high priority restart from HouseKeeping.
-     * High priority will stop all user actions until the restart
-     * occurs.
-     *
+     * Request a high priority restart from HouseKeeping. High priority will
+     * stop all user actions until the restart occurs.
+     * 
      */
     @Override
     public void requestUrgentRestart() throws MessagingException {
@@ -173,15 +172,16 @@ public class HouseKeepingManagerImpl implements HouseKeepingManager {
 
     /**
      * Get the latest statistics on message queues.
-     *
-     * @return Map<String, Map<String, String>> of all queues and their statistics
+     * 
+     * @return Map<String, Map<String, String>> of all queues and their
+     *         statistics
      */
     @Override
     public Map<String, Map<String, String>> getQueueStats() {
         if (houseKeeper != null) {
             return houseKeeper.getQueueStats();
         } else {
-            return new LinkedHashMap();
+            return new LinkedHashMap<String, Map<String, String>>();
         }
     }
 }

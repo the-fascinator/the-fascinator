@@ -71,7 +71,7 @@ public class SolrResult extends JsonSimple {
      */
     public Map<String, SolrFacet> getFacets() {
         if (facets == null) {
-            facets = new LinkedHashMap();
+            facets = new LinkedHashMap<String, SolrFacet>();
             JsonObject object = getObject("facet_counts", "facet_fields");
             if (object == null) {
                 return null;
@@ -98,7 +98,7 @@ public class SolrResult extends JsonSimple {
      * @return List<String> : The List of values found from this field
      */
     public List<String> getFieldList(String field) {
-        List<String> response = new ArrayList();
+        List<String> response = new ArrayList<String>();
         for (SolrDoc doc : getResults()) {
             response.add(doc.get(field));
         }
@@ -135,7 +135,7 @@ public class SolrResult extends JsonSimple {
      */
     public List<SolrDoc> getResults() {
         if (results == null) {
-            results = new LinkedList();
+            results = new LinkedList<SolrDoc>();
             JSONArray array = getArray("response", "docs");
             if (array == null) {
                 return null;

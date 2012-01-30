@@ -338,10 +338,10 @@ public class DerbyAccessControl implements AccessControl {
         try {
             List<String> roles = search(recordId);
             if (roles == null || roles.isEmpty()) {
-                return new ArrayList();
+                return new ArrayList<AccessControlSchema>();
             }
 
-            List<AccessControlSchema> schemas = new ArrayList();
+            List<AccessControlSchema> schemas = new ArrayList<AccessControlSchema>();
             DerbySchema schema;
             for (String role : roles) {
                 schema = new DerbySchema();
@@ -631,7 +631,7 @@ public class DerbyAccessControl implements AccessControl {
      * @throws SQLException if there were database errors during the search
      */
     private List<String> search(String recordId) throws SQLException {
-        List<String> roles = new ArrayList();
+        List<String> roles = new ArrayList<String>();
 
         PreparedStatement sql = connection().prepareStatement(
                     "SELECT * FROM " + ROLE_TABLE + " WHERE recordId = ?");
@@ -650,7 +650,7 @@ public class DerbyAccessControl implements AccessControl {
         // Do we even have this record on file?
         if (roles.isEmpty()) {
             if (checkRecord(recordId)) {
-                return new ArrayList();
+                return new ArrayList<String>();
             } else {
                 return null;
             }

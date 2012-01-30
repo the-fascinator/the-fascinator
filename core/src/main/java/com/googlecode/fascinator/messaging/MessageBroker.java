@@ -185,7 +185,7 @@ public class MessageBroker {
         BrokerPlugin[] aPlugins = brokerService.getPlugins();
         if (aPlugins == null) aPlugins = new BrokerPlugin[] {};
         // Add stats to the list
-        List<BrokerPlugin> lPlugins = new ArrayList();
+        List<BrokerPlugin> lPlugins = new ArrayList<BrokerPlugin>();
         lPlugins.addAll(Arrays.asList(aPlugins));
         lPlugins.add(statsPlugin);
         // Setup the broker
@@ -200,7 +200,7 @@ public class MessageBroker {
     private void startMessageQueues() {
         log.info("Starting Message Queues...");
         if (messageQueues == null) {
-            messageQueues = new ArrayList();
+            messageQueues = new ArrayList<GenericListener>();
         }
         List<JsonSimple> threadConfig =
                 config.getJsonSimpleList("messaging", "threads");

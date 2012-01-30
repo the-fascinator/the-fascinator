@@ -429,7 +429,7 @@ public class FileSystemAuthentication implements Authentication {
             throws AuthenticationException {
         // Complete list of users
         String[] users = file_store.keySet().toArray(new String[file_store.size()]);
-        List<User> found = new ArrayList();
+        List<User> found = new ArrayList<User>();
 
         // Look through the list for anyone who matches
         for (int i = 0; i < users.length; i++) {

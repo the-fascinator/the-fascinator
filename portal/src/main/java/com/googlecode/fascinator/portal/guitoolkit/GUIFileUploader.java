@@ -18,16 +18,16 @@
  */
 package com.googlecode.fascinator.portal.guitoolkit;
 
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 /**
  * Present a file upload interface to the user for ingesting into various
@@ -36,9 +36,11 @@ import org.slf4j.LoggerFactory;
  * @author Greg Pendlebury
  */
 public class GUIFileUploader {
+    @SuppressWarnings("unused")
+    private static Logger log = LoggerFactory.getLogger(GUIFileUploader.class);
+
     private GUIFormRenderer fr;
     private Map<String, String> harvesters;
-    private static Logger log = LoggerFactory.getLogger(GUIFileUploader.class);
 
     /**
      * Constructor. Access to system configuration and a list of the user's
@@ -55,7 +57,7 @@ public class GUIFileUploader {
         JsonObject object = config.getObject("uploader");
         Map<String, JsonSimple> workflows = JsonSimple.toJavaMap(object);
 
-        harvesters = new LinkedHashMap();
+        harvesters = new LinkedHashMap<String, String>();
         // Foreach workflow
         for (String workflow : workflows.keySet()) {
             // Check this user is allowed to upload files for it

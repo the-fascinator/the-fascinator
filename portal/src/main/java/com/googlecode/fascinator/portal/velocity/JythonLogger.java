@@ -20,8 +20,8 @@ package com.googlecode.fascinator.portal.velocity;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import org.apache.commons.lang.StringUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JythonLogger extends OutputStream {
 
+    @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(JythonLogger.class);
 
     private Logger jythonLogger;
@@ -42,9 +43,10 @@ public class JythonLogger extends OutputStream {
 
     public JythonLogger(String name) {
         String packageName = getClass().getPackage().getName();
-        String scriptName = StringUtils.substringBetween(name, "scripts/", ".py");
+        String scriptName = StringUtils.substringBetween(name, "scripts/",
+                ".py");
         scriptName = scriptName.replace("/", "$") + "$py";
-        //log.debug("scriptName:{}", scriptName);
+        // log.debug("scriptName:{}", scriptName);
         jythonLogger = LoggerFactory.getLogger(packageName + "." + scriptName);
         dirty = false;
         buffer = new StringBuilder();

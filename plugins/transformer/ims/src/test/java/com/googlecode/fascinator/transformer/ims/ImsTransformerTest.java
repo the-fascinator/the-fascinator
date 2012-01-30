@@ -90,7 +90,8 @@ public class ImsTransformerTest {
         zipObject = StorageUtils.storeFile(ram, zipFile);
 
         imsTransformer.init("{}");
-        DigitalObject object = imsTransformer.transform(zipObject, "{}");
+        @SuppressWarnings("unused")
+		DigitalObject object = imsTransformer.transform(zipObject, "{}");
         //System.out.println("000 " + object.getPayloadIdList());
     }
 }

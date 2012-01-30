@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tapestry5.services.Request;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class FormData {
 
+    @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(FormData.class);
 
     private Map<String, List<String>> parameters;
@@ -40,7 +42,7 @@ public class FormData {
     }
 
     public void set(String name, String value) {
-        String[] values = {value};
+        String[] values = { value };
         setValues(name, Arrays.asList(values));
     }
 
@@ -83,7 +85,7 @@ public class FormData {
     public Map<String, String> getHeaders() {
         if (headers == null) {
             headers = new HashMap<String, String>();
-            Enumeration e = hsr.getHeaderNames();
+            Enumeration<?> e = hsr.getHeaderNames();
             while (e.hasMoreElements()) {
                 String name = e.nextElement().toString();
                 String value = hsr.getHeader(name);

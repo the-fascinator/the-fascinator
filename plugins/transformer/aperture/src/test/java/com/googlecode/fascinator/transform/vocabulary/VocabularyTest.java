@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
@@ -60,13 +59,12 @@ public class VocabularyTest {
 
         RDFContainer container = new RDFContainerImpl(model, uri);
         String mimeType = container.getString(NIE.mimeType);
-        Assert.assertEquals(container.getString(NIE.mimeType),
-                "application/vnd.oasis.opendocument.text");
+        Assert.assertEquals(mimeType, "application/vnd.oasis.opendocument.text");
 
         List<String> creators = new ArrayList<String>();
-        Collection collection = container.getAll(NCO.creator);
-        for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
-            Node node = (Node) iterator.next();
+        Collection<?> collection = container.getAll(NCO.creator);
+        for (Object name : collection) {
+            Node node = (Node) name;
             URI creatorUri = model.createURI(node.toString());
             RDFContainer creatorContainer = new RDFContainerImpl(model,
                     creatorUri);

@@ -18,14 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.portal.services.DynamicPageCache;
-import com.googlecode.fascinator.portal.services.PortalManager;
-import com.googlecode.fascinator.portal.services.ScriptingServices;
-import com.googlecode.fascinator.portal.services.VelocityService;
-import com.googlecode.fascinator.portal.services.cache.JythonCacheEntryFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,6 +33,14 @@ import org.python.core.PyInstance;
 import org.python.core.PyObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.portal.services.DynamicPageCache;
+import com.googlecode.fascinator.portal.services.PortalManager;
+import com.googlecode.fascinator.portal.services.ScriptingServices;
+import com.googlecode.fascinator.portal.services.VelocityService;
+import com.googlecode.fascinator.portal.services.cache.JythonCacheEntryFactory;
 
 /**
  * Implements a DynamicPageCache using Ehcache.
@@ -59,7 +59,8 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
     private static final String DEFAULT_PROFILE = "default";
 
     /** Logging */
-    private Logger log = LoggerFactory.getLogger(EhcacheDynamicPageCacheImpl.class);
+    private Logger log = LoggerFactory
+            .getLogger(EhcacheDynamicPageCacheImpl.class);
 
     /** PortalManager instance */
     private PortalManager portalManager;
@@ -87,8 +88,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      * @param scriptingServices ScriptingServices instance
      */
     public EhcacheDynamicPageCacheImpl(PortalManager portalManager,
-            VelocityService velocityService,
-            ScriptingServices scriptingServices) {
+            VelocityService velocityService, ScriptingServices scriptingServices) {
 
         this.portalManager = portalManager;
 
@@ -99,31 +99,44 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
         try {
             JsonSimpleConfig config = new JsonSimpleConfig();
 
-            Map<String, JsonSimple> cacheProfiles = config.getJsonSimpleMap("portal", "caching", "profiles");
-            Map<String, JsonSimple> cacheConfigs = config.getJsonSimpleMap("portal", "caching", "caches");
+            Map<String, JsonSimple> cacheProfiles = config.getJsonSimpleMap(
+                    "portal", "caching", "profiles");
+            Map<String, JsonSimple> cacheConfigs = config.getJsonSimpleMap(
+                    "portal", "caching", "caches");
             for (String cacheId : cacheConfigs.keySet()) {
-                //log.debug("{}: {}", cacheId, cacheConfigs.get(cacheId));
+                // log.debug("{}: {}", cacheId, cacheConfigs.get(cacheId));
                 Ehcache cache = cacheManager.getCache(cacheId);
                 if (cache == null) {
                     log.warn("Cache '{}' does not exist!", cacheId);
                 } else {
                     JsonSimple jsonConfig = cacheConfigs.get(cacheId);
-                    String profileId = jsonConfig.getString(DEFAULT_PROFILE, "profile");
+                    String profileId = jsonConfig.getString(DEFAULT_PROFILE,
+                            "profile");
                     if (cacheProfiles.containsKey(profileId)) {
-                        log.debug("Configuring cache '{}' with profile '{}'", cacheId, profileId);
+                        log.debug("Configuring cache '{}' with profile '{}'",
+                                cacheId, profileId);
                         JsonSimple profile = cacheProfiles.get(profileId);
-                        CacheConfiguration cacheConfig = cache.getCacheConfiguration();
-                        cacheConfig.setMaxElementsInMemory(profile.getInteger(10000, "maxElementsInMemory"));
-                        cacheConfig.setEternal(profile.getBoolean(false, "eternal"));
+                        CacheConfiguration cacheConfig = cache
+                                .getCacheConfiguration();
+                        cacheConfig.setMaxElementsInMemory(profile.getInteger(
+                                10000, "maxElementsInMemory"));
+                        cacheConfig.setEternal(profile.getBoolean(false,
+                                "eternal"));
                         if (!cacheConfig.isEternal()) {
-                            cacheConfig.setTimeToIdleSeconds(profile.getInteger(120, "timeToIdleSeconds"));
-                            cacheConfig.setTimeToLiveSeconds(profile.getInteger(120, "timeToLiveSeconds"));
+                            cacheConfig.setTimeToIdleSeconds(profile
+                                    .getInteger(120, "timeToIdleSeconds"));
+                            cacheConfig.setTimeToLiveSeconds(profile
+                                    .getInteger(120, "timeToLiveSeconds"));
                         }
-                        cacheConfig.setOverflowToDisk(profile.getBoolean(false, "overflowToDisk"));
-                        cacheConfig.setMaxElementsOnDisk(profile.getInteger(10000, "maxElementsOnDisk"));
-                        cacheConfig.setMemoryStoreEvictionPolicy(profile.getString("LRU", "memoryStoreEvictionPolicy"));
+                        cacheConfig.setOverflowToDisk(profile.getBoolean(false,
+                                "overflowToDisk"));
+                        cacheConfig.setMaxElementsOnDisk(profile.getInteger(
+                                10000, "maxElementsOnDisk"));
+                        cacheConfig.setMemoryStoreEvictionPolicy(profile
+                                .getString("LRU", "memoryStoreEvictionPolicy"));
                     } else {
-                        log.warn("Cache profile '{}' does not exist!", profileId);
+                        log.warn("Cache profile '{}' does not exist!",
+                                profileId);
                     }
                 }
             }
@@ -137,7 +150,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
             scriptCache = new SelfPopulatingCache(
                     cacheManager.getCache(SCRIPT_CACHE_ID),
                     new JythonCacheEntryFactory(portalManager, velocityService,
-                    scriptingServices));
+                            scriptingServices));
             pathCache = cacheManager.getCache(PATH_CACHE_ID);
 
         } catch (IOException ioe) {
@@ -156,24 +169,24 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
     }
 
     /**
-     * Gets the script object with the specified path. If not already cached
-     * the script object will be created by the JythonCacheEntryFactory.
-     *
+     * Gets the script object with the specified path. If not already cached the
+     * script object will be created by the JythonCacheEntryFactory.
+     * 
      * @param path jython script path - including portal and skin. this should
-     * be a valid Velocity resource
+     *            be a valid Velocity resource
      * @return a script object or null if an error occurred
      */
     @Override
     public PyObject getScriptObject(String path) {
-        //log.debug("getScriptObject: '{}'", path);
+        // log.debug("getScriptObject: '{}'", path);
         if (lastModifiedCheck) {
             // check if the script was modified and remove from cache
             File scriptFile = new File(portalManager.getHomeDir(), path);
             long lastModified = scriptFile.lastModified();
-            //log.debug("lastModified: {}:{}", scriptFile, lastModified);
+            // log.debug("lastModified: {}:{}", scriptFile, lastModified);
             if (lastModifiedMap.containsKey(path)) {
                 if (lastModified > lastModifiedMap.get(path)) {
-                    //log.debug("Expiring {} because it was modified!", path);
+                    // log.debug("Expiring {} because it was modified!", path);
                     scriptCache.remove(path);
                 }
             }
@@ -197,7 +210,7 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      */
     @Override
     public String getPath(String pathId) {
-        //log.debug("getPath: {}", pathId);
+        // log.debug("getPath: {}", pathId);
         Element element = pathCache.get(pathId);
         if (element != null) {
             return element.getObjectValue().toString();
@@ -213,15 +226,17 @@ public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
      */
     @Override
     public void putPath(String pathId, String path) {
-        //log.debug("putPath: {} {}", pathId, path);
+        // log.debug("putPath: {} {}", pathId, path);
         pathCache.put(new Element(pathId, path));
     }
 
     /**
-     * Internal wrapper class for PyInstance to keep variables contained
-     * within the executing thread.
+     * Internal wrapper class for PyInstance to keep variables contained within
+     * the executing thread.
      */
     private class LocalPyInstance extends PyInstance {
+        /** Serializable - required */
+        private static final long serialVersionUID = 1L;
 
         public LocalPyInstance(PyInstance instance) {
             super(instance.instclass);

@@ -211,7 +211,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
                     "indexer", "solr", "autocommit");
 
             // Buffering
-            docBuffer = new LinkedHashMap();
+            docBuffer = new LinkedHashMap<String, String>();
             bufferSize = 0;
             bufferOldest = 0;
             bufferDocLimit = globalConfig.getInteger(BUFFER_LIMIT_DOCS,

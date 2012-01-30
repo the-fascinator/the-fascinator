@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.json.simple.JSONAware;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
@@ -17,41 +18,48 @@ import org.json.simple.JSONValue;
  * <p>
  * This class is and all code is a direct copy of the org.json.simple.JSONObject
  * implementation found here:
- * http://json-simple.googlecode.com/svn/trunk/src/org/json/simple/JSONObject.java
+ * http://json-simple.googlecode.com/svn/trunk/src/org
+ * /json/simple/JSONObject.java
  * </p>
- *
+ * 
  * <p>
  * It has been duplicated for the sole purpose of moving to a LinkedHashMap to
  * preserve order. All credit must go to the original authors.
  * </p>
- *
+ * 
  * <p>
  * Because JSONValue.escape() is inaccessible from outside the original package
  * it needed to be added to the end of the class as well.
  * </p>
- *
- * A JSON object. Key value pairs are unordered. JSONObject supports java.util.Map interface.
- *
+ * 
+ * A JSON object. Key value pairs are unordered. JSONObject supports
+ * java.util.Map interface.
+ * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
- *
+ * 
  */
-public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStreamAware {
+public class JsonObject extends LinkedHashMap<Object, Object> implements
+        Map<Object, Object>, JSONAware, JSONStreamAware {
+    /** Serializable - required */
+    private static final long serialVersionUID = 1L;
+
     public JsonObject() {
         super();
     }
 
-    public JsonObject(Map map) {
+    public JsonObject(Map<?, ?> map) {
         super(map);
     }
 
-    public static void writeJSONString(Map map, Writer out) throws IOException {
+    public static void writeJSONString(Map<?, ?> map, Writer out)
+            throws IOException {
         if (map == null) {
             out.write("null");
             return;
         }
 
         boolean first = true;
-        Iterator iter = map.entrySet().iterator();
+        Iterator<?> iter = map.entrySet().iterator();
 
         out.write('{');
         while (iter.hasNext()) {
@@ -60,7 +68,7 @@ public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStr
             } else {
                 out.write(',');
             }
-            Map.Entry entry = (Map.Entry) iter.next();
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) iter.next();
             out.write('\"');
             out.write(escape(String.valueOf(entry.getKey())));
             out.write('\"');
@@ -75,14 +83,14 @@ public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStr
         writeJSONString(this, out);
     }
 
-    public static String toJSONString(Map map) {
+    public static String toJSONString(Map<?, ?> map) {
         if (map == null) {
             return "null";
         }
 
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        Iterator iter = map.entrySet().iterator();
+        Iterator<?> iter = map.entrySet().iterator();
 
         sb.append('{');
         while (iter.hasNext()) {
@@ -92,7 +100,7 @@ public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStr
                 sb.append(',');
             }
 
-            Map.Entry entry = (Map.Entry) iter.next();
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) iter.next();
             toJSONString(String.valueOf(entry.getKey()), entry.getValue(), sb);
         }
         sb.append('}');
@@ -130,11 +138,12 @@ public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStr
     }
 
     /**
-     * Escape quotes, \, /, \r, \n, \b, \f, \t and other control characters (U+0000 through U+001F).
-     * It's the same as JSONValue.escape() only for compatibility here.
-     *
+     * Escape quotes, \, /, \r, \n, \b, \f, \t and other control characters
+     * (U+0000 through U+001F). It's the same as JSONValue.escape() only for
+     * compatibility here.
+     * 
      * @see org.json.simple.JSONValue#escape(String)
-     *
+     * 
      * @param s
      * @return
      */
@@ -146,28 +155,44 @@ public class JsonObject extends LinkedHashMap implements Map, JSONAware, JSONStr
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
             switch (ch) {
-                case '"':   sb.append("\\\"");  break;
-                case '\\':  sb.append("\\\\");  break;
-                case '\b':  sb.append("\\b");   break;
-                case '\f':  sb.append("\\f");   break;
-                case '\n':  sb.append("\\n");   break;
-                case '\r':  sb.append("\\r");   break;
-                case '\t':  sb.append("\\t");   break;
-                case '/':   sb.append("\\/");   break;
-                default:
-                    //Reference: http://www.unicode.org/versions/Unicode5.1.0/
-                    if ((ch >= '\u0000' && ch <= '\u001F') ||
-                            (ch >= '\u007F' && ch <= '\u009F') ||
-                            (ch >= '\u2000' && ch <= '\u20FF')) {
-                        String ss = Integer.toHexString(ch);
-                        sb.append("\\u");
-                        for (int k = 0; k < 4 - ss.length(); k++) {
-                            sb.append('0');
-                        }
-                        sb.append(ss.toUpperCase());
-                    } else {
-                        sb.append(ch);
+            case '"':
+                sb.append("\\\"");
+                break;
+            case '\\':
+                sb.append("\\\\");
+                break;
+            case '\b':
+                sb.append("\\b");
+                break;
+            case '\f':
+                sb.append("\\f");
+                break;
+            case '\n':
+                sb.append("\\n");
+                break;
+            case '\r':
+                sb.append("\\r");
+                break;
+            case '\t':
+                sb.append("\\t");
+                break;
+            case '/':
+                sb.append("\\/");
+                break;
+            default:
+                // Reference: http://www.unicode.org/versions/Unicode5.1.0/
+                if ((ch >= '\u0000' && ch <= '\u001F')
+                        || (ch >= '\u007F' && ch <= '\u009F')
+                        || (ch >= '\u2000' && ch <= '\u20FF')) {
+                    String ss = Integer.toHexString(ch);
+                    sb.append("\\u");
+                    for (int k = 0; k < 4 - ss.length(); k++) {
+                        sb.append('0');
                     }
+                    sb.append(ss.toUpperCase());
+                } else {
+                    sb.append(ch);
+                }
             }
         }
     }

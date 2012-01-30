@@ -29,7 +29,7 @@ public class JythonVelMethod implements VelMethod {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class getReturnType() {
+    public Class<Object> getReturnType() {
         return Object.class;
     }
 
@@ -64,7 +64,7 @@ public class JythonVelMethod implements VelMethod {
                     } else if (param instanceof PyObject) {
                         args.add((PyObject) param);
                     } else if (param instanceof List) {
-                        args.add(new PyList((List) param));
+                        args.add(new PyList((List<?>) param));
                     } else {
                         log.trace("Converting param type: {} to PyObject",
                                 param.getClass().getName());

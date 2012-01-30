@@ -52,7 +52,7 @@ public class GenericSchema implements AccessControlSchema {
         // Grab the class name which is extending
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             response = new JsonObject();
 
@@ -80,7 +80,7 @@ public class GenericSchema implements AccessControlSchema {
     public final String get(String property) {
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             for (int i = 0; i < field_list.length; i++) {
                 if (property.equals(field_list[i].getName())) {
@@ -117,7 +117,7 @@ public class GenericSchema implements AccessControlSchema {
     public final void set(String property, String value) {
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             for (int i = 0; i < field_list.length; i++) {
                 if (property.equals(field_list[i].getName())) {

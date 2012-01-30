@@ -18,25 +18,25 @@
  */
 package com.googlecode.fascinator.common.storage;
 
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
 
 /**
  * Storage API utility methods.
@@ -49,6 +49,7 @@ public class StorageUtils {
     public static final String DEFAULT_HOSTNAME = "localhost";
 
     /** Logging */
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory
             .getLogger(StorageUtils.class);
 
@@ -67,14 +68,14 @@ public class StorageUtils {
         } catch (UnknownHostException uhe) {
         }
         String username = System.getProperty("user.name", "anonymous");
-        //log.debug("Generating OID path:'{}' hostname:'{}' username:'{}'",
-        //        new String[] { path, hostname, username });
+        // log.debug("Generating OID path:'{}' hostname:'{}' username:'{}'",
+        // new String[] { path, hostname, username });
         return DigestUtils.md5Hex(path + hostname + username);
     }
 
     /**
      * Hash the internal contents of a file.
-     *
+     * 
      * @param file The File to hash
      * @return String Hash of the file's contents
      * @throws IOException If there was an error accessing the file
@@ -194,7 +195,7 @@ public class StorageUtils {
 
     /**
      * Ensure the provided harvest file is up-to-date in storage.
-     *
+     * 
      * @param storage a Storage instance
      * @param file to check in storage
      * @return a DigitalObject

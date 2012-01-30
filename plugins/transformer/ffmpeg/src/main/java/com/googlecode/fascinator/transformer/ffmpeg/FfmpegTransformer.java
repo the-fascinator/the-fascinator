@@ -18,20 +18,6 @@
  */
 package com.googlecode.fascinator.transformer.ffmpeg;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.PayloadType;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.api.transformer.Transformer;
-import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MimeTypeUtil;
-import com.googlecode.fascinator.common.storage.StorageUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +45,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.PayloadType;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.Transformer;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.MimeTypeUtil;
+import com.googlecode.fascinator.common.storage.StorageUtils;
 
 /**
  * <p>
@@ -125,6 +125,7 @@ public class FfmpegTransformer implements Transformer {
     private Map<String, JsonObject> metadata;
 
     /** Old Metadata */
+    @SuppressWarnings("unused")
     private Map<String, JsonSimple> oldMetadata;
 
     /** Error messages */
@@ -239,9 +240,9 @@ public class FfmpegTransformer implements Transformer {
         itemConfig = null;
         info = null;
         format = null;
-        errors = new LinkedHashMap();
-        metadata = new LinkedHashMap();
-        oldMetadata = new LinkedHashMap();
+        errors = new LinkedHashMap<String, JsonObject>();
+        metadata = new LinkedHashMap<String, JsonObject>();
+        oldMetadata = new LinkedHashMap<String, JsonSimple>();
     }
 
     /**
@@ -323,8 +324,7 @@ public class FfmpegTransformer implements Transformer {
     private String testExecLevel() {
         // Make sure we can start
         if (ffmpeg == null) {
-            ffmpeg = new FfmpegImpl(
-                    get(null, null, "binaries", "transcoding"),
+            ffmpeg = new FfmpegImpl(get(null, null, "binaries", "transcoding"),
                     get(null, null, "binaries", "metadata"));
         }
         return ffmpeg.testAvailability();
@@ -444,8 +444,8 @@ public class FfmpegTransformer implements Transformer {
         }
 
         // What conversions are required for this format?
-        List<JsonSimple> conversions = getJsonList(itemConfig,
-                "transcodings", format);
+        List<JsonSimple> conversions = getJsonList(itemConfig, "transcodings",
+                format);
         for (JsonSimple conversion : conversions) {
             String name = conversion.getString(null, "alias");
             // And what/how many renditions does it have?
@@ -480,8 +480,8 @@ public class FfmpegTransformer implements Transformer {
                             // TODO: Type checking needs more work
                             // Indexing fails silently if you add two thumbnails
                             // or two previews
-                            payload.setType(resolveType(
-                                    render.getString(null, "type")));
+                            payload.setType(resolveType(render.getString(null,
+                                    "type")));
                             payload.close();
                         } catch (Exception ex) {
                             addError(jsonKey(converted.getName()),
@@ -563,7 +563,7 @@ public class FfmpegTransformer implements Transformer {
 
             // We need to do some merging, lets validate IDs first
             log.info("Found {} source segments! Merging...", segments);
-            List<String> segmentIds = new ArrayList();
+            List<String> segmentIds = new ArrayList<String>();
             Set<String> payloadIds = object.getPayloadIdList();
             // The first segment
             String sourceId = object.getSourceId();
@@ -590,7 +590,7 @@ public class FfmpegTransformer implements Transformer {
             }
 
             // Transcode all the files to neutral MPEGs first
-            Map<String, File> files = new HashMap();
+            Map<String, File> files = new HashMap<String, File>();
             for (String segment : segmentIds) {
                 try {
                     File file = basicMpeg(object, segment);
@@ -755,7 +755,7 @@ public class FfmpegTransformer implements Transformer {
      */
     private String mergeRender(File in, File out) throws IOException {
         // Render config
-        List<String> params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         params.add("-i");
         params.add(in.getAbsolutePath());
         params.add("-sameq");
@@ -962,6 +962,7 @@ public class FfmpegTransformer implements Transformer {
      * 
      * @param object: The object to extract data from
      */
+    @SuppressWarnings("unused")
     private void readMetadata(DigitalObject object) {
         Set<String> pids = object.getPayloadIdList();
         if (pids.contains(METADATA_PAYLOAD)) {
@@ -1150,7 +1151,7 @@ public class FfmpegTransformer implements Transformer {
             metadata.put(key, renderMetadata);
             // And statistics
             if (stats != null) {
-                Map<String, String> data = new HashMap();
+                Map<String, String> data = new HashMap<String, String>();
                 data.put("oid", oid);
                 data.put("datetime", String.valueOf(startTime));
                 data.put("timespent", String.valueOf(timeSpent));
@@ -1186,7 +1187,7 @@ public class FfmpegTransformer implements Transformer {
      */
     private List<String> getPaddedParams(JsonSimple renderConfig,
             FfmpegInfo info, JsonObject renderMetadata, List<String> stats) {
-        List<String> response = new ArrayList();
+        List<String> response = new ArrayList<String>();
 
         // Get the output dimensions to use for the actual video
         int maxX = renderConfig.getInteger(-1, "maxWidth");
@@ -1411,7 +1412,7 @@ public class FfmpegTransformer implements Transformer {
         }
         // Return an empty list otherwise
         if (response == null) {
-            response = new ArrayList();
+            response = new ArrayList<JsonSimple>();
         }
         return response;
     }
@@ -1428,7 +1429,7 @@ public class FfmpegTransformer implements Transformer {
             Object... path) {
         String configEntry = get(json, null, path);
         if (configEntry == null) {
-            return new ArrayList();
+            return new ArrayList<String>();
         } else {
             return split(configEntry, separator);
         }

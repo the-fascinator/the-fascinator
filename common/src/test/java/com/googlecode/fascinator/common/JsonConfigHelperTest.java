@@ -20,7 +20,6 @@ package com.googlecode.fascinator.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,19 +78,19 @@ public class JsonConfigHelperTest {
      */
     @Test
     public void getList() throws Exception {
-        List expected1 = new ArrayList();
+        List<String> expected1 = new ArrayList<String>();
         expected1.add("one");
         expected1.add("two");
         expected1.add("three");
 
         Assert.assertEquals(expected1, config.getList("numbers"));
-        List expected2 = new ArrayList();
+        List<String> expected2 = new ArrayList<String>();
         expected2.add("aperture");
         expected2.add("ice2");
         Assert.assertEquals(expected2, config.getList("transformer/conveyer"));
 
         System.setProperty("one", "1");
-        List expected3 = new ArrayList();
+        List<Comparable<?>> expected3 = new ArrayList<Comparable<?>>();
         expected3.add("1");
         expected3.add(2);
         expected3.add(3);
@@ -186,6 +185,7 @@ public class JsonConfigHelperTest {
     public void getJsonMap() {
         Map<String, JsonConfigHelper> iceConfig = config
                 .getJsonMap("transformer/ice2/resize");
+        @SuppressWarnings("unused")
         String json = "";
         for (String key : iceConfig.keySet()) {
             JsonConfigHelper j = iceConfig.get(key);

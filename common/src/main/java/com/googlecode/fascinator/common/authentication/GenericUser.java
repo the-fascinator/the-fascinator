@@ -50,7 +50,7 @@ public class GenericUser implements User {
         // Grab the class name which is extending
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             response = new JsonObject();
 
@@ -79,7 +79,7 @@ public class GenericUser implements User {
     public final String get(String property) {
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             for (Field element : field_list) {
                 if (property.equals(element.getName())) {
@@ -115,7 +115,7 @@ public class GenericUser implements User {
     public final void set(String property, String value) {
         String class_name = this.getClass().getCanonicalName();
         try {
-            Class ref_class = Class.forName(class_name);
+            Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
             for (Field element : field_list) {
                 if (property.equals(element.getName())) {

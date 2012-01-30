@@ -151,11 +151,11 @@ public class JsonSimple {
         JSONParser parser = new JSONParser();
         ContainerFactory containerFactory = new ContainerFactory() {
             @Override
-            public List creatArrayContainer() {
+            public List<?> creatArrayContainer() {
                 return new JSONArray();
             }
             @Override
-            public Map createObjectContainer() {
+            public Map<?, ?> createObjectContainer() {
                 return new JsonObject();
             }
         };
@@ -427,7 +427,7 @@ public class JsonSimple {
             return JsonSimple.getStringList((JSONArray) target);
         }
         if (isString(target)) {
-            List<String> response = new LinkedList();
+            List<String> response = new LinkedList<String>();
             response.add((String) target);
             return response;
         }
@@ -494,7 +494,7 @@ public class JsonSimple {
      * @return List<Object> : A list of matching Objects from the data
      */
     public List<Object> search(String node) {
-        List<Object> response = new LinkedList();
+        List<Object> response = new LinkedList<Object>();
         for (Object key : jsonObject.keySet()) {
             Object value = jsonObject.get(key);
             // Check this node
@@ -742,7 +742,7 @@ public class JsonSimple {
         // Data - Arrays
         String dataString = null;
         if (data instanceof JSONArray) {
-            List<String> lines = new LinkedList();
+            List<String> lines = new LinkedList<String>();
             JSONArray array = (JSONArray) data;
             for (Object entry : array) {
                 lines.add(printNode(null, entry, prefix + tab));
@@ -752,7 +752,7 @@ public class JsonSimple {
         }
         // Data - Objects
         if (data instanceof JsonObject) {
-            List<String> lines = new LinkedList();
+            List<String> lines = new LinkedList<String>();
             JsonObject object = (JsonObject) data;
             for (Object key : object.keySet()) {
                 lines.add(printNode(
@@ -825,7 +825,7 @@ public class JsonSimple {
      * @return List<String> The resulting list
      */
     public static List<String> getStringList(JsonObject json, String field) {
-        List<String> response = new LinkedList();
+        List<String> response = new LinkedList<String>();
         Object object = json.get(field);
         if (object instanceof JSONArray) {
             return getStringList((JSONArray) object);
@@ -840,7 +840,7 @@ public class JsonSimple {
      * @return List<String> The resulting list
      */
     public static List<String> getStringList(JSONArray json) {
-        List<String> response = new LinkedList();
+        List<String> response = new LinkedList<String>();
         for (Object obj : json) {
             if (obj instanceof String) {
                 response.add((String) obj);
@@ -860,7 +860,7 @@ public class JsonSimple {
      * @return String : The JSON String
      */
     public static List<JsonSimple> toJavaList(JSONArray array) {
-        List<JsonSimple> response = new LinkedList();
+        List<JsonSimple> response = new LinkedList<JsonSimple>();
         if (array != null && !array.isEmpty()) {
             for (Object object : array) {
                 if (object != null && object instanceof JsonObject) {
@@ -882,7 +882,7 @@ public class JsonSimple {
      * @return String : The JSON String
      */
     public static Map<String, JsonSimple> toJavaMap(JsonObject object) {
-        Map<String, JsonSimple> response = new LinkedHashMap();
+        Map<String, JsonSimple> response = new LinkedHashMap<String, JsonSimple>();
         if (object != null && !object.isEmpty()) {
             for (Object key : object.keySet()) {
                 Object child = object.get(key);
@@ -907,7 +907,7 @@ public class JsonSimple {
      */
     public static Map<String, JsonObject> fromJavaMap(
             Map<String, JsonSimple> from) {
-        Map<String, JsonObject> response = new LinkedHashMap();
+        Map<String, JsonObject> response = new LinkedHashMap<String, JsonObject>();
         if (from != null && !from.isEmpty()) {
             for (String key : from.keySet()) {
                 response.put(key, from.get(key).getJsonObject());

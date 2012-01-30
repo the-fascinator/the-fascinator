@@ -247,7 +247,7 @@ public class SolrEventLogSubscriber implements Subscriber {
             core.ping();
 
             // Buffering
-            docBuffer = new ArrayList();
+            docBuffer = new ArrayList<String>();
             bufferSize = 0;
             bufferOldest = 0;
             bufferDocLimit = config.getInteger(BUFFER_LIMIT_DOCS,

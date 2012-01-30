@@ -18,22 +18,6 @@
  */
 package com.googlecode.fascinator.transformer.ice2;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.PayloadType;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.api.transformer.Transformer;
-import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.BasicHttpClient;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.MimeTypeUtil;
-import com.googlecode.fascinator.common.sax.SafeSAXReader;
-import com.googlecode.fascinator.common.storage.StorageUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,6 +49,22 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.PayloadType;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.Transformer;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.BasicHttpClient;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.MimeTypeUtil;
+import com.googlecode.fascinator.common.sax.SafeSAXReader;
+import com.googlecode.fascinator.common.storage.StorageUtils;
 
 /**
  * <p>
@@ -887,8 +887,8 @@ public class Ice2Transformer implements Transformer {
      * @param object: The object to retrieve thumbnails for
      */
     private void getThumbAndPreviews(DigitalObject object) {
-        thumbnails = new ArrayList();
-        previews = new ArrayList();
+        thumbnails = new ArrayList<String>();
+        previews = new ArrayList<String>();
         // Loop through all payloads
         for (String pid : object.getPayloadIdList()) {
             try {

@@ -42,7 +42,7 @@ public class SolrFacet {
      */
     public SolrFacet(String field, JSONArray data) {
         fieldName = field;
-        values = new LinkedHashMap();
+        values = new LinkedHashMap<String, Integer>();
 
         /* This code relies on the Solr response coming back in a very specific
          format. Every odd numbered entry is a String and will be the value,
@@ -61,7 +61,7 @@ public class SolrFacet {
             }
         } catch (Exception ex) {
             // Processing problem. The data is in some unexpected format
-            values = new LinkedHashMap();
+            values = new LinkedHashMap<String, Integer>();
         }
     }
 

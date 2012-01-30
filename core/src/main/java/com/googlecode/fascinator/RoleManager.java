@@ -141,7 +141,7 @@ public class RoleManager implements RolesManager {
 
     @Override
     public void shutdown() throws RolesException {
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             try {
@@ -160,11 +160,11 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public String[] getRoles(String username) {
-        List<String> found = new ArrayList();
+        List<String> found = new ArrayList<String>();
         String[] result;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             result = p.getRoles(username);
@@ -186,11 +186,11 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public String[] getUsersInRole(String role) {
-        List<String> found = new ArrayList();
+        List<String> found = new ArrayList<String>();
         String[] result;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             result = p.getUsersInRole(role);
@@ -213,7 +213,7 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public boolean supportsRoleManagement() {
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             // Return true as soon as we
@@ -245,7 +245,7 @@ public class RoleManager implements RolesManager {
 
         // Now try all the others
         Boolean success = false;
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext() && !success) {
             p = (Roles) i.next();
             try {
@@ -286,7 +286,7 @@ public class RoleManager implements RolesManager {
 
         // Now try all the others
         Boolean success = false;
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             try {
@@ -360,7 +360,7 @@ public class RoleManager implements RolesManager {
 
         // Now try all the others
         Boolean success = false;
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             try {
@@ -389,7 +389,7 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public String[] searchRoles(String search) throws RolesException {
-        List<String> found = new ArrayList();
+        List<String> found = new ArrayList<String>();
         String[] result;
 
         // Try the active plugin first
@@ -404,7 +404,7 @@ public class RoleManager implements RolesManager {
         }
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             result = p.searchRoles(search);
@@ -427,7 +427,7 @@ public class RoleManager implements RolesManager {
     @Override
     public void setActivePlugin(String pluginId) {
         // Make sure it exists
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             if (pluginId.equals(p.getId())) {
@@ -453,11 +453,11 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public List<PluginDescription> getPluginList() {
-        List<PluginDescription> found = new ArrayList();
+        List<PluginDescription> found = new ArrayList<PluginDescription>();
         PluginDescription result;
 
         // Loop through each plugin
-        Iterator i = plugins.values().iterator();
+        Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
             p = (Roles) i.next();
             result = new PluginDescription(p);

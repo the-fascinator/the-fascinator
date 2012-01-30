@@ -1,9 +1,5 @@
 package com.googlecode.fascinator.harvester.oaipmh;
 
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.harvester.Harvester;
-import com.googlecode.fascinator.api.storage.Storage;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +25,13 @@ import org.mortbay.jetty.testing.HttpTester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.harvester.Harvester;
+import com.googlecode.fascinator.api.storage.Storage;
+
 public class OaiPmhHarvesterTest {
 
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory
             .getLogger(OaiPmhHarvesterTest.class);
 
@@ -64,8 +65,7 @@ public class OaiPmhHarvesterTest {
                     } else {
                         retries++;
                         if (retries < 2) {
-                            response
-                                    .setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                             response.setIntHeader("Retry-After", 1);
                             ((Request) request).setHandled(true);
                             return;

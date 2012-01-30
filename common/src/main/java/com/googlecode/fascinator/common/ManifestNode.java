@@ -133,7 +133,7 @@ public class ManifestNode extends JsonSimple {
      * a zero length List will be returned if no children are found.
      */
     public List<ManifestNode> getChildren() {
-        List<ManifestNode> response = new ArrayList();
+        List<ManifestNode> response = new ArrayList<ManifestNode>();
         Map<String, JsonSimple> children = getJsonSimpleMap("children");
         if (children == null) {
             return response;

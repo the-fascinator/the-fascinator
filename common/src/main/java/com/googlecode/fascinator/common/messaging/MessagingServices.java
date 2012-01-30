@@ -19,8 +19,6 @@
  */
 package com.googlecode.fascinator.common.messaging;
 
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +34,9 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 /**
  * Messaging services
@@ -78,8 +79,7 @@ public class MessagingServices {
     }
 
     /** AMQ Connector URL for THIS server */
-    private String localBroker =
-            ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL;
+    private String localBroker = ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL;
 
     /** AMQ Connectors */
     private Map<String, ActiveMQConnectionFactory> connectors;
@@ -111,14 +111,14 @@ public class MessagingServices {
         }
 
         // Setup our connector factory(s)...
-        //    we'll only have a local one usually
-        connectors = new HashMap();
+        // we'll only have a local one usually
+        connectors = new HashMap<String, ActiveMQConnectionFactory>();
         connectors.put(localBroker, new ActiveMQConnectionFactory(localBroker));
 
         // Setup the first of our JMS objects for a local broker
-        connections = new HashMap();
-        sessions = new HashMap();
-        producers = new HashMap();
+        connections = new HashMap<String, Connection>();
+        sessions = new HashMap<String, Session>();
+        producers = new HashMap<String, MessageProducer>();
         newProducer();
     }
 
@@ -128,7 +128,7 @@ public class MessagingServices {
      * @return Connection JMS connection
      * @throws MessagingException if an error occurs
      */
-    private Connection newConnection() throws MessagingException {
+    public Connection newConnection() throws MessagingException {
         return newConnection(localBroker);
     }
 
@@ -142,7 +142,7 @@ public class MessagingServices {
     private Connection newConnection(String brokerUrl)
             throws MessagingException {
         // Hopefully we've seen this broker before
-        if (!connectors.containsKey(brokerUrl))  {
+        if (!connectors.containsKey(brokerUrl)) {
             log.info("Opening new AMQ Connection Factory for broker: '{}'",
                     brokerUrl);
             connectors.put(brokerUrl, new ActiveMQConnectionFactory(brokerUrl));
@@ -150,16 +150,16 @@ public class MessagingServices {
 
         // Try creating our connection
         try {
-            connections.put(brokerUrl,
-                    connectors.get(brokerUrl).createConnection());
+            connections.put(brokerUrl, connectors.get(brokerUrl)
+                    .createConnection());
         } catch (JMSException ex) {
             // Ignore the first error, in case it is just a dead connection
             try {
                 log.warn("Failed to create Connection! Try new connector.");
-                connectors.put(brokerUrl,
-                        new ActiveMQConnectionFactory(brokerUrl));
-                connections.put(brokerUrl,
-                        connectors.get(brokerUrl).createConnection());
+                connectors.put(brokerUrl, new ActiveMQConnectionFactory(
+                        brokerUrl));
+                connections.put(brokerUrl, connectors.get(brokerUrl)
+                        .createConnection());
             } catch (JMSException ex1) {
                 log.error("Error creating connection: ", ex1);
                 throw new MessagingException(ex1);
@@ -182,7 +182,7 @@ public class MessagingServices {
      * @return Session JMS session
      * @throws MessagingException if an error occurs
      */
-    private Session newSession() throws MessagingException {
+    public Session newSession() throws MessagingException {
         return newSession(localBroker);
     }
 
@@ -193,8 +193,7 @@ public class MessagingServices {
      * @return Session JMS session
      * @throws MessagingException if an error occurs
      */
-    private Session newSession(String brokerUrl)
-            throws MessagingException {
+    private Session newSession(String brokerUrl) throws MessagingException {
         // Confirm we have a connection to use
         if (!connections.containsKey(brokerUrl)) {
             log.info("Opening new AMQ Session for broker: '{}'", brokerUrl);
@@ -203,8 +202,10 @@ public class MessagingServices {
 
         // Establish a new session
         try {
-            sessions.put(brokerUrl, connections.get(brokerUrl)
-                    .createSession(false, Session.AUTO_ACKNOWLEDGE));
+            sessions.put(
+                    brokerUrl,
+                    connections.get(brokerUrl).createSession(false,
+                            Session.AUTO_ACKNOWLEDGE));
         } catch (JMSException ex) {
             // Ignore the first error, in case it is just an expired session
             try {
@@ -222,8 +223,8 @@ public class MessagingServices {
     }
 
     /**
-     * Establish a new JMS Message Producer in an existing session
-     * to the local broker
+     * Establish a new JMS Message Producer in an existing session to the local
+     * broker
      * 
      * @return MessageProducer JMS Message Producer
      * @throws MessagingException if an error occurs
@@ -309,7 +310,7 @@ public class MessagingServices {
      * @param name The topic to send to
      * @param msg The message to send
      * @throws MessagingException If any errors occur in resolving the
-     * destination or sending.
+     *             destination or sending.
      */
     public void publishMessage(String name, String msg)
             throws MessagingException {
@@ -323,7 +324,7 @@ public class MessagingServices {
      * @param name The topic to send to
      * @param msg The message to send
      * @throws MessagingException If any errors occur in resolving the
-     * destination or sending.
+     *             destination or sending.
      */
     public void publishMessage(String brokerUrl, String name, String msg)
             throws MessagingException {
@@ -338,10 +339,9 @@ public class MessagingServices {
      * @param name The queue to send to
      * @param msg The message to send
      * @throws MessagingException If any errors occur in resolving the
-     * destination or sending.
+     *             destination or sending.
      */
-    public void queueMessage(String name, String msg)
-            throws MessagingException {
+    public void queueMessage(String name, String msg) throws MessagingException {
         queueMessage(localBroker, name, msg);
     }
 
@@ -352,7 +352,7 @@ public class MessagingServices {
      * @param name The queue to send to
      * @param msg The message to send
      * @throws MessagingException If any errors occur in resolving the
-     * destination or sending.
+     *             destination or sending.
      */
     public void queueMessage(String brokerUrl, String name, String msg)
             throws MessagingException {

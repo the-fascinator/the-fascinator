@@ -18,9 +18,6 @@
  */
 package com.googlecode.fascinator.transformer.ffmpeg;
 
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +28,9 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+
 /**
  * Extract metadata about a media file
  * 
@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 public class FfmpegInfo {
 
     /** Logger */
+    @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(FfmpegInfo.class);
 
     /** Supported file format */
@@ -69,7 +70,7 @@ public class FfmpegInfo {
     private JsonObject format = new JsonObject();
 
     /** Raw stream data */
-    private List<JsonObject> streams = new ArrayList();
+    private List<JsonObject> streams = new ArrayList<JsonObject>();
 
     /** Processed video stream data */
     private JsonObject videoStream = new JsonObject();
@@ -79,7 +80,7 @@ public class FfmpegInfo {
 
     /**
      * Extract metadata from the given file using the provided FFmpeg object
-     *
+     * 
      * @param ffmpeg implementation to used for extract
      * @param inputFile to extract metadata from
      * @throws IOException if execution failed
@@ -92,14 +93,15 @@ public class FfmpegInfo {
             return;
         }
 
-        //log.debug("\n\n=====\n\\/ \\/\n\n{}\n/\\ /\\\n=====\n", rawMediaData);
+        // log.debug("\n\n=====\n\\/ \\/\n\n{}\n/\\ /\\\n=====\n",
+        // rawMediaData);
 
         // FFprobe
         if (ffmpeg.testAvailability().equals(Ffmpeg.DEFAULT_BIN_METADATA)) {
             parseFFprobeMetadata(rawMediaData);
             processFFprobeMetadata();
 
-        // FFmpeg
+            // FFmpeg
         } else {
             parseFFmpegMetadata(rawMediaData);
             JsonObject mData = new JsonObject();
@@ -110,20 +112,22 @@ public class FfmpegInfo {
 
     /**
      * Get and clean a value from the raw output
-     *
+     * 
      * @param json raw output
      * @param path where the data should be stored
      * @return String containing the cleaned output
      */
     private String getCleanValue(JsonObject json, String path) {
         String result = new JsonSimple(json).getString(null, path);
-        if (result != null) result = result.trim();
+        if (result != null) {
+            result = result.trim();
+        }
         return result;
     }
 
     /**
      * Parse raw output from FFprobe into object properties
-     *
+     * 
      * @param rawMetaData to parse
      */
     private void parseFFprobeMetadata(String rawMetaData) {
@@ -169,7 +173,7 @@ public class FfmpegInfo {
 
     /**
      * Parse raw output from FFmpeg into object properties
-     *
+     * 
      * @param rawMetaData to parse
      */
     private void parseFFmpegMetadata(String rawMetaData) {
@@ -194,26 +198,26 @@ public class FfmpegInfo {
                 duration = Long.valueOf(hrs + min + sec).intValue();
             }
             // check for video
-            video = Pattern.compile("Stream #.*Video:.*")
-                    .matcher(rawMetaData).find();
+            video = Pattern.compile("Stream #.*Video:.*").matcher(rawMetaData)
+                    .find();
             // check for audio
-            audio = Pattern.compile("Stream #.*Audio:.*")
-                    .matcher(rawMetaData).find();
+            audio = Pattern.compile("Stream #.*Audio:.*").matcher(rawMetaData)
+                    .find();
         }
     }
 
     /**
      * Process parsed output from object properties into a return value
-     *
+     * 
      */
     private void processFFprobeMetadata() {
         getPrimaryStreams();
         JsonObject mData = new JsonObject();
 
-        //log.debug("\n========\nFORMAT:\n\n{}\n", format.toString());
-        //for (JsonConfigHelper stream : streams) {
-        //    log.debug("\n========\nSTREAM:\n\n{}\n", stream.toString());
-        //}
+        // log.debug("\n========\nFORMAT:\n\n{}\n", format.toString());
+        // for (JsonConfigHelper stream : streams) {
+        // log.debug("\n========\nSTREAM:\n\n{}\n", stream.toString());
+        // }
 
         // Duration
         String dString = getCleanValue(format, "duration");
@@ -265,8 +269,8 @@ public class FfmpegInfo {
             videoCodec.put("label",
                     getCleanValue(videoStream, "codec_long_name"));
             videoData.put("codec", videoCodec);
-            videoData.put("pixel_format",
-                    getCleanValue(videoStream, "pix_fmt"));
+            videoData
+                    .put("pixel_format", getCleanValue(videoStream, "pix_fmt"));
 
             // Add video to metadata
             mData.put("video", videoData);
@@ -300,8 +304,8 @@ public class FfmpegInfo {
             // Sample rate
             String sample_rate = getCleanValue(audioStream, "sample_rate");
             if (sample_rate != null) {
-                audioData.put("sample_rate",
-                        Float.valueOf(sample_rate).intValue());
+                audioData.put("sample_rate", Float.valueOf(sample_rate)
+                        .intValue());
             }
             // Channels
             audioData.put("channels", getCleanValue(audioStream, "channels"));
@@ -313,14 +317,16 @@ public class FfmpegInfo {
     }
 
     /**
-     * Process raw stream data from object properties
-     * into primary video/audio streams
-     *
+     * Process raw stream data from object properties into primary video/audio
+     * streams
+     * 
      */
     private void getPrimaryStreams() {
         for (JsonObject stream : streams) {
             String type = (String) stream.get("codec_type");
-            if (type == null) continue;
+            if (type == null) {
+                continue;
+            }
 
             // The highest index video stream should be considered primary
             if (type.equals("video") && videoStream != null) {
@@ -335,7 +341,7 @@ public class FfmpegInfo {
 
     /**
      * Return the raw ouput that came from the binary
-     *
+     * 
      * @return String containing the raw output
      */
     public String getRaw() {
@@ -344,7 +350,7 @@ public class FfmpegInfo {
 
     /**
      * Return the duration of the media
-     *
+     * 
      * @return int duration in seconds
      */
     public int getDuration() {
@@ -353,7 +359,7 @@ public class FfmpegInfo {
 
     /**
      * Return the duration of the media
-     *
+     * 
      * @return int duration in seconds
      */
     public int getWidth() {
@@ -362,7 +368,7 @@ public class FfmpegInfo {
 
     /**
      * Return the duration of the media
-     *
+     * 
      * @return int duration in seconds
      */
     public int getHeight() {
@@ -371,7 +377,7 @@ public class FfmpegInfo {
 
     /**
      * Is the file format supported?
-     *
+     * 
      * @return boolean flag if supported
      */
     public boolean isSupported() {
@@ -380,7 +386,7 @@ public class FfmpegInfo {
 
     /**
      * Does the media have audio?
-     *
+     * 
      * @return boolean if media has audio
      */
     public boolean hasAudio() {
@@ -389,7 +395,7 @@ public class FfmpegInfo {
 
     /**
      * Does the media have video?
-     *
+     * 
      * @return boolean if media has video
      */
     public boolean hasVideo() {
@@ -398,7 +404,7 @@ public class FfmpegInfo {
 
     /**
      * Return the processed metadata as a string
-     *
+     * 
      * @return String containing the processed output
      */
     @Override

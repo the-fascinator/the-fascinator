@@ -18,7 +18,7 @@
  */
 package com.googlecode.fascinator.common;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.junit.Test;
 
 /**
  * Unit tests for JsonSimple
- *
+ * 
  * @author Greg Pendlebury
  */
 public class JsonSimpleTest {
@@ -41,13 +41,13 @@ public class JsonSimpleTest {
 
     @Before
     public void setup() throws Exception {
-        json = new JsonSimple(
-                getClass().getResourceAsStream("/test-config.json"));
+        json = new JsonSimple(getClass().getResourceAsStream(
+                "/test-config.json"));
     }
 
     /**
      * Tests simple String retrieval
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -64,7 +64,7 @@ public class JsonSimpleTest {
 
     /**
      * Tests simple Integer retrieval
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -77,22 +77,22 @@ public class JsonSimpleTest {
 
     /**
      * Tests simple Boolean retrieval
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
     public void simpleBoolean() throws Exception {
         // Genuine Boolean
-        Assert.assertTrue(
-                json.getBoolean(null, "indexer", "config", "autocommit"));
+        Assert.assertTrue(json.getBoolean(null, "indexer", "config",
+                "autocommit"));
         // "true" String
-        Assert.assertTrue(
-                json.getBoolean(null, "portal", "facet-sort-by-count"));
+        Assert.assertTrue(json
+                .getBoolean(null, "portal", "facet-sort-by-count"));
     }
 
     /**
      * Tests default value handling is working as intended
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -102,11 +102,10 @@ public class JsonSimpleTest {
         Assert.assertTrue(json.getBoolean(true, "invalid", "path"));
         Assert.assertFalse(json.getBoolean(false, "invalid", "path"));
         // String => Boolean (valid)
-        Assert.assertTrue(
-                json.getBoolean(false, "portal", "facet-sort-by-count"));
+        Assert.assertTrue(json.getBoolean(false, "portal",
+                "facet-sort-by-count"));
         // Integer => Boolean (invalid)
-        Assert.assertFalse(
-                json.getBoolean(false, "portal", "records-per-page"));
+        Assert.assertFalse(json.getBoolean(false, "portal", "records-per-page"));
         // Boolean - Parsing a random string (on valid path) will be false
         Assert.assertFalse(json.getBoolean(true, "test"));
 
@@ -127,17 +126,15 @@ public class JsonSimpleTest {
 
     /**
      * Test more complicated pathing
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
     public void complexPaths() throws Exception {
-        Assert.assertEquals("3",
-                json.getString(null, "transformer", "ints", 2));
+        Assert.assertEquals("3", json.getString(null, "transformer", "ints", 2));
         Assert.assertEquals((Integer) 3,
                 json.getInteger(null, "transformer", "ints", 2));
-        Assert.assertEquals("two",
-                json.getString(null, "numbers", 1));
+        Assert.assertEquals("two", json.getString(null, "numbers", 1));
 
         Assert.assertEquals("map-one",
                 json.getString(null, "map-list", 0, "name"));
@@ -145,13 +142,12 @@ public class JsonSimpleTest {
                 json.getInteger(null, "map-list", 0, "sub-list", 2));
         Assert.assertEquals("map-two",
                 json.getString(null, "map-list", 1, "name"));
-        Assert.assertTrue(
-                json.getBoolean(false, "map-list", 1, "sub-list", 3));
+        Assert.assertTrue(json.getBoolean(false, "map-list", 1, "sub-list", 3));
     }
 
     /**
      * Test dropping out to the JSON.simple API at a specific node
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -171,33 +167,33 @@ public class JsonSimpleTest {
 
     /**
      * Build an object using API and round-trip it through the wrapping object.
-     *
-     * We do this twice, once using basic Java Objects and parsing properly.
-     * And a second time using JSON.simple objects and basic toString().
-     *
+     * 
+     * We do this twice, once using basic Java Objects and parsing properly. And
+     * a second time using JSON.simple objects and basic toString().
+     * 
      * @throws Exception if any error occurs
      */
     @Test
     public void apiComparisonTest() throws Exception {
-        Map object = new LinkedHashMap();
+        Map<String, Serializable> object = new LinkedHashMap<String, Serializable>();
         object.put("name", "Random Name");
 
         // A simple list of strings
-        LinkedList listOne = new LinkedList();
+        LinkedList<Object> listOne = new LinkedList<Object>();
         listOne.add("one");
         listOne.add("two");
         listOne.add("three");
         object.put("simple-list", listOne);
 
         // A complex list of objects containing strings
-        Map objectOne = new LinkedHashMap();
+        Map<String, String> objectOne = new LinkedHashMap<String, String>();
         objectOne.put("name", "object-one");
-        Map objectTwo = new LinkedHashMap();
+        Map<String, String> objectTwo = new LinkedHashMap<String, String>();
         objectTwo.put("name", "object-two");
-        Map objectThree = new LinkedHashMap();
+        Map<String, String> objectThree = new LinkedHashMap<String, String>();
         objectThree.put("name", "object-three");
 
-        LinkedList listTwo = new LinkedList();
+        LinkedList<Map<String, String>> listTwo = new LinkedList<Map<String, String>>();
         listTwo.add(objectOne);
         listTwo.add(objectTwo);
         listTwo.add(objectThree);
@@ -260,7 +256,7 @@ public class JsonSimpleTest {
 
     /**
      * Write data into API objects that are still inside the wrapper
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -292,17 +288,17 @@ public class JsonSimpleTest {
         // Appending arrays
         object = json.writeObject("some", "random", "object", "array", -1);
         object.put("key", "value1");
-        Assert.assertEquals("value1", json.getString(null,
-                "some", "random", "object", "array", 0, "key"));
+        Assert.assertEquals("value1", json.getString(null, "some", "random",
+                "object", "array", 0, "key"));
         object = json.writeObject("some", "random", "object", "array", -1);
         object.put("key", "value2");
-        Assert.assertEquals("value2", json.getString(null,
-                "some", "random", "object", "array", 1, "key"));
+        Assert.assertEquals("value2", json.getString(null, "some", "random",
+                "object", "array", 1, "key"));
     }
 
     /**
      * Test the various utility classes offered
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -321,14 +317,13 @@ public class JsonSimpleTest {
         array = json.getArray("map-list");
         List<JsonSimple> jsonList = JsonSimple.toJavaList(array);
         Assert.assertEquals(2, jsonList.size());
-        Assert.assertEquals("3",
-                jsonList.get(0).getString(null, "sub-list", 2));
+        Assert.assertEquals("3", jsonList.get(0).getString(null, "sub-list", 2));
         Assert.assertEquals(false,
                 jsonList.get(1).getBoolean(null, "sub-list", 2));
 
         // toJavaMap()
-        Map<String, JsonSimple> map =
-                JsonSimple.toJavaMap(json.getJsonObject());
+        Map<String, JsonSimple> map = JsonSimple
+                .toJavaMap(json.getJsonObject());
         // Ensure that non-objects didn't come along
         Assert.assertNotNull(json.getString(null, "comment1"));
         Assert.assertFalse(map.containsKey("comment1"));
@@ -337,7 +332,7 @@ public class JsonSimpleTest {
                 json.getString(null, "indexer", "config", "username"));
 
         // fromJavaMap()
-        map = new LinkedHashMap();
+        map = new LinkedHashMap<String, JsonSimple>();
         JsonObject object1 = new JsonObject();
         object1.put("name", "object1");
         map.put("one", new JsonSimple(object1));
@@ -353,7 +348,7 @@ public class JsonSimpleTest {
 
     /**
      * Test system property substitution
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -369,7 +364,7 @@ public class JsonSimpleTest {
 
     /**
      * Test searching for nodes at any depth
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -379,7 +374,7 @@ public class JsonSimpleTest {
         Assert.assertEquals(7, labels.size());
 
         // Look for two lists, that are children
-        //   of objects inside a list themselves
+        // of objects inside a list themselves
         List<Object> subLists = json.search("sub-list");
         Assert.assertEquals(2, subLists.size());
 
@@ -455,7 +450,7 @@ public class JsonSimpleTest {
     /**
      * Make sure the toString method hasn't changed any of the more complicated
      * data structures.
-     *
+     * 
      * @throws Exception if any error occurs
      */
     @Test
@@ -464,17 +459,17 @@ public class JsonSimpleTest {
         String newString = json.toString(true);
         JsonSimple newJson = new JsonSimple(newString);
 
-        Object[] path = {"map-list", 0, "name"};
-        Assert.assertEquals(
-                newJson.getString(null, path), json.getString(null, path));
+        Object[] path = { "map-list", 0, "name" };
+        Assert.assertEquals(newJson.getString(null, path),
+                json.getString(null, path));
 
-        Object[] path2 = {"map-list", 0, "sub-list", 2};
-        Assert.assertEquals(
-                newJson.getInteger(null, path2), json.getInteger(null, path2));
+        Object[] path2 = { "map-list", 0, "sub-list", 2 };
+        Assert.assertEquals(newJson.getInteger(null, path2),
+                json.getInteger(null, path2));
 
-        Object[] path3 = {"map-list", 1, "sub-list", 3};
-        Assert.assertEquals(
-                newJson.getBoolean(null, path3), json.getBoolean(null, path3));
+        Object[] path3 = { "map-list", 1, "sub-list", 3 };
+        Assert.assertEquals(newJson.getBoolean(null, path3),
+                json.getBoolean(null, path3));
 
         // Some null handling issues we want to test for.
         // Make sure the node existed... and was null beforehand
@@ -492,7 +487,8 @@ public class JsonSimpleTest {
         object.put("quote", "Some \"quoted\" text with \\ escaped characters");
         newJson = new JsonSimple(object);
         // Exception will be thrown here re-parsing incorrectly
-        //  escaped quote if error is not fixed
+        // escaped quote if error is not fixed
+        @SuppressWarnings("unused")
         JsonSimple testJson = new JsonSimple(newJson.toString(true));
     }
 }

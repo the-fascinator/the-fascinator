@@ -18,12 +18,6 @@
  */
 package com.googlecode.fascinator.storage.ram;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.storage.impl.GenericDigitalObject;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +25,12 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.storage.impl.GenericDigitalObject;
 
 /**
  * RAM based storage. This is not a persistent store, it's primary use is for
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RamStorage implements Storage {
 
+    @SuppressWarnings("unused")
     private final Logger log = LoggerFactory.getLogger(RamStorage.class);
 
     private Map<String, DigitalObject> manifest;
@@ -56,7 +57,7 @@ public class RamStorage implements Storage {
 
     /**
      * Gets a PluginDescription object relating to this plugin.
-     *
+     * 
      * @return a PluginDescription
      */
     @Override

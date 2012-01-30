@@ -24,7 +24,6 @@ import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.User;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -99,7 +98,8 @@ public class InternalAuthentication implements Authentication {
     private static String DEFAULT_FILE_NAME = "users.properties";
 
     /** Loggin */
-    private final Logger log = LoggerFactory
+    @SuppressWarnings("unused")
+	private final Logger log = LoggerFactory
             .getLogger(InternalAuthentication.class);
 
     /** User object */
@@ -451,7 +451,7 @@ public class InternalAuthentication implements Authentication {
         // Complete list of users
         String[] users = file_store.keySet().toArray(
                 new String[file_store.size()]);
-        List<User> found = new ArrayList();
+        List<User> found = new ArrayList<User>();
 
         // Look through the list for anyone who matches
         for (int i = 0; i < users.length; i++) {

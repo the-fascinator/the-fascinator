@@ -157,7 +157,7 @@ public class HarvestQueueConsumer implements GenericListener {
             consumer.setMessageListener(this);
 
             // broadcast = session.createTopic(MessagingServices.MESSAGE_TOPIC);
-            renderers = new LinkedHashMap();
+            renderers = new LinkedHashMap<String, Queue>();
             for (String selector : rendererNames.keySet()) {
                 renderers.put(selector,
                         session.createQueue(rendererNames.get(selector)));
@@ -194,7 +194,7 @@ public class HarvestQueueConsumer implements GenericListener {
             storage.init(sysFile);
 
             // Setup render queue logic
-            rendererNames = new LinkedHashMap();
+            rendererNames = new LinkedHashMap<String, String>();
             String userQueue = config.getString(null,
                     "config", "user-renderer");
             rendererNames.put(ConveyerBelt.CRITICAL_USER_SELECTOR, userQueue);

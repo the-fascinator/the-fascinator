@@ -88,9 +88,10 @@ import org.slf4j.LoggerFactory;
  */
 
 public class InternalRoles implements Roles {
+    @SuppressWarnings("unused")
+	private final Logger log = LoggerFactory.getLogger(InternalRoles.class);
 
     private static String DEFAULT_FILE_NAME = "roles.properties";
-    private final Logger log = LoggerFactory.getLogger(InternalRoles.class);
     private String file_path;
     private Properties file_store;
     private Map<String, List<String>> user_list;
@@ -158,18 +159,18 @@ public class InternalRoles implements Roles {
             file_store.load(new FileInputStream(file_path));
             user_list = new LinkedHashMap<String, List<String>>();
             role_list = new LinkedHashMap<String, List<String>>();
-            List<String> my_roles = new ArrayList();
-            List<String> users_with_role = new ArrayList();
+            List<String> my_roles = new ArrayList<String>();
+            List<String> users_with_role = new ArrayList<String>();
 
             // Loop through all users
             String[] users = file_store.keySet().toArray(new String[file_store.size()]);
             for (String user : users) {
-                my_roles = new ArrayList();
+                my_roles = new ArrayList<String>();
 
                 // Loop through each role the user has
                 String[] roles = file_store.getProperty(user).split(",");
                 for (String role : roles) {
-                    users_with_role = new ArrayList();
+                    users_with_role = new ArrayList<String>();
 
                     // Record it for this user
                     my_roles.add(role);
@@ -256,7 +257,7 @@ public class InternalRoles implements Roles {
     @Override
     public void setRole(String username, String newrole)
             throws RolesException {
-        List<String> users_with_role = new ArrayList();
+        List<String> users_with_role = new ArrayList<String>();
 
         if (user_list.containsKey(username)) {
             List<String> roles_of_user = user_list.get(username);
@@ -285,7 +286,7 @@ public class InternalRoles implements Roles {
             }
         } else {
             // Add the user
-            List<String> empty = new ArrayList();
+            List<String> empty = new ArrayList<String>();
             user_list.put(username, empty);
             // Try again
             this.setRole(username, newrole);
@@ -302,7 +303,7 @@ public class InternalRoles implements Roles {
     @Override
     public void removeRole(String username, String oldrole)
             throws RolesException {
-        List<String> users_with_role = new ArrayList();
+        List<String> users_with_role = new ArrayList<String>();
 
         if (user_list.containsKey(username)) {
             List<String> roles_of_user = user_list.get(username);
@@ -436,7 +437,7 @@ public class InternalRoles implements Roles {
     public String[] searchRoles(String search) throws RolesException {
          // Complete list of users
         String[] roles = role_list.keySet().toArray(new String[role_list.size()]);
-        List<String> found = new ArrayList();
+        List<String> found = new ArrayList<String>();
 
         // Look through the list for anyone who matches
         for (int i = 0; i < roles.length; i++) {

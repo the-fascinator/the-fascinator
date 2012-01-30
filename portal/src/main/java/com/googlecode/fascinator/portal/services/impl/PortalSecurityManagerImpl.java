@@ -150,7 +150,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         config = new JsonSimpleConfig();
 
         // For all SSO providers configured
-        sso = new LinkedHashMap();
+        sso = new LinkedHashMap<String, SSOInterface>();
         for (String ssoId : config.getStringList("sso", "plugins")) {
             // Instantiate from the ServiceLoader
             SSOInterface valid = getSSOProvider(ssoId);
@@ -176,8 +176,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         // Trust tokens
         Map<String, JsonSimple> tokenMap = config.getJsonSimpleMap(
                 "sso", "trustTokens");
-        tokens = new HashMap();
-        tokenExpiry = new HashMap();
+        tokens = new HashMap<String, String>();
+        tokenExpiry = new HashMap<String, Long>();
         for (String key : tokenMap.keySet()) {
             JsonSimple tok = tokenMap.get(key);
             String publicKey = tok.getString(null, "publicKey");
@@ -249,7 +249,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     @Override
     public String[] getRolesList(JsonSessionState session, User user) {
         String source = user.getSource();
-        List<String> ssoRoles = new ArrayList();
+        List<String> ssoRoles = new ArrayList<String>();
 
         // SSO Users
         if (sso.containsKey(source)) {
@@ -566,10 +566,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     @Override
     public Map<String, Map<String, String>> ssoBuildLogonInterface(
             JsonSessionState session) {
-        Map<String, Map<String, String>> ssoInterface = new LinkedHashMap();
+        Map<String, Map<String, String>> ssoInterface = new LinkedHashMap<String, Map<String, String>>();
         for (String ssoId : sso.keySet()) {
             SSOInterface provider = sso.get(ssoId);
-            Map<String, String> map = new HashMap();
+            Map<String, String> map = new HashMap<String, String>();
             map.put("label", provider.getLabel());
             map.put("interface", provider.getInterface(
                     ssoLoginUrl + "?ssoId=" + ssoId));

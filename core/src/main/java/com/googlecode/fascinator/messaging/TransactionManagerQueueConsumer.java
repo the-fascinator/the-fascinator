@@ -207,7 +207,7 @@ public class TransactionManagerQueueConsumer implements GenericListener {
             storage.init(sysFile);
 
             // Loop through all the system's transformers
-            transformers = new LinkedHashMap();
+            transformers = new LinkedHashMap<String, Transformer>();
             Map<String, JsonSimple> map = globalConfig.getJsonSimpleMap(
                     "transformerDefaults");
             if (map != null && map.size() > 0) {

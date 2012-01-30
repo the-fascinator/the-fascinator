@@ -465,7 +465,7 @@ public class PythonUtils {
             return null;
         }
         try {
-            List<String> roles = new ArrayList();
+            List<String> roles = new ArrayList<String>();
             access.setActivePlugin(plugin);
             List<AccessControlSchema> schemas = access.getSchemas(recordId);
             for (AccessControlSchema schema : schemas) {
@@ -573,7 +573,7 @@ public class PythonUtils {
             index.get(field).add(value);
         // New data
         } else {
-            List<String> newList = new ArrayList();
+            List<String> newList = new ArrayList<String>();
             newList.add(value);
             index.put(field, newList);
         }

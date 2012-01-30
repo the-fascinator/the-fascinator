@@ -142,7 +142,7 @@ public class SolrDoc extends JsonSimple {
         Object object = this.getPath(field);
 
         // Doesn't exist
-        if (object == null) return new LinkedList();
+        if (object == null) return new LinkedList<String>();
 
         // An array = easy
         if (object instanceof JSONArray) {
@@ -151,7 +151,7 @@ public class SolrDoc extends JsonSimple {
 
         // String, create a new list
         if (object instanceof String) {
-            List<String> response = new LinkedList();
+            List<String> response = new LinkedList<String>();
             response.add((String) object);
             return response;
         }

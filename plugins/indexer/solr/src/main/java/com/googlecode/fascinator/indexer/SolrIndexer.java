@@ -18,23 +18,6 @@
  */
 package com.googlecode.fascinator.indexer;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.indexer.IndexerException;
-import com.googlecode.fascinator.api.indexer.SearchRequest;
-import com.googlecode.fascinator.api.indexer.rule.RuleException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.PythonUtils;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.common.messaging.MessagingServices;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +43,23 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.indexer.SearchRequest;
+import com.googlecode.fascinator.api.indexer.rule.RuleException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.PythonUtils;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 /**
  * <p>
@@ -91,13 +91,6 @@ import org.slf4j.LoggerFactory;
  * <td>The name of the indexer</td>
  * <td><b>Yes</b></td>
  * <td>fascinator</td>
- * </tr>
- * 
- * <tr>
- * <td>autocommit</td>
- * <td>If true, solr will commit any changes for every object update</td>
- * <td><b>Yes</b></td>
- * <td>false</td>
  * </tr>
  * 
  * <tr>
@@ -177,9 +170,6 @@ public class SolrIndexer implements Indexer {
 
     /** Anotar core */
     private SolrServer anotar;
-
-    /** Auto-commit flag for main core */
-    private boolean autoCommit;
 
     /** Auto-commit flag for anotar core */
     private boolean anotarAutoCommit;
@@ -302,10 +292,8 @@ public class SolrIndexer implements Indexer {
             solr = initCore("solr");
             anotar = initCore("anotar");
 
-            autoCommit = config.getBoolean(true,
-                    "indexer", "solr", "autocommit");
-            anotarAutoCommit = config.getBoolean(true,
-                    "indexer", "anotar", "autocommit");
+            anotarAutoCommit = config.getBoolean(true, "indexer", "anotar",
+                    "autocommit");
             propertiesId = config.getString(DEFAULT_METADATA_PAYLOAD,
                     "indexer", "propertiesId");
 
@@ -356,15 +344,15 @@ public class SolrIndexer implements Indexer {
             URI solrUri = new URI(uri);
             CommonsHttpSolrServer thisCore = new CommonsHttpSolrServer(
                     solrUri.toURL());
-            String username = config.getString(null,
-                    "indexer", coreName, "username");
-            String password = config.getString(null,
-                    "indexer", coreName, "password");
+            String username = config.getString(null, "indexer", coreName,
+                    "username");
+            String password = config.getString(null, "indexer", coreName,
+                    "password");
             usernameMap.put(coreName, username);
             passwordMap.put(coreName, password);
             if (username != null && password != null) {
-                UsernamePasswordCredentials credentials =
-                        new UsernamePasswordCredentials(username, password);
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+                        username, password);
                 HttpClient hc = (thisCore).getHttpClient();
                 hc.getParams().setAuthenticationPreemptive(true);
                 hc.getState().setCredentials(AuthScope.ANY, credentials);
@@ -681,7 +669,6 @@ public class SolrIndexer implements Indexer {
      */
     private void annotate(DigitalObject object, Payload payload)
             throws IndexerException {
-        String oid = object.getId();
         String pid = payload.getId();
         if (propertiesId.equals(pid)) {
             return;
@@ -753,8 +740,8 @@ public class SolrIndexer implements Indexer {
             JsonSimpleConfig jsonConfig = getConfigFile(confOid);
 
             // Get our data ready
-            Map<String, Object> bindings = new HashMap();
-            Map<String, List<String>> fields = new HashMap();
+            Map<String, Object> bindings = new HashMap<String, Object>();
+            Map<String, List<String>> fields = new HashMap<String, List<String>>();
             bindings.put("fields", fields);
             bindings.put("jsonConfig", jsonConfig);
             bindings.put("indexer", this);

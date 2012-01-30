@@ -98,7 +98,8 @@ public class ImsTransformer implements Transformer {
     private static Logger log = LoggerFactory.getLogger(ImsTransformer.class);
 
     /** Json config file **/
-    private JsonSimpleConfig config;
+    @SuppressWarnings("unused")
+	private JsonSimpleConfig config;
 
     /** ims Manifest file **/
     private String manifestFile = "imsmanifest.xml";

@@ -19,12 +19,6 @@
  */
 package com.googlecode.fascinator.messaging;
 
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.subscriber.Subscriber;
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -49,6 +43,12 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.subscriber.Subscriber;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
 
 /**
  * Consumer for Subscribers. Jobs in this queue should be short running
@@ -125,8 +125,8 @@ public class SubscriberQueueConsumer implements GenericListener {
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
                     "messaging", "url");
-            ActiveMQConnectionFactory connectionFactory =
-                    new ActiveMQConnectionFactory(brokerUrl);
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                    brokerUrl);
             connection = connectionFactory.createConnection();
 
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -157,7 +157,7 @@ public class SubscriberQueueConsumer implements GenericListener {
         thread.setName(name);
 
         // A list of core fields
-        coreFields = new ArrayList();
+        coreFields = new ArrayList<String>();
         coreFields.add("id");
         coreFields.add("oid");
         coreFields.add("eventType");
@@ -169,8 +169,8 @@ public class SubscriberQueueConsumer implements GenericListener {
             subscriberList = new ArrayList<Subscriber>();
             globalConfig = new JsonSimpleConfig();
             File sysFile = JsonSimpleConfig.getSystemFile();
-            List<String> subscribers = config.getStringList(
-                    "config", "subscribers");
+            List<String> subscribers = config.getStringList("config",
+                    "subscribers");
             if (subscribers != null && !subscribers.isEmpty()) {
                 for (String sid : subscribers) {
                     if (!sid.equals("")) {
@@ -252,8 +252,8 @@ public class SubscriberQueueConsumer implements GenericListener {
                 try {
                     sub.shutdown();
                 } catch (Exception ex) {
-                    log.warn("Failed to shutdown Subscriber: {}", sub.getName(),
-                            ex);
+                    log.warn("Failed to shutdown Subscriber: {}",
+                            sub.getName(), ex);
                 }
             }
         }
@@ -282,8 +282,8 @@ public class SubscriberQueueConsumer implements GenericListener {
 
             log.info(" *** Received event, object id={}, from={}", oid, context);
 
-            //sendNotification(oid, "logging start", "(" + name
-            //        + ") Event Logging starting : '" + oid + "'");
+            // sendNotification(oid, "logging start", "(" + name
+            // + ") Event Logging starting : '" + oid + "'");
 
             DateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
             String now = df.format(new Date());
@@ -315,8 +315,8 @@ public class SubscriberQueueConsumer implements GenericListener {
                 subscriber.onEvent(param);
             }
 
-            //sendNotification(oid, "logging end", "(" + name
-            //        + ") Event Logging ending : '" + oid + "'");
+            // sendNotification(oid, "logging end", "(" + name
+            // + ") Event Logging ending : '" + oid + "'");
 
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse.getMessage());
@@ -334,6 +334,7 @@ public class SubscriberQueueConsumer implements GenericListener {
      * @param status Status of the object
      * @param message Message to be sent
      */
+    @SuppressWarnings("unused")
     private void sendNotification(String oid, String status, String message)
             throws JMSException {
         JsonObject jsonMessage = new JsonObject();

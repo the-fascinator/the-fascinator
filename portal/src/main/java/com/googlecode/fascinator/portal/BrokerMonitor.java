@@ -18,14 +18,8 @@
  */
 package com.googlecode.fascinator.portal;
 
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,10 +45,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
+
 /**
- * Monitoring class for the AMQ Broker. Periodically sends updated statistics
- * to the house keeper.
- *
+ * Monitoring class for the AMQ Broker. Periodically sends updated statistics to
+ * the house keeper.
+ * 
  * @author Greg Pendlebury
  */
 public class BrokerMonitor implements GenericListener {
@@ -89,7 +88,7 @@ public class BrokerMonitor implements GenericListener {
     /** Message Destination - This object */
     private Queue destStatsUpdate;
 
-    /** Message Destination - House Keeping*/
+    /** Message Destination - House Keeping */
     private Queue destHouseKeeping;
 
     /** Message Consumer instance */
@@ -133,13 +132,14 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Constructor required by ServiceLoader
-     *
+     * 
      */
-    public BrokerMonitor() {}
+    public BrokerMonitor() {
+    }
 
     /**
      * Constructor.
-     *
+     * 
      * @param brokerService AMQ Broker service we're monitoring
      * @throws Exception If unable to start properly
      */
@@ -149,9 +149,9 @@ public class BrokerMonitor implements GenericListener {
         monitor = broker.getAdminView();
 
         // Local record keeping
-        queues = new ArrayList();
-        stats = new LinkedHashMap();
-        targetQueues = new HashMap();
+        queues = new ArrayList<String>();
+        stats = new LinkedHashMap<String, Map<String, String>>();
+        targetQueues = new HashMap<String, Queue>();
 
         // Thready stuff
         thread = new Thread(this, QUEUE_ID);
@@ -159,7 +159,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Start thread running
-     *
+     * 
      */
     @Override
     public void run() {
@@ -170,14 +170,16 @@ public class BrokerMonitor implements GenericListener {
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
                     "messaging", "url");
-            ActiveMQConnectionFactory connectionFactory =
-                    new ActiveMQConnectionFactory(brokerUrl);
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                    brokerUrl);
             connection = connectionFactory.createConnection();
 
             // Sessions are not thread safe, to send a message outside
-            //  of the onMessage() callback you need another session.
-            cSession = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
-            pSession = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+            // of the onMessage() callback you need another session.
+            cSession = connection
+                    .createSession(false, Session.AUTO_ACKNOWLEDGE);
+            pSession = connection
+                    .createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             // Consumer - 'us'
             destStatsUpdate = cSession.createQueue(QUEUE_ID);
@@ -192,7 +194,7 @@ public class BrokerMonitor implements GenericListener {
             connection.start();
 
             // Display statistics in the order found in config
-            statsOrder = new ArrayList();
+            statsOrder = new ArrayList<String>();
 
             List<JsonSimple> qConfig = globalConfig.getJsonSimpleList(
                     "messaging", "threads");
@@ -216,19 +218,19 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Start the callback timer
-     *
+     * 
      */
-    private void startTimer(){
+    private void startTimer() {
         // Stop the old timer if it is online
         if (timer != null) {
             // A tiny sleep should allow the broker time
-            //  to come online if it isn't already.
+            // to come online if it isn't already.
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ex) {
                 // Just interrupted sleep, no big deal
             }
-            //log.info("Restarting timer. Timeout = {}s", DEFAULT_TIMEOUT);
+            // log.info("Restarting timer. Timeout = {}s", DEFAULT_TIMEOUT);
             timer.cancel();
             timer = null;
         }
@@ -244,19 +246,19 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Initialization method
-     *
+     * 
      * @param config Configuration to use
      * @throws Exception if an error occurred
      */
     @Override
     public void init(JsonSimpleConfig config) throws Exception {
         // Doesn't matter for this class since
-        //  the ServiceLoader doesn't see it
+        // the ServiceLoader doesn't see it
     }
 
     /**
      * Start the queue
-     *
+     * 
      * @throws Exception if an error occurred
      */
     @Override
@@ -266,18 +268,18 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Return the ID string for this listener.
-     *
+     * 
      */
     @Override
     public String getId() {
         // Doesn't matter for this class since
-        //  the ServiceLoader doesn't see it
+        // the ServiceLoader doesn't see it
         return QUEUE_ID;
     }
 
     /**
      * Callback function for periodic house keeping.
-     *
+     * 
      */
     private void onTimeout() {
         MDC.put("name", QUEUE_ID);
@@ -292,7 +294,7 @@ public class BrokerMonitor implements GenericListener {
         // Check our queue lists are up-to-date
         if (monitor.getQueues().length != numQueues) {
             // We use this variable because we will ignore
-            //  statistics queues for our list
+            // statistics queues for our list
             numQueues = monitor.getQueues().length;
             refreshQueues();
             send = true;
@@ -305,14 +307,14 @@ public class BrokerMonitor implements GenericListener {
         }
 
         // Make sure we don't send until the
-        //  broker has given us some stats
+        // broker has given us some stats
         if (!statsReceived) {
             startTimer();
             return;
         }
 
         // Force send on first (valid) execution
-        //   if House Keeping is online
+        // if House Keeping is online
         if (firstRun) {
             firstRun = false;
             send = true;
@@ -333,9 +335,13 @@ public class BrokerMonitor implements GenericListener {
                 // the send flag, it causes an infinite loop
                 if (!queue.equals(HouseKeeper.QUEUE_ID)) {
                     // If the queue has new items, send
-                    if (key.equals("size") && !value.equals("0")) send = true;
+                    if (key.equals("size") && !value.equals("0")) {
+                        send = true;
+                    }
                     // Or we processed new items, send
-                    if (key.equals("change") && !value.equals("0")) send = true;
+                    if (key.equals("change") && !value.equals("0")) {
+                        send = true;
+                    }
                 }
             }
             queueStats.put(queue, thisQueue);
@@ -362,7 +368,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Check the active queues on the Broker and update our list if needed.
-     *
+     * 
      */
     private void refreshQueues() {
         // Get all the active queues
@@ -376,8 +382,7 @@ public class BrokerMonitor implements GenericListener {
                     queue = queue.substring(12);
                     // Ignore stats queues, and this queue
                     if (!(queue.startsWith(STATS_PREFIX)
-                            || queue.equals(QUEUE_ID)
-                            || queues.contains(queue))) {
+                            || queue.equals(QUEUE_ID) || queues.contains(queue))) {
                         log.debug("New queue found: '{}'", queue);
                         queues.add(queue);
                     }
@@ -391,14 +396,14 @@ public class BrokerMonitor implements GenericListener {
 
         // Change the order to match the config file, followed
         // by any additional queues (eg. house keeping)
-        List<String> temp = new ArrayList();
+        List<String> temp = new ArrayList<String>();
         temp.addAll(queues);
-        queues = new ArrayList();
+        queues = new ArrayList<String>();
         // We need to keep our stats in order too
-        Map<String, Map<String, String>> oldStats = new LinkedHashMap();
+        Map<String, Map<String, String>> oldStats = new LinkedHashMap<String, Map<String, String>>();
         oldStats.putAll(stats);
         Map<String, String> oldData;
-        stats = new LinkedHashMap();
+        stats = new LinkedHashMap<String, Map<String, String>>();
 
         // Config queues first
         for (String q : statsOrder) {
@@ -406,7 +411,7 @@ public class BrokerMonitor implements GenericListener {
                 queues.add(q);
                 oldData = oldStats.get(q);
                 if (oldData == null) {
-                    stats.put(q, new HashMap());
+                    stats.put(q, new HashMap<String, String>());
                 } else {
                     stats.put(q, oldData);
                 }
@@ -418,7 +423,7 @@ public class BrokerMonitor implements GenericListener {
                 queues.add(q);
                 oldData = oldStats.get(q);
                 if (oldData == null) {
-                    stats.put(q, new HashMap());
+                    stats.put(q, new HashMap<String, String>());
                 } else {
                     stats.put(q, oldData);
                 }
@@ -428,7 +433,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Send a request to the broker for a statistics update.
-     *
+     * 
      */
     private void updateStats(String queue) {
         // Send/Receive requirements
@@ -499,7 +504,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Callback function for incoming messages.
-     *
+     * 
      * @param message The incoming message
      */
     @Override
@@ -522,7 +527,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Parse the statistics response from the AMQ broker.
-     *
+     * 
      * @param stats The MapMessage response containing stats
      */
     private void parseStats(MapMessage message) throws JMSException {
@@ -531,13 +536,13 @@ public class BrokerMonitor implements GenericListener {
         int change, total, oldTotal, target, lost;
         float speed;
         // Get new data
-        queue   = message.getString("destinationName").replace("queue://", "");
-        memory  = message.getString("memoryPercentUsage");
-        size    = message.getString("size");
+        queue = message.getString("destinationName").replace("queue://", "");
+        memory = message.getString("memoryPercentUsage");
+        size = message.getString("size");
         average = message.getString("averageEnqueueTime");
-        total   = Integer.valueOf(message.getString("dequeueCount"));
-        target  = Integer.valueOf(message.getString("enqueueCount"));
-        lost    = -1 * (target - (total + Integer.valueOf(size)));
+        total = Integer.valueOf(message.getString("dequeueCount"));
+        target = Integer.valueOf(message.getString("enqueueCount"));
+        lost = -1 * (target - (total + Integer.valueOf(size)));
 
         if (queue != null) {
             statsReceived = true;
@@ -546,7 +551,7 @@ public class BrokerMonitor implements GenericListener {
             oldTotalStr = stats.get(queue).get("total");
             if (oldTotalStr == null) {
                 // Use this to force a send, we just received stats
-                //   for this queue for the first time
+                // for this queue for the first time
                 firstRun = true;
                 oldTotal = 0;
             } else {
@@ -556,14 +561,14 @@ public class BrokerMonitor implements GenericListener {
             // * (60 / DEFAULT_TIMEOUT) = Messages per minute
             speed = (float) change * (60 / DEFAULT_TIMEOUT);
 
-            Map<String, String> newData = new HashMap();
-            newData.put("size",    size);
-            newData.put("memory",  memory);
+            Map<String, String> newData = new HashMap<String, String>();
+            newData.put("size", size);
+            newData.put("memory", memory);
             newData.put("average", average);
-            newData.put("total",   String.valueOf(total));
-            newData.put("change",  String.valueOf(change));
-            newData.put("speed",   String.valueOf(speed));
-            newData.put("lost",    String.valueOf(lost));
+            newData.put("total", String.valueOf(total));
+            newData.put("change", String.valueOf(change));
+            newData.put("speed", String.valueOf(speed));
+            newData.put("lost", String.valueOf(lost));
 
             stats.put(queue, newData);
         }
@@ -579,7 +584,7 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Send an update to House Keeping
-     *
+     * 
      * @param message Message to be sent
      */
     private void sendUpdate(String message) throws JMSException {
@@ -589,13 +594,13 @@ public class BrokerMonitor implements GenericListener {
 
     /**
      * Sets the priority level for the thread. Used by the OS.
-     *
+     * 
      * @param newPriority The priority level to set the thread at
      */
     @Override
     public void setPriority(int newPriority) {
-        if (newPriority >= Thread.MIN_PRIORITY &&
-            newPriority <= Thread.MAX_PRIORITY) {
+        if (newPriority >= Thread.MIN_PRIORITY
+                && newPriority <= Thread.MAX_PRIORITY) {
             thread.setPriority(newPriority);
         }
     }
