@@ -8,13 +8,14 @@ class SettingsData:
 
     def __activate__(self, context):
         self.velocityContext = context
+        self.log = context["log"]
 
         self.writer = self.vc("response").getPrintWriter("text/html; charset=UTF-8")
 
         if self.vc("page").authentication.is_logged_in() and self.vc("page").authentication.is_admin():
             self.process()
         else:
-            print " * settings.py : AJAX : Unauthorised access"
+            self.log.debug(" * settings.py : AJAX : Unauthorised access")
             self.throw_error("Only administrative users can access this feature")
 
     # Get from velocity context
@@ -22,7 +23,7 @@ class SettingsData:
         if self.velocityContext[index] is not None:
             return self.velocityContext[index]
         else:
-            log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
+            self.log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
             return None
 
     def getWatcherFile(self):
@@ -32,10 +33,15 @@ class SettingsData:
         return None
 
     def process(self):
-        print " * settings.py: formData=%s" % self.vc("formData")
+        self.log.debug(" * settings.py: formData={}", self.vc("formData"))
+
+        valid = self.vc("page").csrfSecurePage()
+        if not valid:
+            self.throw_error("Invalid request")
+            return
 
         result = "{}"
-        portalManager = Services.getPortalManager()
+        portalManager = self.vc("Services").getPortalManager()
         portal = portalManager.get(self.vc("portalId"))
         func = self.vc("formData").get("func")
 
@@ -59,9 +65,9 @@ class SettingsData:
                 obj.put("configured", "true")
                 config.storeSystemConfig()
                 # mark restart
-                Services.getHouseKeepingManager().requestUrgentRestart()
+                self.vc("Services").getHouseKeepingManager().requestUrgentRestart()
             else:
-                print " * settings.py: email not updated: did not change"
+                self.log.debug(" * settings.py: email not updated: did not change")
                 self.throw_error("Email address is the same! No change saved.")
 
         elif func == "facets-update":
@@ -130,7 +136,7 @@ class SettingsData:
             # restore default
             JsonSimpleConfig.getSystemFile()
             # mark restart
-            Services.getHouseKeepingManager().requestUrgentRestart()
+            self.vc("Services").getHouseKeepingManager().requestUrgentRestart()
 
         elif func == "housekeeping-update":
             config = JsonSimpleConfig()
@@ -149,7 +155,7 @@ class SettingsData:
             # Refresh the HouseKeeper
             message = JsonObject()
             message.put("type", "refresh")
-            Services.getHouseKeepingManager().sendMessage(message.toString())
+            self.vc("Services").getHouseKeepingManager().sendMessage(message.toString())
 
         self.writer.println(result)
         self.writer.close()

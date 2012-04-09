@@ -6,7 +6,7 @@
 #parseTemplate("wrapping/info-box-open.vm")
 <div class="info">
     <b>PLEASE WAIT</b>
-    <p id="reharvest-in-progress">Reharvest of '$title' in progress...</p>
+    <p id="reharvest-in-progress">Reharvest of '$page.escapeHtml($title)' in progress...</p>
     <p class="hidden" id="reharvest-complete">Reharvest completed, please <a href="$portalPath/detail/$oid">refresh</a> to view the latest version</p>
     ##<ul id="reharvest-progress"></ul>
 </div>

@@ -4,4 +4,7 @@
 #else
     #set($pageTitle = "Detail")
 #end
+#if($title)
+    #set($title = $page.escapeHtml($title))
+#end
 <h2 id="page-heading"><span>#if($title)$title#{else}Detail#end</span></h2>

@@ -9,6 +9,7 @@ class AdminData:
     def __activate__(self, context):
         self.velocityContext = context
         self.writer = self.vc("response").getPrintWriter("text/html; charset=UTF-8")
+        self.log = context["log"]
 
         if self.vc("page").authentication.is_logged_in() and self.vc("page").authentication.is_admin():
             self.process()
@@ -234,6 +235,11 @@ class AdminData:
             self.throw_error(err)
 
     def process(self):
+        valid = self.vc("page").csrfSecurePage()
+        if not valid:
+            self.throw_error("Invalid request")
+            return
+
         action = self.vc("formData").get("verb")
 
         switch = {

@@ -6,6 +6,7 @@ class DeleteData:
 
     def __activate__(self, context):
         self.vc = context
+        self.log = context["log"]
 
         self.writer = self.vc["response"].getPrintWriter("text/html; charset=UTF-8")
 
@@ -15,9 +16,15 @@ class DeleteData:
             self.throw_error("Only administrative users can access this feature")
 
     def process(self):
+        valid = self.vc["page"].csrfSecurePage()
+        if not valid:
+            self.throw_error("Invalid request")
+            return
+
         record = self.vc["formData"].get("record")
         if record is None:
             self.throw_error("Record ID required")
+            return
 
         errors = False
         storage = self.vc["Services"].getStorage();
@@ -58,6 +65,7 @@ class DeleteData:
             self.writer.close()
 
     def throw_error(self, message):
+        self.log.error(message)
         self.vc["response"].setStatus(500)
         self.writer.println("Error: " + message)
         self.writer.close()
