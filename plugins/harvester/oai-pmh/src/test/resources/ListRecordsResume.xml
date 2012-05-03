@@ -39,5 +39,17 @@
         </oai_dc:dc>
       </metadata>
     </record>
+      <record>
+        <header status="deleted">
+          <identifier>oai:localhost:6</identifier>
+            <datestamp>2007-10-11T00:11:34Z</datestamp>
+          </header>
+      </record>
+      <record>
+        <header status="deleted">
+          <identifier>oai:localhost:7</identifier>
+          <datestamp>2007-10-11T00:11:34Z</datestamp>
+        </header>
+      </record>
   </ListRecords>
 </OAI-PMH>

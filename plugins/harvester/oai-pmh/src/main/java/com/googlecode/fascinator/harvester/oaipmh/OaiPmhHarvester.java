@@ -372,6 +372,8 @@ public class OaiPmhHarvester extends GenericHarvester {
                     try {
                         items.add(createOaiPmhDigitalObject(
                                 record, metadataPrefix));
+                    } catch (HarvesterException he) {
+                        // Already logged
                     } catch (StorageException se) {
                         log.error("Failed to create object", se);
                     } catch (IOException ioe) {
@@ -424,6 +426,8 @@ public class OaiPmhHarvester extends GenericHarvester {
                                         metadataPrefixes.get(count));
                             }
                         }
+                    } catch (HarvesterException he) {
+                        // Already logged
                     } catch (StorageException se) {
                         log.error("Failed to create object", se);
                     } catch (IOException ioe) {
@@ -465,12 +469,19 @@ public class OaiPmhHarvester extends GenericHarvester {
             StorageException {
         Storage storage = getStorage();
         String oid = record.getHeader().getIdentifier();
+        String metadata = null;
+        try {
+            metadata = record.getMetadataAsString();
+        } catch (Exception ex) {
+            log.error("Unable to access record metadata for ID: '{}'. Delete event?", oid);
+            throw new HarvesterException("Record has not metadata to store!");
+        }
         oid = DigestUtils.md5Hex(oid);
         DigitalObject object = StorageUtils.getDigitalObject(storage, oid);
         String pid = metadataPrefix + ".xml";
 
         Payload payload = StorageUtils.createOrUpdatePayload(object, pid,
-                IOUtils.toInputStream(record.getMetadataAsString(), "UTF-8"));
+                IOUtils.toInputStream(metadata, "UTF-8"));
         payload.setContentType("text/xml");
         // Make sure only the first metadataPrefix will be set as source
         if (object.getSourceId() == null) {
