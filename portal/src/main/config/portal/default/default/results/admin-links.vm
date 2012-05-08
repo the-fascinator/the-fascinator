@@ -8,5 +8,5 @@
     <div class="owner">$user</div>
     #end
   </div>
-  <a class="admin-delete-link" rel="$id" title="$title" href="#">Delete Object</a>
+  <a class="admin-delete-link" rel="$id" title="$page.escapeHtml($title)" href="#">Delete Object</a>
 </div>

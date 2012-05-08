@@ -54,7 +54,7 @@
         });
 
         $("#delete-annotation .type").html(type);
-        $("#delete-annotation .content").html(content);
+        $("#delete-annotation .content").html(content.replace("<", "&lt;").replace(">", "&gt;"));
         $("#delete-annotation").dialog("option", "title", title);
         $("#delete-annotation").dialog("open");
     }
