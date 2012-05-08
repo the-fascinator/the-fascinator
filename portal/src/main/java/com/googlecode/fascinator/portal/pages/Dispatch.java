@@ -1,6 +1,7 @@
 /* 
  * The Fascinator - Portal
  * Copyright (C) 2008-2011 University of Southern Queensland
+ * Copyright (C) 2012 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -257,6 +258,11 @@ public class Dispatch {
             log.error("No workflow provided with form data.");
             return;
         }
+        // Upload context
+        String uploadContext = "";
+        if (reqParams.contains("upload-file-context")) {
+            uploadContext = request.getParameter("upload-file-context");
+        }
 
         JsonSimple workflowConfig = sysConfig.getJsonSimpleMap("uploader").get(
                 workflowId);
@@ -290,7 +296,11 @@ public class Dispatch {
         }
 
         // Write the file to that directory
-        file_path = file_path + "/" + uploadedFile.getFileName();
+        if (uploadContext == null || "".equals(uploadContext)) {
+            file_path = file_path + "/" + uploadedFile.getFileName();
+        } else {
+            file_path = file_path + "/" + uploadContext + "/" + uploadedFile.getFileName();
+        }
         File file = new File(file_path);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
