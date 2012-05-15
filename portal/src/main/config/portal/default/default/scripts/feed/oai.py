@@ -446,6 +446,7 @@ class OaiData:
         self.portalDir = context["portalDir"]
 
         self.__result = None
+        self.lastPage = False
 
         # Check if the OAI request has an overriding portal ('set') to the URL
         paramSet = self.vc("formData").get("set")
@@ -658,6 +659,7 @@ class OaiData:
         else:
             if self.__result.getResults().size() < recordsPerPage:
                 self.tokensDB.removeToken(self.__currentToken)
+                self.lastPage = True
 
         # Store/update the resumption token
         if newToken is not None:
@@ -670,7 +672,7 @@ class OaiData:
             self.__currentToken = newToken
 
     def getToken(self):
-        if self.isInView(self.__metadataPrefix):
+        if self.isInView(self.__metadataPrefix) and not self.lastPage:
             return self.__currentToken
         return None
 
