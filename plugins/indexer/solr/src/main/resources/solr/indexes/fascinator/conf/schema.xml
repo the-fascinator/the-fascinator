@@ -93,6 +93,16 @@
       </analyzer>
     </fieldType>
 
+    <!-- Similar to above, but allows for alphanumeric text with spaces -->
+    <fieldType name="alphaNumSort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory" />
+        <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.TrimFilterFactory" />
+        <filter class="solr.PatternReplaceFilterFactory" pattern="([^a-z0-9\s])" replacement="" replace="all" />
+      </analyzer>
+    </fieldType>
+
     <!-- since fields of this type are by default not stored or indexed, any data
          added to them will be ignored outright -->
     <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" />
@@ -198,6 +208,8 @@
     <dynamicField name="bool_*" type="boolean" indexed="true" stored="true" />
     <dynamicField name="float_*" type="sfloat" indexed="true" stored="true" />
     <dynamicField name="date_*" type="date" indexed="true" stored="true" />
+    <!-- Dynamic sorting field. Not stored. -->
+    <dynamicField name="sort_text_*" type="alphaNumSort" indexed="true" stored="false" />
 
     <dynamicField name="*" type="string" indexed="true" stored="true" multiValued="true" />
   </fields>
@@ -231,6 +243,9 @@
   <copyField source="dc_subject" dest="f_dc_subject" />
   <copyField source="dc_title" dest="f_dc_title" />
   <copyField source="dc_type" dest="f_dc_type" />
+  <!-- Sortable text fields -->
+  <copyField source="dc_title" dest="sort_text_title" />
+  <copyField source="dc_type" dest="sort_text_type" />
 
   <copyField source="*" dest="full_text" />
 

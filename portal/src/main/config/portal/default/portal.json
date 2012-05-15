@@ -56,8 +56,8 @@
         "sort-field-default-order": "desc",
         "sort-fields": {
             "last_modified": "Last modified",
-            "f_dc_title": "Title",
-            "f_dc_type": "Type"
+            "sort_text_title": "Title",
+            "sort_text_type": "Type"
         }
     }
 }
