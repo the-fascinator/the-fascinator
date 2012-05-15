@@ -52,6 +52,7 @@ class SearchData:
         # reset the query and facet selections when changing views
         lastPortalId = self.sessionState.get("lastPortalId")
         if lastPortalId != self.portalId:
+            self.log.info("Portal changed. Resetting saved search values in session.")
             self.sessionState.remove("fq")
             self.sessionState.remove("pageNum")
             self.sessionState.remove("sortField")
