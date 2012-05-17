@@ -355,11 +355,31 @@ public class JsonSimpleTest {
     public void substitutionTest() throws Exception {
         JsonObject object = new JsonObject();
         object.put("test", "${test.one}");
+        JSONArray array = new JSONArray();
+        array.add("test.one");
+        array.add("${test.one}");
+        object.put("array", array);
         json = new JsonSimple(object);
 
         Assert.assertEquals("${test.one}", json.getString(null, "test"));
+        List<String> strings = json.getStringList("array");
+        Assert.assertEquals(2, strings.size());
+        Assert.assertEquals("test.one", strings.get(0));
+        Assert.assertEquals("${test.one}", strings.get(1));
+        strings = json.getStringList("test");
+        Assert.assertEquals(1, strings.size());
+        Assert.assertEquals("${test.one}", strings.get(0));
+
+        // Set a property and retest
         System.setProperty("test.one", "1");
         Assert.assertEquals("1", json.getString(null, "test"));
+        strings = json.getStringList("array");
+        Assert.assertEquals(2, strings.size());
+        Assert.assertEquals("test.one", strings.get(0));
+        Assert.assertEquals("1", strings.get(1));
+        strings = json.getStringList("test");
+        Assert.assertEquals(1, strings.size());
+        Assert.assertEquals("1", strings.get(0));
     }
 
     /**

@@ -423,12 +423,25 @@ public class JsonSimple {
      */
     public List<String> getStringList(Object... path) {
         Object target = getPath(path);
+        List<String> response = new LinkedList<String>();
         if (isArray(target)) {
-            return JsonSimple.getStringList((JSONArray) target);
+            if (substitueProperties) {
+                List<String> temp = JsonSimple.getStringList((JSONArray) target);
+                for (String string : temp) {
+                    response.add(StrSubstitutor.replaceSystemProperties(string));
+                }
+                return response;
+            } else {
+                return JsonSimple.getStringList((JSONArray) target);
+            }
         }
         if (isString(target)) {
-            List<String> response = new LinkedList<String>();
-            response.add((String) target);
+            // Are we substituting system properites?
+            if (substitueProperties) {
+                response.add(StrSubstitutor.replaceSystemProperties((String) target));
+            } else {
+                response.add((String) target);
+            }
             return response;
         }
         return null;
