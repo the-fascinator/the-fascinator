@@ -21,6 +21,6 @@
     #end
     
     #if ($self.getToken() != $nullValue)
-        <resumptionToken>$self.getToken().getToken()</resumptionToken>
+        <resumptionToken>$self.getToken().getToken():$self.getToken().getStart()</resumptionToken>
     #end
 </ListRecords>

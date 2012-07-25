@@ -466,8 +466,14 @@ class OaiData:
         self.__currentToken = None
         resumptionToken = self.vc("formData").get("resumptionToken")
         if resumptionToken is not None:
+            # Split out the start component from the actual resumption token
+            (resumptionTokenPart,start) = resumptionToken.strip().split(":") 
             # This could still be be null
-            self.__currentToken = self.tokensDB.getToken(resumptionToken)
+            self.__currentToken = self.tokensDB.getToken(resumptionTokenPart)
+            # Code to handle null token is handled later on
+            if self.__currentToken is not None:
+                self.__currentToken.setStart(start)
+            
 
         # Process/parse the request we've received for validity
         self.vc("request").setAttribute("Content-Type", "text/xml")
@@ -657,7 +663,7 @@ class OaiData:
                 newToken = None
         # Check if we need to remove the resumption token
         else:
-            if self.__result.getResults().size() < recordsPerPage:
+            if (start + recordsPerPage) >= totalFound:
                 self.tokensDB.removeToken(self.__currentToken)
                 self.lastPage = True
 
