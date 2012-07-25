@@ -131,34 +131,4 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <!-- Needed for rdf2go.* artifacts -->
-        <repository>
-            <id>theoretiker-repo</id>
-            <name>Semweb4j.org maven repo</name>
-            <url>http://semweb4j.org/repo/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- Needed for aperture-* artifacts -->
-        <repository>
-            <id>aperture-repo</id>
-            <name>Aperture Dependencies Repo</name>
-            <url>http://aperture.sf.net/maven</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 </project>
