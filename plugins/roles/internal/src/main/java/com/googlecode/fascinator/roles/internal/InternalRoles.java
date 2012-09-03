@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * 
  * <tr>
  * <td>internal/path</td>
- * <td>File path in wich the roles information is stored</td>
+ * <td>File path in which the roles information is stored</td>
  * <td><b>Yes</b></td>
  * <td>${user.home}/.fascinator/roles.properties</td>
  * </tr>
