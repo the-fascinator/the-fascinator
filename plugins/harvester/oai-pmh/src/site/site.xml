@@ -1,4 +1,4 @@
-<project title="OAI-PMH harvester plugin">
+<project name="OAI-PMH harvester plugin">
     <bannerLeft>
         <name>The Fascinator</name>
         <src>http://fascinator.usq.edu.au/skin/logo_small.png</src>
