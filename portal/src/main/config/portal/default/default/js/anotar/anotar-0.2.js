@@ -685,10 +685,16 @@ function anotarFactory(jQ, config) {
         var timeZone = function() {
             tz = d.getTimezoneOffset() * 60 / -36;
             tz = tz.toString();
-            if (tz[0] !== '-')
-                tz = "+" + tz;
-            while (tz.length < 5)
-                tz = tz[0] + "0" + tz.substring(2);
+            var negTz = false;
+            if (tz[0] == '-')
+                negTz = true;
+            while (tz.length < 4)
+                tz = "0" + tz;
+            if(negTz) {
+              tz = '-' +tz;
+            }  else {
+              tz = '+'+tz;
+            } 
             tz = tz.substring(0,3) + ":" + tz.substring(3);
             return(tz);
         }
@@ -1082,4 +1088,3 @@ function Crc32(str) {
 }
 
 // Basic String util
-
