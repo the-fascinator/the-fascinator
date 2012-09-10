@@ -18,20 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.api.access.AccessControlManager;
-import com.googlecode.fascinator.api.authentication.AuthenticationException;
-import com.googlecode.fascinator.api.authentication.AuthManager;
-import com.googlecode.fascinator.api.authentication.User;
-import com.googlecode.fascinator.api.roles.RolesManager;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.authentication.GenericUser;
-import com.googlecode.fascinator.portal.FormData;
-import com.googlecode.fascinator.portal.JsonSessionState;
-import com.googlecode.fascinator.portal.services.PortalManager;
-import com.googlecode.fascinator.portal.services.PortalSecurityManager;
-import com.googlecode.fascinator.portal.sso.SSOInterface;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,6 +31,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -56,11 +43,25 @@ import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.access.AccessControlManager;
+import com.googlecode.fascinator.api.authentication.AuthManager;
+import com.googlecode.fascinator.api.authentication.AuthenticationException;
+import com.googlecode.fascinator.api.authentication.User;
+import com.googlecode.fascinator.api.roles.RolesManager;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.portal.FormData;
+import com.googlecode.fascinator.portal.JsonSessionState;
+import com.googlecode.fascinator.portal.services.PortalManager;
+import com.googlecode.fascinator.portal.services.PortalSecurityManager;
+import com.googlecode.fascinator.portal.sso.SSOInterface;
+
 /**
- * The security manager coordinates access to various security plugins
- * when cross plugin awareness is required, and executes some server side
- * logic required for features such as single sign-on.
- *
+ * The security manager coordinates access to various security plugins when
+ * cross plugin awareness is required, and executes some server side logic
+ * required for features such as single sign-on.
+ * 
  * @author Greg Pendlebury
  */
 public class PortalSecurityManagerImpl implements PortalSecurityManager {
@@ -75,8 +76,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     private static String TRUST_TOKEN_EXPIRY = "600";
 
     /** Logging */
-    private Logger log = LoggerFactory.getLogger(
-            PortalSecurityManagerImpl.class);
+    private Logger log = LoggerFactory
+            .getLogger(PortalSecurityManagerImpl.class);
 
     /** User entry point for SSO logon */
     private String SSO_LOGIN_PAGE = "/sso";
@@ -143,7 +144,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Basic constructor, should be run automatically by Tapestry.
-     *
+     * 
      */
     public PortalSecurityManagerImpl() throws IOException {
         // Get system configuration
@@ -174,8 +175,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         excEquals = config.getStringList("sso", "urlExclusions", "equals");
 
         // Trust tokens
-        Map<String, JsonSimple> tokenMap = config.getJsonSimpleMap(
-                "sso", "trustTokens");
+        Map<String, JsonSimple> tokenMap = config.getJsonSimpleMap("sso",
+                "trustTokens");
         tokens = new HashMap<String, String>();
         tokenExpiry = new HashMap<String, Long>();
         for (String key : tokenMap.keySet()) {
@@ -195,13 +196,13 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Get a SSO Provider from the ServiceLoader
-     *
+     * 
      * @param id SSO Implementation ID
      * @return SSOInterface implementation matching the ID, if found
      */
     private SSOInterface getSSOProvider(String id) {
-        ServiceLoader<SSOInterface> providers =
-                ServiceLoader.load(SSOInterface.class);
+        ServiceLoader<SSOInterface> providers = ServiceLoader
+                .load(SSOInterface.class);
         for (SSOInterface provider : providers) {
             if (id.equals(provider.getId())) {
                 return provider;
@@ -212,7 +213,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Return the Access Control Manager
-     *
+     * 
      * @return AccessControlManager
      */
     @Override
@@ -222,7 +223,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Return the Authentication Manager
-     *
+     * 
      * @return AuthManager
      */
     @Override
@@ -232,7 +233,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Return the Role Manager
-     *
+     * 
      * @return RolesManager
      */
     @Override
@@ -242,7 +243,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Get the list of roles possessed by the current user.
-     *
+     * 
      * @param user The user object of the current user
      * @return String[] A list of roles
      */
@@ -253,7 +254,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
         // SSO Users
         if (sso.containsKey(source)) {
-            ssoRoles = sso.get(source).getRolesList(session);
+            ssoRoles.addAll(sso.get(source).getRolesList(session));
         }
 
         // Standard Users
@@ -272,28 +273,29 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Retrieve the details of a user by username
-     *
+     * 
      * @param username The username of a user to retrieve
      * @param source The authentication source if known
      * @return User The user requested
      * @throws AuthenticationException if any errors occur
      */
     @Override
-    public User getUser(JsonSessionState session, String username,
-            String source) throws AuthenticationException {
+    public User getUser(JsonSessionState session, String username, String source)
+            throws AuthenticationException {
         // Sanity check
-        if (username == null || username.equals("") ||
-                source == null || source.equals("")) {
+        if (username == null || username.equals("") || source == null
+                || source.equals("")) {
             throw new AuthenticationException("Invalid user data requested");
         }
 
         // SSO Users
         if (sso.containsKey(source)) {
-            GenericUser user = (GenericUser) sso.get(source).getUserObject(session);
+            GenericUser user = (GenericUser) sso.get(source).getUserObject(
+                    session);
             // Sanity check our data
             if (user == null || !user.getUsername().equals(username)) {
-                throw new AuthenticationException(
-                        "Unknown user '" + username + "'");
+                throw new AuthenticationException("Unknown user '" + username
+                        + "'");
             }
             return user;
         }
@@ -304,10 +306,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             String sSource = (String) session.get("source");
 
             // We can't lookup token users so it must match
-            if (sUsername == null || !username.equals(sUsername) ||
-                    sSource == null || !source.equals(sSource)) {
-                throw new AuthenticationException(
-                        "Unknown user '" + username + "'");
+            if (sUsername == null || !username.equals(sUsername)
+                    || sSource == null || !source.equals(sSource)) {
+                throw new AuthenticationException("Unknown user '" + username
+                        + "'");
             }
 
             // Seems valid, create a basic user object and return
@@ -324,7 +326,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Logout the provided user
-     *
+     * 
      * @return user The user to logout
      */
     @Override
@@ -353,18 +355,17 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     }
 
     /**
-     * Wrapper method for other SSO methods provided by the security manager.
-     * If desired, the security manager can take care of the integration using
-     * the default usage pattern, rather then calling them individually.
-     *
+     * Wrapper method for other SSO methods provided by the security manager. If
+     * desired, the security manager can take care of the integration using the
+     * default usage pattern, rather then calling them individually.
+     * 
      * @param session : The session of the current request
      * @param formData : FormData object for the current request
      * @return boolean : True if SSO has redirected, in which case no response
-     *      should be sent by Dispatch, otherwise False.
+     *         should be sent by Dispatch, otherwise False.
      */
     @Override
-    public boolean runSsoIntegration(JsonSessionState session,
-            FormData formData) {
+    public boolean runSsoIntegration(JsonSessionState session, FormData formData) {
         this.formData = formData;
 
         // Used in integrating with thrid party systems. They can send us a
@@ -390,14 +391,14 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         }
         if (token != null) {
             // Valid token
-            if (this.testTrustToken(session, token)) {
+            if (testTrustToken(session, token)) {
                 // Dispatch can continue
                 return false;
             }
 
             // Invalid token
             // Given that trust tokens are designed for system integration
-            //  we are going to fail with a non-branded error message
+            // we are going to fail with a non-branded error message
             try {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN,
                         "Invalid or expired security token!");
@@ -411,10 +412,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         // Single Sign-On integration
         try {
             // Instantiate with access to the session
-            String ssoId = this.ssoInit(session);
+            String ssoId = ssoInit(session);
             if (ssoId != null) {
                 // We are logging in, so send them to the SSO portal
-                String ssoUrl = this.ssoGetRemoteLogonURL(session, ssoId);
+                String ssoUrl = ssoGetRemoteLogonURL(session, ssoId);
                 if (ssoUrl != null) {
                     log.info("Redirect to external URL: '{}'", ssoUrl);
                     response.sendRedirect(ssoUrl);
@@ -422,7 +423,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
                 }
             } else {
                 // Otherwise, check if we have user's details
-                boolean valid = this.ssoCheckUserDetails(session);
+                boolean valid = ssoCheckUserDetails(session);
                 // If we validly logged in an SSO user, check for an
                 // external redirect to third party systems
                 if (valid) {
@@ -444,7 +445,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Initialize the SSO Service, prepare a login if required
-     *
+     * 
      * @param session The server session data
      * @throws Exception if any errors occur
      */
@@ -460,7 +461,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         String currentAddress = serverUrlBase + path;
 
         // Store the portal URL, might be required by implementers to build
-        //  an interface (images etc).
+        // an interface (images etc).
         session.set("ssoPortalUrl", serverUrlBase + portalId);
 
         // Makes sure all SSO plugins get initialised
@@ -517,7 +518,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Get user details from SSO connection and set them in the user session.
-     *
+     * 
      * @return boolean: Flag whether a user was actually logged in or not.
      */
     @Override
@@ -535,7 +536,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
                 // ... and check if it survived the trip
                 if (!currentParams.contains(oldParam)) {
                     // No it didn't, add it to form data... the parameters are
-                    //   already accessible from there in Jython
+                    // already accessible from there in Jython
                     String data = (String) session.get(key);
                     formData.set(oldParam, data);
                     // Don't forget to clear it from the session
@@ -547,7 +548,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         // Check our SSO providers for valid logins
         for (String ssoId : sso.keySet()) {
             sso.get(ssoId).ssoCheckUserDetails(session);
-            GenericUser user = (GenericUser) sso.get(ssoId).getUserObject(session);
+            GenericUser user = (GenericUser) sso.get(ssoId).getUserObject(
+                    session);
             if (user != null) {
                 session.set("username", user.getUsername());
                 session.set("source", ssoId);
@@ -560,7 +562,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     /**
      * Build a Map of Maps of on-screen string values for each SSO provider.
      * Should be enough to generate a login interface.
-     *
+     * 
      * @return Map Containing the data structure of valid SSO interfaces.
      */
     @Override
@@ -571,8 +573,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             SSOInterface provider = sso.get(ssoId);
             Map<String, String> map = new HashMap<String, String>();
             map.put("label", provider.getLabel());
-            map.put("interface", provider.getInterface(
-                    ssoLoginUrl + "?ssoId=" + ssoId));
+            map.put("interface",
+                    provider.getInterface(ssoLoginUrl + "?ssoId=" + ssoId));
             ssoInterface.put(ssoId, map);
         }
         return ssoInterface;
@@ -580,13 +582,12 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Retrieve the login URL for redirection against a given provider.
-     *
+     * 
      * @param String The SSO source to use
      * @return String The URL used by the SSO Service for logins
      */
     @Override
-    public String ssoGetRemoteLogonURL(JsonSessionState session, String source)
-    {
+    public String ssoGetRemoteLogonURL(JsonSessionState session, String source) {
         if (!sso.containsKey(source)) {
             return null;
         } else {
@@ -599,7 +600,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
      * resource. 'Aware' resources are valid return return points after SSO
      * redirects, so the test should return false on (for examples) static
      * resources and utilities such as atom feeds.
-     *
+     * 
      * @param session : The session for this request
      * @param resource : The name of the resource being accessed
      * @param uri : The full URI of the resource if simple matches fail
@@ -644,16 +645,15 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
         // Detail screen - specific payload target
         // This is an edge case, where the payload was a deep link,
-        //   it's not a subpage we can ignore
+        // it's not a subpage we can ignore
         String returnAddress = (String) session.get("returnAddress");
         if (returnAddress != null && returnAddress.endsWith(uri)) {
             return true;
         }
 
         // The detail screen generates a lot of background calls to the server
-        if (resource.equals("detail") ||
-            resource.equals("download") ||
-            resource.equals("preview")) {
+        if (resource.equals("detail") || resource.equals("download")
+                || resource.equals("preview")) {
             // Now check for the core page
             if (resource.equals("detail")) {
                 if (detailPattern == null) {
@@ -676,7 +676,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /**
      * Validate the provided trust token.
-     *
+     * 
      * @param token : The token to validate
      * @return boolean : True if the token is valid, False otherwise
      */
@@ -696,8 +696,8 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         String timestamp = parts[1];
         String publicKey = parts[2];
         String userToken = parts[3];
-        if (username.isEmpty() || timestamp.isEmpty() || publicKey.isEmpty() ||
-                userToken.isEmpty()) {
+        if (username.isEmpty() || timestamp.isEmpty() || publicKey.isEmpty()
+                || userToken.isEmpty()) {
             log.error("TOKEN: One or more parts are empty : '{}'", token);
             return false;
         }
@@ -745,7 +745,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
      * Get (or validate) a formatted time string. If the input is null, the
      * current time will be returned, otherwise it will validate the provided
      * string, returning null if it is invalid.
-     *
+     * 
      * @param input : A time string to validate, null will use current time
      * @return String : A formatted time string, null if input is invalid
      */
