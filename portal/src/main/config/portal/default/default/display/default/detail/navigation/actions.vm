@@ -20,7 +20,7 @@
                 </script>
             </li>
         #end
-        <li><a href="$portalPath/blog/$oid">Blog...</a></li>
+        <li><a id="fascinator-blog-link" href="$portalPath/blog/$oid">Blog...</a></li>
         #if($self.hasWorkflowAccess())
           <li><a href="$portalPath/zippackage/$oid">Zip Package...</a></li>
         #end
