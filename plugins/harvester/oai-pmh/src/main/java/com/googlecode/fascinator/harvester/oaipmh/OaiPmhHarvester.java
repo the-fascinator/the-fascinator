@@ -30,6 +30,8 @@ import com.googlecode.fascinator.common.harvester.impl.GenericHarvester;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -435,8 +437,19 @@ public class OaiPmhHarvester extends GenericHarvester {
                     }
                 }
             }
-            token = records.getResumptionToken();
+            // The library fails to escape resumption tokens containing non-URL
+            //  safe characters, which tends to cause problems when sending them
+            ResumptionToken tempToken = records.getResumptionToken();
+            if (tempToken != null) {
+              String safeToken = URLEncoder.encode(tempToken.getId(), "UTF-8");
+              token = new ResumptionToken(safeToken,
+                      tempToken.getExpirationDate());
+            } else {
+              token = null;
+            }
         } catch (OAIException oe) {
+            throw new HarvesterException(oe);
+        } catch (UnsupportedEncodingException oe) {
             throw new HarvesterException(oe);
         }
 
