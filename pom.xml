@@ -30,10 +30,12 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<scm>
-    <url>https://github.com/the-fascinator/the-fascinator.git</url>
-    <developerConnection>scm:git:https://github.com/the-fascinator/the-fascinator.git</developerConnection>
-	</scm>
+  <scm>
+        <url>scm:git://github.com/the-fascinator/the-fascinator.git</url>
+        <connection>scm:git://github.com/the-fascinator/the-fascinator.git</connection>
+        <developerConnection>scm:git:https://github.com/the-fascinator/the-fascinator.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 	<distributionManagement>
 		<site>
 			<id>website</id>
