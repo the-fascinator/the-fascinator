@@ -31,9 +31,8 @@
 		</plugins>
 	</reporting>
 	<scm>
-		<url>http://the-fascinator.googlecode.com/svn/the-fascinator/trunk</url>
-		<connection>scm:svn:http://the-fascinator.googlecode.com/svn/the-fascinator/trunk</connection>
-		<developerConnection>scm:svn:https://the-fascinator.googlecode.com/svn/the-fascinator/trunk</developerConnection>
+    <url>https://github.com/the-fascinator/the-fascinator</url>
+    <developerConnection>scm:git:https://github.com/the-fascinator/the-fascinator.git</developerConnection>
 	</scm>
 	<distributionManagement>
 		<site>
