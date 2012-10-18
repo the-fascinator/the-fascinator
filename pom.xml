@@ -36,12 +36,6 @@
         <developerConnection>scm:git:https://github.com/the-fascinator/the-fascinator.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-	<distributionManagement>
-		<site>
-			<id>website</id>
-			<url>${sites.location}</url>
-		</site>
-	</distributionManagement>
 	<modules>
 		<module>common</module>
 		<module>core</module>
