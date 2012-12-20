@@ -19,6 +19,8 @@
 package com.googlecode.fascinator.portal.services.impl;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -578,6 +580,47 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             ssoInterface.put(ssoId, map);
         }
         return ssoInterface;
+    }
+
+    /**
+     * Retrieve the login URL for redirection against a given provider.
+     * 
+     * @param String The SSO source to use
+     * @return String The URL used by the SSO Service for logins
+     */
+    public String ssoGetRemoteLogoutURL(JsonSessionState session, String source) {
+        if (!sso.containsKey(source)) {
+            return null;
+        } else {
+            // return sso.get(source).ssoGetRemoteLogonURL(session);
+            Class ssoInterfaceClass = sso.get(source).getClass();
+            Method remoteLogoutURLMethod;
+            try {
+                remoteLogoutURLMethod = ssoInterfaceClass.getMethod(
+                        "getRemoteLogoutURL", null);
+                if (remoteLogoutURLMethod != null) {
+                    return (String) remoteLogoutURLMethod.invoke(
+                            sso.get(source), null);
+                }
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 
     /**
