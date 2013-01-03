@@ -597,10 +597,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             Method remoteLogoutURLMethod;
             try {
                 remoteLogoutURLMethod = ssoInterfaceClass.getMethod(
-                        "getRemoteLogoutURL", null);
+                        "ssoGetRemoteLogoutURL", JsonSessionState.class);
                 if (remoteLogoutURLMethod != null) {
                     return (String) remoteLogoutURLMethod.invoke(
-                            sso.get(source), null);
+                            sso.get(source), session);
                 }
             } catch (NoSuchMethodException e) {
                 // TODO Auto-generated catch block
