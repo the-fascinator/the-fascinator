@@ -18,49 +18,49 @@
  */
 package com.googlecode.fascinator.portal.services;
 
+import java.util.Map;
+
 import com.googlecode.fascinator.api.access.AccessControlManager;
-import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.AuthManager;
+import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.User;
 import com.googlecode.fascinator.api.roles.RolesManager;
 import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.JsonSessionState;
 
-import java.util.Map;
-
 /**
- * The security manager coordinates access to various security plugins
- * when cross plugin awareness is required, and executes some server side
- * logic required for features such as single sign-on.
- *
+ * The security manager coordinates access to various security plugins when
+ * cross plugin awareness is required, and executes some server side logic
+ * required for features such as single sign-on.
+ * 
  * @author Greg Pendlebury
  */
 public interface PortalSecurityManager {
 
     /**
      * Return the Access Control Manager
-     *
+     * 
      * @return AccessControlManager
      */
     public AccessControlManager getAccessControlManager();
 
     /**
      * Return the Authentication Manager
-     *
+     * 
      * @return AuthManager
      */
     public AuthManager getAuthManager();
 
     /**
      * Return the Role Manager
-     *
+     * 
      * @return RolesManager
      */
     public RolesManager getRoleManager();
 
     /**
      * Get the list of roles possessed by the current user.
-     *
+     * 
      * @param user The user object of the current user
      * @return String[] A list of roles
      */
@@ -68,39 +68,38 @@ public interface PortalSecurityManager {
 
     /**
      * Retrieve the details of a user by username
-     *
+     * 
      * @param username The username of a user to retrieve
      * @param source The authentication source if known
      * @return User The user requested
      * @throws AuthenticationException if any errors occur
      */
-    public User getUser(JsonSessionState session, String username,
-            String source) throws AuthenticationException;
+    public User getUser(JsonSessionState session, String username, String source)
+            throws AuthenticationException;
 
     /**
      * Logout the provided user
-     *
+     * 
      * @return user The user to logout
      */
     public void logout(JsonSessionState session, User user)
             throws AuthenticationException;
 
     /**
-     * Wrapper method for other SSO methods provided by the security manager.
-     * If desired, the security manager can take care of the integration using
-     * the default usage pattern, rather then calling them individually.
-     *
+     * Wrapper method for other SSO methods provided by the security manager. If
+     * desired, the security manager can take care of the integration using the
+     * default usage pattern, rather then calling them individually.
+     * 
      * @param session : The session of the current request
      * @param formData : FormData object for the current request
      * @return boolean : True if SSO has redirected, in which case no response
-     *      should be sent by Dispatch, otherwise False.
+     *         should be sent by Dispatch, otherwise False.
      */
-    public boolean runSsoIntegration(JsonSessionState session,
-            FormData formData);
+    public boolean runSsoIntegration(JsonSessionState session, FormData formData);
 
     /**
      * Initialize the SSO Service, prepare a login if required
-     *
+     * 
      * @param session The server session data
      * @throws Exception if any errors occur
      */
@@ -108,15 +107,17 @@ public interface PortalSecurityManager {
 
     /**
      * Retrieve the login URL for redirection against a given provider.
-     *
+     * 
      * @param String The SSO source to use
      * @return String The URL used by the SSO Service for logins
      */
     public String ssoGetRemoteLogonURL(JsonSessionState session, String source);
 
+    public String ssoGetRemoteLogoutURL(JsonSessionState session, String source);
+
     /**
      * Get user details from SSO connection and set them in the user session.
-     *
+     * 
      * @return boolean: Flag whether a user was actually logged in or not.
      */
     public boolean ssoCheckUserDetails(JsonSessionState session);
@@ -124,17 +125,18 @@ public interface PortalSecurityManager {
     /**
      * Build a Map of Maps of on-screen string values for each SSO provider.
      * Should be enough to generate a login interface.
-     *
+     * 
      * @return Map Containing the data structure of valid SSO interfaces.
      */
-    public Map<String, Map<String, String>> ssoBuildLogonInterface(JsonSessionState session);
+    public Map<String, Map<String, String>> ssoBuildLogonInterface(
+            JsonSessionState session);
 
     /**
      * Given the provided resource, test whether SSO should be 'aware' of this
      * resource. 'Aware' resources are valid return return points after SSO
      * redirects, so the test should return false on (for examples) static
      * resources and utilities such as atom feeds.
-     *
+     * 
      * @param session : The session for this request
      * @param resource : The name of the resource being accessed
      * @param uri : The full URI of the resource if simple matches fail
@@ -145,7 +147,7 @@ public interface PortalSecurityManager {
 
     /**
      * Validate the provided trust token.
-     *
+     * 
      * @param token : The token to validate
      * @return boolean : True if the token is valid, False otherwise
      */
