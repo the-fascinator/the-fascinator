@@ -13,4 +13,10 @@
     <from>^(/amq/.*)$</from>
     <to last="true">$1</to>
   </rule>
+  <rule>
+    <name>UTF-8 Encoding</name>
+    <note>Set UTF-8 Encoding header on some pages</note>
+    <from>/workflow/</from>
+    <set type="content-type">text/html; charset=UTF-8</set>
+  </rule>
 </urlrewrite>

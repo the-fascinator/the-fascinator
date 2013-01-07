@@ -24,7 +24,7 @@ import com.googlecode.fascinator.portal.JsonSessionState;
 import com.googlecode.fascinator.portal.services.DynamicPageService;
 
 import java.io.ByteArrayOutputStream;
-
+import java.io.UnsupportedEncodingException;
 /**
  * Displays arbitrary content in the portal.
  * 
@@ -80,7 +80,12 @@ public class GUIDisplay {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         pageService.render(portalId, template, out, formData, sessionState);
-
-        return out.toString();
+        String data = null;                
+        try {          
+          data = out.toString("UTF-8");                    
+        } catch (UnsupportedEncodingException ex) {          
+          data = out.toString();
+        }
+        return data;
     }
 }
