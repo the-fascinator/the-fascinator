@@ -291,7 +291,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
                 velocityService.renderTemplate(portalId, pageName, vc,
                         pageContentWriter);
                 if (isAjax || isScript) {
-                    out.write(pageContentWriter.toString().getBytes());
+                    out.write(pageContentWriter.toString().getBytes("UTF-8"));
                 } else {
                     vc.put("pageContent", pageContentWriter.toString());
                 }
