@@ -1,0 +1,47 @@
+<p>By default Jaffa will internally log at various levels to the browser Console (if it is available):</p>
+<ul>
+    <li><strong>DEBUG</strong>: Disabled unless <code class="prettyprint">debuggingEnabled: true</code> is set in configuration. Used during development, but not recommended unless you are hunting bugs.</li>
+    <li><strong>INFO</strong>: Information on significant events occurring during normal operation.</li>
+    <li><strong>WARN</strong>: Problems/errors (or just potential ones) that do not halt operation of Jaffa will be reported here.</li>
+    <li><strong>ERROR</strong>: Fatal errors that Jaffa (or just the utility you are using) will halt operations for are reported here, and also displayed in a dialog to the user.</li>
+</ul>
+
+<h4>Custom Logging</h4>
+<p>Providing custom logging is somewhat similar to what we've already seen on the 'Alerts' tab, we
+    just provide a custom function in the <code class="prettyprint">functionLog</code> configuration.
+    Here is an example we use for this page to add a scolling log to this tab (below), although I've
+    snipped out some of the less relevant stuff to avoid bloat. Perhaps it would be useful (along
+    with debugging) on your site if the user is a super user?</p>
+<pre class="prettyprint lang-js">
+var logging = null;
+var debugLogging = function(type, message) {
+    if (logging == null) {
+        logging = $(".jaffa-logs");
+    }
+    var logLine = "&lt;div class='log-row'&gt;";
+    logLine += "&lt;span class='time'&gt;" + now() + "&lt;/span&gt;";
+    logLine += "&lt;span class='level'&gt;" + type + "&lt;/span&gt;";
+    logLine += "&lt;span class='message'&gt;" + message + "&lt;/span&gt;";
+    logLine += "&lt;/div&gt;";
+    logging.prepend(logLine);
+    // Send them to Jaffa's standard log as well, the null test
+    //  avoids some issues in IE due to startup timing.
+    if (jaffa != null) {
+        jaffa.log(type, message);
+    }
+};
+
+jaffa = jaffaFactory({
+        debuggingEnabled: true,
+        functionLog: debugLogging
+    });
+</pre>
+
+<p>So with appropriate styling you can see the output in the fake 'window' below:</p>
+<div class="well">
+    <h4>Jaffa framework logging (example for Administrators):</h4>
+    <div class="jaffa-logs log-scroller">
+        <div class="log-row">
+        </div>
+    </div>
+</div>

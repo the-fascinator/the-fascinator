@@ -1,0 +1,41 @@
+<h3>Getting Jaffa</h3>
+<p>We start by loading our Jaffa Library... in any form. This page is using a
+    full non-minified version for development, but you can load any version you
+    like. Some options:</p>
+<ul>
+    <li>TODO: Minified Build</li>
+    <li>TODO: Release Build</li>
+    <li>TODO: Development Build</li>
+</ul>
+<p>You can see here I've also loaded up my own script where I put all the
+    instantiation and configuration for how I use Jaffa. You may prefer to do
+    this in some other way... it doesn't really matter. Examples of
+    configuration and customization on this demo page and the instantiation code
+    below are generally located inside that script.</p>
+<pre class="prettyprint lang-html">
+&lt;script type="text/javascript" src="jaffa.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="myJaffa.js"&gt;&lt;/script&gt;
+</pre>
+
+<h3>Starting Jaffa</h3>
+<p>At its simplest, starting Jaffa involves requesting an instance from the
+    <code class="prettyprint">jaffaFactory()</code> method and providing it with
+    a configuration object... empty in this case.</p>
+<pre class="prettyprint lang-js">
+var jaffa = jaffaFactory({});
+</pre>
+<p>Of course, in most circumstances you are going to want to provide some
+    configuration to Jaffa, so let's look at a basic example of that as well. In
+    this example we are going to enable debug logging, as well as specifying a
+    callback function of our own that we would like Jaffa to execute after it
+    has performed all instantiation activity:</p>
+<pre class="prettyprint lang-js">
+function jaffaLoaded(jaffa) {
+    alert("Woot! Jaffa is loaded!");
+}
+
+var jaffa = jaffaFactory({
+        debuggingEnabled: true,
+        callbackStartupComplete: jaffaLoadedFunction
+    });
+</pre>

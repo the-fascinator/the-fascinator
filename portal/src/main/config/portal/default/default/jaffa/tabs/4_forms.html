@@ -1,0 +1,125 @@
+<h3>Managed Form Fields</h3>
+<p>During Jaffa's instantiation process it will look through your page trying to
+    find 'form' fields that you have flagged as significant for it to manage. As
+    per the information on the 'Data' tab the IDs used should line up with the
+    JSON keys coming from the server.</p>
+<p>By default you can flag these fields simply by adding
+    <code class="prettyprint">class="jaffa-field"</code>, however you can
+    provide an overriding CSS Selector during startup, making them as
+    complicated (or broad) as you like. For example, you could provide a
+    selector to say that every <code class="prettyprint">input</code> in a
+    particular <code class="prettyprint">form</code> is important:</p>
+<pre class="prettyprint lang-js">
+var jaffa = jaffaFactory({
+        selectorFormFields: "form#myFormId input",
+    });
+</pre>
+<p>From here Jaffa will take care of the rest, although it does have some fairly
+    sensible requirements for uniqueness, but these are in line with HTML
+    standards anyway. Each managed field must have an
+    <code class="prettyprint">id</code> that is unique within the document, or
+    radio groups use a <code class="prettyprint">name</code> instead. The
+    'Examples' section below shows a variety of field definitions that Jaffa
+    will find correctly.</p>
+<p>Once the field is managed, you can access/manipulate the field using Jaffa's
+    APIs. For most generic fields you might not even want to do this, but for
+    some fields where you need to get a bit fancy these will make your life
+    easier. Specifics on these APIs can be found under 'Jaffa.form' on the
+    'Details' tab.</p>
+
+<h3>Examples</h3>
+<div class="control-group thumbnail">
+    <h5>Text Inputs</h5>
+    <p>Very basic, and functionally identical to 'hidden', 'password' inputs.</p>
+<pre class="prettyprint lang-html">
+&lt;input class="jaffa-field" type="text" id="testFieldOne" /&gt;
+</pre>
+    <h6>eg.</h6>
+    <label class="control-label" for="testFieldOne">Text:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="testFieldOne" size="40" value="" />
+        <p class="help-block">Help text is slightly faded</p>
+    </div>
+</div>
+
+<div class="control-group thumbnail error">
+    <h5>Textarea tags</h5>
+    <p>For ye' olde multi-line text.</p>
+<pre class="prettyprint lang-html">
+&lt;textarea class="jaffa-field" id="testFieldTwo" rows="2" cols="40"&gt;&lt;/textarea&gt;
+</pre>
+    <h6>eg.</h6>
+    <label class="control-label" for="testFieldTwo">Textarea:</label>
+    <div class="controls">
+        <textarea class="jaffa-field span5" id="testFieldTwo" rows="2" cols="40">Larger &lt;textarea&gt;</textarea>
+        <p class="help-block">Styled for an example error (using Bootstrap)</p>
+    </div>
+</div>
+
+<div class="control-group thumbnail">
+    <h5>Checkbox inputs</h5>
+    <p>Send the <code class="prettyprint">value</code> to the server if checked, or nothing.</p>
+<pre class="prettyprint lang-html">
+&lt;input class="jaffa-field" type="checkbox" id="testFieldThree" value="checkbox1" /&gt;
+</pre>
+    <h6>eg.</h6>
+    <label class="control-label" for="testFieldThree">Checkbox:</label>
+    <div class="controls">
+        <input class="jaffa-field" type="checkbox" id="testFieldThree" value="checkbox1"/>
+    </div>
+</div>
+
+<div class="control-group thumbnail">
+    <h5>Radio inputs</h5>
+    <p>You'll note we use <code class="prettyprint">name</code> for the field, as in a normal <code class="prettyprint">form</code>.</p>
+<pre class="prettyprint lang-html">
+&lt;input class="jaffa-field" type="radio" name="testFieldFour" value="radio1"/&gt;
+&lt;input class="jaffa-field" type="radio" name="testFieldFour" value="radio2"/&gt;
+&lt;input class="jaffa-field" type="radio" name="testFieldFour" value="radio3"/&gt;
+</pre>
+    <h6>eg.</h6>
+    <label class="control-label" for="testFieldFour">Radio:</label>
+    <div class="controls">
+        <label for="radio1" class="radio inline"><input class="jaffa-field" type="radio" name="testFieldFour" value="radio1"/>one</label>
+        <label for="radio2" class="radio inline"><input class="jaffa-field" type="radio" name="testFieldFour" value="radio2"/>two</label>
+        <label for="radio3" class="radio inline"><input class="jaffa-field" type="radio" name="testFieldFour" value="radio3" />three</label>
+    </div>
+</div>
+
+<div class="control-group thumbnail">
+    <h5>Select drop-downs</h5>
+    <p>Send the <code class="prettyprint">value</code> of the selected <code class="prettyprint">option</code> to the server.</p>
+<pre class="prettyprint lang-html">
+&lt;select class="jaffa-field" id="testFieldFive"&gt;
+    &lt;option value="select1"&gt;one&lt;/option&gt;
+    &lt;option value="select2" selected="selected"&gt;two&lt;/option&gt;
+    &lt;option value="select3"&gt;three&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+    <h6>eg.</h6>
+    <label class="control-label" for="testFieldFive">Select:</label>
+    <div class="controls">
+        <select class="jaffa-field span5" id="testFieldFive">
+            <option>Please select a value...</option>
+            <option value="select1">one</option>
+            <option value="select2">two</option>
+            <option value="select3">three</option>
+        </select>
+    </div>
+</div>
+
+<!-- We have a bunch of hidden stuff here for the unit tests -->
+<div class="hidden">
+    <input class="jaffa-field" type="button" id="testFieldHiddenButton" value="This is a hidden button" />
+    <input class="jaffa-field" type="file" id="testFieldHiddenFile" />
+    <input class="jaffa-field" type="hidden" id="testFieldHiddenHidden" value="This is a hidden input" />
+    <input class="jaffa-field" type="image" id="testFieldHiddenImage" src="grippy.png" alt="This is a hidden image" />
+    <input class="jaffa-field" type="password" id="testFieldHiddenPassword" value="This is a hidden password" />
+    <input class="jaffa-field" type="reset" id="testFieldHiddenReset" value="This is a hidden reset button" />
+    <input class="jaffa-field" type="submit" id="testFieldHiddenSubmit" value="This is a hidden submit button" />
+    <!-- Not currently aware of Jaffa, but the unit tests will 'link' them -->
+    <input type="hidden" id="testFieldAddLater" value="Hidden value" />
+    <input type="radio" name="testFieldAddLaterRadio" value="hiddenRadio1"/><label for="hiddenRadio1">one</label>
+    <input type="radio" name="testFieldAddLaterRadio" value="hiddenRadio2"/><label for="hiddenRadio2">two</label>
+    <input type="radio" name="testFieldAddLaterRadio" value="hiddenRadio3" /><label for="hiddenRadio3">three</label>
+</div>

@@ -1,0 +1,244 @@
+<h3>Form Validation</h3>
+<p>Jaffa uses <a href="http://validatious.org">Validatious 2.0</a> to provide a
+    flexible validation system with minimal effort. Whether you are using widgets
+    to take care of the validation or bolting them on to basic form controls this
+    will make validating your forms a lot simpler.</p>
+<p>It is worth noting however that Jaffa's usage of Validatious focuses on the
+    core APIs, as opposed to the higher level functions provided provided by the
+    DSL. These higher level functions are generally incompatible with Jaffa since
+    they internalise and automate data and actions that Jaffa would either like
+    access to, or to replace with its own features. For all that, the core API's
+    do provide a lot of options, as this page will demonstrate.</p>
+
+<h3>Basic Text Examples</h3>
+<div class="control-group thumbnail">
+    <p>These fields show basic examples of validation, although in this case they
+        can be triggered from the button provided. This is simply to separate
+        them from the rest of the form in this demo.</p>
+    <label class="control-label" for="requiredText">Really Important:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="requiredText" size="40" />
+    </div>
+
+    <label class="control-label" for="requiredEmail">Email Address:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="requiredEmail" size="40" />
+    </div>
+
+    <p>&nbsp;</p>
+    <p>
+        <button class="btn btn-primary" id="validateTabSaveNowDemo">Run Save Validation</button>
+    </p>
+</div>
+<p>This demo uses built in Validatious rules(<code class="prettyprint">required</code>
+    and <code class="prettyprint">email</code>), and we tell Jaffa to apply them
+    like so:</p>
+<pre class="prettyprint lang-js">
+jaffa.valid.setSaveRules("requiredText",  ["required"]);
+jaffa.valid.setSaveRules("requiredEmail",  ["required", "email"]);
+</pre>
+<p>This method has additional optional parameters we've ignored however, such as
+    callbacks. These are explored further below under 'Custom Validation'.</p>
+
+<h3>Triggering Validation</h3>
+<p>Internally, Jaffa is keeping a list of all Validatious rules we have provided
+    against each field, along with the context (ie. 'save' or 'submit'). So we
+    can request validation execute against specific fields and contexts at any
+    time we want.</p>
+<p>Top-level validation is typically built into the 'save' and 'submit' events
+    firing, but you can target them explicity if desired:</p>
+<ul>
+    <li><code class="prettyprint">jaffa.valid.okToSave()</code> will test every field to see if they pass 'save' validation.</li>
+    <li><code class="prettyprint">jaffa.valid.okToSubmit()</code> will test every field to see if they pass 'submit' validation.</li>
+</ul>
+<p>Those two methods are really just cosmetic wrappers around the first two below
+    (for the sake of convenience), but if you call them as per below, you can
+    additionally provide an optional field name (or list) and just test against
+    that field(s). Some examples:</p>
+<ul>
+    <li><code class="prettyprint">jaffa.valid.test("save")</code> all fields for a 'save' event.</li>
+    <li><code class="prettyprint">jaffa.valid.test("submit")</code> all fields for a 'submit' event.</li>
+    <li><code class="prettyprint">jaffa.valid.test("save", "requiredText")</code> just the field 'requiredText' for a 'save' event.</li>
+    <li><code class="prettyprint">jaffa.valid.test("submit", ["requiredText", "requiredEmail"])</code> both the fields 'requiredText' and 'requiredEmail' for a 'submit' event.</li>
+</ul>
+<p>The last entry is what we are running for the button below, which triggers
+    the 'submit' context for validation, rather then the 'save' context we used
+    above. The next section covers the additional custom validation that was
+    added on 'submit'.</p>
+<p>
+    <button class="btn btn-primary" id="validateTabSubmitNowDemo">Run Submit Validation</button>
+</p>
+
+<p>One final point to triggering validation is to see how we can control the
+    behaviour of standard <code class="prettyprint">change()</code> events on
+    each field. By default all field changes will trigger validation in a
+    'submit' context, but this could either be disabled altogether by adding
+    <code class="prettyprint">validateOnChange: false</code> to your Jaffa config,
+    or you could change it to a 'save' context using
+    <code class="prettyprint">validateOnChangeType: "save"</code>. In either
+    scenario, a field failing validation does not prevent the change from
+    occurring, nor does it stop any change() callbacks you have specified from
+    firing (although is does provide an <code class="prettyprint">isValid</code>
+    parameter to said callback).</p>
+<div class="control-group thumbnail" id="validOnChangeDemo">
+    <p>This field is required to say 'Test' for submission. Editing it and
+        failing to add this value will be detected on change.</p>
+    <label class="control-label" for="requiredTest">Test:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="requiredTest" size="40" />
+    </div>
+    <div id="validOnChangeDemoMsg" class="alert alert-error">
+        <b>Validation Failure:</b> This value needs to be 'Test'.
+    </div>
+</div>
+
+<h3>Custom Validation</h3>
+<p>Jaffa doesn't treat custom validation as anything special, so adding your own
+    custom logic is as simple as creating a <a href="http://validatious.org/learn/features/core/custom_validators">custom Validatious validator</a>
+    (there's a mouthful) and telling Jaffa to use it like any other validator.</p>
+<pre class="prettyprint lang-js">
+// A custom Validatious validator
+v2.Validator.add({
+    name: "myCustom",
+    acceptEmpty: true,
+    fn: function(field, value, params) {
+        // Field value must equal first parameter (if it has one)
+        if (params[0] == null || value == params[0]) {
+            return true;
+        }
+        return false;
+    }
+});
+// Add some rules using the above validator
+jaffa.valid.addNewRule("myCustomFooBar", "myCustom", ["FooBar"]);
+jaffa.valid.setSubmitRules("requiredText", ["required", "myCustomFooBar"], null, validationFail);
+</pre>
+
+<p>This is a very basic custom validator, but it is worth pointing out the
+    <code class="prettyprint">acceptEmpty</code> option because of its significance.
+    The default value is <code class="prettyprint">true</code> and it will cause
+    your validator to 'pass' when the field is empty (ie. <b>your validator will
+    not execute</b>, it will just pass). The Validatious documentation covers this
+    (quoted below), and the reasoning is good, but it can cause the appearance of
+    incorrect validation if you are not aware of it.</p>
+<blockquote>"<code class="prettyprint">acceptEmpty</code>: Decides if the validator
+    should pass (return true) when the value is empty. This is usually a good idea
+    because you can leave it up to the 'required' validator to specifically check
+    for emptiness. One benefit of this approach is more fine grained error
+    reporting, helping the user."</blockquote>
+<p>Aside from the validator itself, we have a couple of other new things in this
+    code snippet. First is the call to <code class="prettyprint">addNewRule()</code>,
+    which is used to tell Jaffa that we'd like to run a validator with some
+    configuration (ie. parameters at call time). This can used whether or not you
+    have a custom validator, but if you don't want to pass any parameters along
+    you can just put the name of the validator directly into the call to
+    <code class="prettyprint">setXXXXRules()</code> (like we did earlier); Jaffa
+    will work out what you mean.</p>
+<p>The other thing shown above is connecting it to Jaffa in a 'submit' context.
+    You'll notice that the <code class="prettyprint">setSubmitRules()</code> call
+    also has more parameters than we saw earlier (listed in order):</p>
+<ol>
+    <li><code class="prettyprint">"requiredText"</code> the field we are validating, nothing new here.</li>
+    <li><code class="prettyprint">["required", "myCustomFooBar"]</code> an array of 'rules' to run for this field.</li>
+    <li><code class="prettyprint">null</code> this parameter is for a callback if the validator passes, although obviously we aren't using it in our example.</li>
+    <li><code class="prettyprint">validationFail</code> this parameter is for a callback if the validator fails and is where the demo opens message boxes (see below).</li>
+</ol>
+
+<pre class="prettyprint lang-js">
+// A callback for validation failures
+function validationFail(fieldId, testsFailed) {
+    if (fieldId == "requiredText") {
+        if ($.inArray("required", testsFailed) != -1) {
+            jaffa.ui.messageBox("The 'Really Important' field is mandatory!");
+        }
+        if ($.inArray("myCustomFooBar", testsFailed) != -1) {
+            jaffa.ui.messageBox("For submission, the 'Really Important' field must be 'FooBar'!");
+        }
+    }
+    if (fieldId == "requiredEmail") {
+        if ($.inArray("required", testsFailed) != -1) {
+            jaffa.ui.messageBox("An email address is mandatory!");
+        }
+        if ($.inArray("email", testsFailed) != -1) {
+            jaffa.ui.messageBox("Your email address is malformed!");
+        }
+    }
+}
+</pre>
+
+<p>The example callback above isn't particularly elegant and is probably a bad
+    way to do things for anything other then a small sample of fields. In practice
+    you'll probably want the callback to alter your page's UI and place the error
+    information in close proximity to your control. Also, unlike our demo, this
+    scenario is where you would make use of the success callback (which we've
+    ignored) to clear the UI up again. Jaffa's default widgets all use this
+    approach, as does the demo above triggered by edits. Here's everything
+    related to that field's validation (although we reused the earlier
+    <code class="prettyprint">myCustom</code> validator with a new rule).
+    You can see we use Bootstrap classes to achieve the styling:</p>
+
+<pre class="prettyprint lang-html">
+&lt;div class="control-group thumbnail" id="validOnChangeDemo"&gt;
+    &lt;p&gt;This field is required to say 'Test' for submission. Editing it and
+        failing to add this value will be detected on change.&lt;/p&gt;
+    &lt;label class="control-label" for="requiredTest"&gt;Test:&lt;/label&gt;
+    &lt;div class="controls"&gt;
+        &lt;input class="jaffa-field span5" type="text" id="requiredTest" size="40" /&gt;
+    &lt;/div&gt;
+    &lt;div id="validOnChangeDemoMsg" class="alert alert-error"&gt;
+        &lt;b&gt;Validation Failure:&lt;/b&gt; This value needs to be 'Test'.
+    &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<pre class="prettyprint lang-js">
+$("#validOnChangeDemoMsg").hide();
+function validationOnChangeFail(fieldId, testsFailed) {
+    $("#validOnChangeDemo").addClass("error");
+    $("#validOnChangeDemoMsg").show();
+}
+function validationOnChangePass(fieldId, testsPassed) {
+    $("#validOnChangeDemo").removeClass("error");
+    $("#validOnChangeDemoMsg").hide();
+}
+jaffa.valid.addNewRule("myCustomTest", "myCustom", ["Test"]);
+jaffa.valid.setSubmitRules("requiredTest", ["required", "myCustomTest"], validationOnChangePass, validationOnChangeFail);
+</pre>
+
+<p>One final example here shows a basic proof-of-concept implementation for
+    multi-field validation. Unfortunately the Validatious or() implementations
+    don't work with Jaffa, since it restricts itself to usage of just the core
+    APIs. So to implement this we create a custom validator, but then dip back
+    into Jaffa to interrogate the form during validation. Finally, we attach the
+    validator to both fields, so it will fire when either of them is edited.</p>
+<div class="control-group thumbnail" id="validOnChangeOrDemo">
+    <p>This time we are looking at a custom validation spanning two fields. One
+        of the two fields below must contain 'Test' for the validation to pass.</p>
+    <label class="control-label" for="requiredTestOr1">Test 'OR' 1:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="requiredTestOr1" size="40" />
+    </div>
+    <label class="control-label" for="requiredTestOr2">Test 'OR' 2:</label>
+    <div class="controls">
+        <input class="jaffa-field span5" type="text" id="requiredTestOr2" size="40" />
+    </div>
+    <div id="validOnChangeOrDemoMsg" class="alert alert-error">
+        <b>Validation Failure:</b> One of the values above needs to be 'Test'.
+    </div>
+</div>
+
+<pre class="prettyprint lang-js">
+// A custom Validatious OR validator
+v2.Validator.add({
+    name: "myCustomOr",
+    acceptEmpty: false,
+    fn: function(field, value, params) {
+        // Get the values from Jaffa
+        var orField1 = jaffa.form.value(params[0]);
+        var orField2 = jaffa.form.value(params[1]);
+        return orField1 == params[2] || orField2 == params[2];
+    }
+});
+jaffa.valid.addNewRule("myCustomOrDemo", "myCustomOr", ["requiredTestOr1", "requiredTestOr2", "Test"]);
+jaffa.valid.setSubmitRules("requiredTestOr1", ["myCustomOrDemo"], validationOnChangeOrPass, validationOnChangeOrFail);
+jaffa.valid.setSubmitRules("requiredTestOr2", ["myCustomOrDemo"], validationOnChangeOrPass, validationOnChangeOrFail);
+</pre>

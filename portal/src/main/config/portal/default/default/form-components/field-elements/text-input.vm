@@ -1,0 +1,1 @@
+<label for="$field-name">$label</label> <input class="jaffa-field $additional-classes" type="text" id="$field-name" />

@@ -1,0 +1,195 @@
+<h3>Loading Data</h3>
+<p>The most important part of this whole scenario is your data. First, Jaffa is
+    going to need to know how to get it from the server, although that's pretty
+    easy, we just tell it where to go with our configuration:</p>
+<pre class="prettyprint lang-js">
+var jaffa = jaffaFactory({
+        urlDataSource: "/server/path/formData.json"
+    });
+</pre>
+
+<p>This could be either a relative or absolute URL; it makes no difference (XSS
+    considerations aside). Eventually it will make its way down into a
+    <code class="prettyprint">jQuery.ajax()</code> call, exactly as you have
+    provided it, so it simply needs to be resolvable from the current
+    page/domain.</p>
+
+<h3>Managed Data</h3>
+<p>On the next tab you'll find information about how Jaffa finds and manages
+    your form's GUI elements. Every field that Jaffa is aware of in this way is
+    considered 'managed', and (in a perfect world) every managed field will be
+    paired up with some of your server provided data. When one changes, so
+    should the other, and ultimately, when the form is 'submitted' we are going
+    to send the resulting JSON data back to the server for storage.</p>
+
+<p>Because this demonstration page does not need to submit any data to the server,
+    we can override the JSON submission method and route the output into the page
+    itself. The below field has been modified so that after any edits it manually
+    forces a form submission and you should see the form data in the area below
+    that update (<b>Note:</b> Tab swapping through the demo also causes an
+    'auto-save' that triggers this submission as well). This is the JSON that
+    would be normally sent to the server from the form elements spread across
+    all tabs of this demonstration.</p>
+
+<p>
+    <label for="aaaFirstFieldDemo">
+        Edit this field:
+        <input type="text" id="aaaFirstFieldDemo" class="jaffa-field" value="Field 'aaaFirstFieldDemo'" />
+        and the JSON below will change.
+    </label>
+</p>
+
+<div id="showMeTheJson" class="alert alert-info">You need to edit the field above to see JSON here.</div>
+<p><i>Apologies to IE users, but after <a href="http://code.google.com/p/google-code-prettify/issues/detail?id=158">patching prettify.js</a>
+    to support webkit browsers I gave up on getting <code class="prettyprint">prettyPrintOne()</code>
+    to preserve newlines under IE.</i></p>
+
+<h3>Unmanaged Data</h3>
+<p>But what about a non-perfect world? Perhaps the server sends Jaffa some data
+    that your form has no controls for and no knowledge of... what should we do?
+    Well the answer is (as always) configurable, but by default Jaffa considers
+    'unmanaged' data to be important enough to halt functioning. Form submission
+    is disabled so data is never sent back to the server.</p>
+<p>In this context unmanaged data is considered to be an error where
+    your form and data do not match, and the potential for corrupting your data
+    is held to be the most important thing to avoid.</p>
+<p><i>It is worth noting that the reverse scenario (no server data for a managed
+    field exists) is not significant. This is what a brand new record would
+    probably look like since no data is stored for it yet.</i></p>
+
+<h3>Give it to me anyway</h3>
+<p>So you know what you are doing, you want the form to keep working and you'll
+    handle the unmanaged data yourself; either on the server, or in the client
+    (our demo below)? Ok, here's how you can do it.</p>
+
+<p>What we would like to do as a trivial demonstration is give Jaffa a callback
+    function to execute whenever it comes across some unmanaged data. The
+    configuration has a really imaginative property name:
+    <code class="prettyprint">callbackUnmanagedServerData</code>.</p>
+
+<pre class="prettyprint lang-js">
+function unmanagedData(fieldName) {
+    $("#unmanagedDataAlerts").append("... Unmanaged field '" + fieldName + "' in server data! ...");
+}
+
+var jaffa = jaffaFactory({
+        callbackUnmanagedServerData: unmanagedData
+    });
+</pre>
+
+<p>There's some HTML wrapping snipped out of there, but really all we are doing
+    is pushing our notifications into the alert box setup below:</p>
+
+<div id="unmanagedDataAlerts" class="alert alert-error">
+    <h4>Unmanaged Data</h4><br/>
+</div>
+
+<p>Now's a good time to show how we achieved some of the demo content above,
+    namely how we forced the submission process to proceed, even though there
+    was unmanaged data, and also how we redirected the submission process to
+    display our JSON:</p>
+
+<pre class="prettyprint lang-js">
+// Look for a change event on that control and start a submit().
+// You can target specific fields in other ways, this is a more global callback
+function onDataChanged(fieldName) {
+    if (fieldName == "aaaFirstFieldDemo") {
+        jaffa.form.submit();
+    }
+}
+
+// Returning 'true' from this (optional) callback forces a submission. We are
+//  provided the 'invalidData' flag and all the data to let us make a decision
+function preSubmission(invalidData, serverData) {
+    return true;
+}
+
+// This overrides Jaffa's internal submission process
+function submissionOverride(invalidData, serverData) {
+    var jsonString = JSON.stringify(serverData, null, 4);
+    // &lt;snip&gt; ... some prettifying of the JSON + add some headings
+    $("#showMeTheJson").append(jsonString);
+}
+
+// How our config gets into Jaffa
+jaffa = jaffaFactory({
+        // Callbacks
+        callbackOnDataChanged: onDataChanged,
+        callbackPreSubmission: preSubmission,
+        // Overide an internal function
+        functionSubmitData: submissionOverride
+    });
+</pre>
+
+<h3>Advanced Usage</h3>
+<p>This section will make more sense if you've looked at the some of other tabs,
+    so you may want to come back to it later.</p>
+
+<p>We can go a step further and 'solve' the problem of unmanaged data by adding
+    additional form fields after the data loads; first the code, then below you
+    can see it in action:</p>
+
+<pre class="prettyprint lang-js">
+// Config during Jaffa's startup
+function newmanagedData(fieldName) {
+    $("#unmanagedDataAlerts #unmanaged-" + fieldName).remove();
+    $("#managedDataAlerts").append("&lt;p&gt;&lt;i class=\"icon-info-sign\"&gt;&lt;/i&gt; Field '" + fieldName + "' is now managed.&lt;/p&gt;");
+}
+
+function unmanagedData(fieldName) {
+    $("#unmanagedDataAlerts").append("&lt;p id=\"unmanaged-" + fieldName + "\"&gt;&lt;i class=\"icon-warning-sign\"&gt;&lt;/i&gt; Unmanaged field '" + fieldName + "' in server data!&lt;/p&gt;");
+}
+
+var jaffa = jaffaFactory($, {
+        callbackUnmanagedServerData: unmanagedData,
+        callbackNewManagedServerData: newmanagedData
+    });
+
+// Click events
+$("#data-manage-text").click(function() {
+    var newInput = $("&lt;input type=\"text\" id=\"formText\" /&gt;");
+    $("#data-manage-text-span").html(newInput);
+    jaffa.form.addField("formText");
+});
+$("#data-manage-date").click(function() {
+    var newInput = $("&lt;input type=\"text\" id=\"formDate\" /&gt;");
+    $("#data-manage-date-span").html(newInput);
+    jaffa.form.addField("formDate");
+    newInput.datepicker({dateFormat: 'yy-mm-dd' });
+});
+</pre>
+
+<p>And this setup results in the behaviour you'll see below:</p>
+<div id="unmanagedDataControls" class="alert alert-info">
+    <h4>Unmanaged Data Controls</h4>
+    <p>This content block will have no form inputs when the page loads, but as you press one of the buttons below the following will occur:</p>
+    <ol>
+        <li>We will build some form inputs using jQuery.</li>
+        <li>Notify Jaffa that we have a new form input with a matching ID.</li>
+        <li>Jaffa will consider the data to now be 'managed' and fire our callback.</li>
+        <li>The callback will remove our entry from the error alert above and drop a success alert below.</li>
+        <li>Our earlier example of data submitted to the server will contain the newly managed field.</li>
+    </ol>
+    <p>
+        <button class="btn btn-primary" id="data-manage-text"><i class="icon-align-left icon-white"></i> Manage 'formText'</button>
+        <span id="data-manage-text-span"></span>
+    </p>
+    <p>
+        <button class="btn btn-primary" id="data-manage-textarea"><i class="icon-align-left icon-white"></i> Manage 'formTextarea'</button>
+        <span id="data-manage-textarea-span"></span>
+    </p>
+    <p>
+        <button class="btn btn-primary" id="data-manage-date"><i class="icon-calendar icon-white"></i> Manage 'formDate'</button>
+        <span id="data-manage-date-span"></span>
+    </p>
+    <p>
+        <button class="btn btn-primary" id="data-manage-utf8"><i class="icon-align-left icon-white"></i> Manage Japanese UTF-8</button>
+        <span id="data-manage-textarea-utf8"></span>
+    </p>
+</div>
+
+<div id="managedDataAlerts" class="alert alert-success">
+    <h4>Newly Managed Data</h4><br/>
+</div>
+
+TODO: Save and Submit events explained, links to validation tab
