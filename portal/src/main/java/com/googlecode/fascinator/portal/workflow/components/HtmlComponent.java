@@ -8,8 +8,8 @@ public interface HtmlComponent {
 
     public abstract void setComponentTemplateName(String componentTemplateName);
 
-    public abstract Map<String, String> getParameterMap();
+    public abstract Map<String, Object> getParameterMap();
 
-    public abstract void setParameterMap(Map<String, String> parameterMap);
+    public abstract void setParameterMap(Map<String, Object> parameterMap);
 
 }

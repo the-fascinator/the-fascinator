@@ -6,7 +6,7 @@ import java.util.Map;
 public class HtmlButton implements HtmlComponent {
     private String componentTemplateName = null;
 
-    private Map<String, String> parameterMap = new HashMap<String, String>();
+    private Map<String, Object> parameterMap = new HashMap<String, Object>();
 
     /* (non-Javadoc)
      * @see com.googlecode.fascinator.portal.workflow.components.HtmlComponent#getComponentTemplateName()
@@ -28,7 +28,7 @@ public class HtmlButton implements HtmlComponent {
      * @see com.googlecode.fascinator.portal.workflow.components.HtmlComponent#getParameterMap()
      */
     @Override
-    public Map<String, String> getParameterMap() {
+    public Map<String, Object> getParameterMap() {
         return parameterMap;
     }
 
@@ -36,7 +36,7 @@ public class HtmlButton implements HtmlComponent {
      * @see com.googlecode.fascinator.portal.workflow.components.HtmlComponent#setParameterMap(java.util.Map)
      */
     @Override
-    public void setParameterMap(Map<String, String> parameterMap) {
+    public void setParameterMap(Map<String, Object> parameterMap) {
         this.parameterMap = parameterMap;
     }
 }

@@ -28,6 +28,7 @@ import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.services.VelocityService;
 import com.googlecode.fascinator.portal.workflow.components.HtmlButton;
 import com.googlecode.fascinator.portal.workflow.components.HtmlComponent;
+import com.googlecode.fascinator.portal.workflow.components.HtmlDiv;
 import com.googlecode.fascinator.portal.workflow.components.HtmlFieldElement;
 import com.googlecode.fascinator.portal.workflow.components.HtmlForm;
 
@@ -182,10 +183,9 @@ public class SimpleWorkflowHelper {
         HtmlForm form = new HtmlForm();
 
         JSONArray formJsonArray = formConfiguration.getArray("stages",
-                workflowMetadata.getString(null, "step"), "fields");
+                workflowMetadata.getString(null, "step"), "divs");
         for (int i = 0; i < formJsonArray.size(); i++) {
-            form.addHtmlFieldElement(getHtmlComponent((JsonObject) formJsonArray
-                    .get(i)));
+            form.addHtmlDiv(getHtmlDiv((JsonObject) formJsonArray.get(i)));
         }
 
         JSONArray buttonJsonArray = formConfiguration.getArray("stages",
@@ -201,7 +201,115 @@ public class SimpleWorkflowHelper {
     }
 
     private String renderFormHtml(HtmlForm form) throws Exception {
-        List<HtmlFieldElement> htmlfieldElements = form.getHtmlComponents();
+
+        String divElementsHtml = renderDivElementsHtml(form);
+
+        String fieldElementsHtml = renderFieldElementsHtml(form
+                .getHtmlFieldElements());
+
+        String buttonElementsHtml = renderButtonElementsHtml(form);
+
+        // Now that we have generated the elements we need for the html form.
+        // Wrap it in the general form template
+        VelocityContext vc = new VelocityContext();
+        vc.put("fieldElementsHtml", fieldElementsHtml);
+        vc.put("buttonElementsHtml", buttonElementsHtml);
+        vc.put("divElementsHtml", divElementsHtml);
+        StringWriter pageContentWriter = new StringWriter();
+        velocityService.renderTemplate(portalId,
+                "form-components/form-template", vc, pageContentWriter);
+
+        return pageContentWriter.toString();
+    }
+
+    private String renderDivElementsHtml(HtmlForm form) throws Exception {
+        String divElementsHtml = "";
+        List<HtmlDiv> htmlDivs = form.getHtmlDivs();
+        for (HtmlDiv htmlDiv : htmlDivs) {
+            String htmlDivTemplate = "form-components/"
+                    + htmlDiv.getComponentTemplateName();
+            if (velocityService.resourceExists(portalId, htmlDivTemplate
+                    + ".vm") != null) {
+
+                String fieldElementsHtml = renderFieldElementsHtml(htmlDiv
+                        .getHtmlFieldElements());
+
+                VelocityContext vc = new VelocityContext();
+
+                Object[] parentKeys = parentVelocityContext.getKeys();
+                for (Object key : parentKeys) {
+                    vc.put((String) key,
+                            parentVelocityContext.get((String) key));
+                }
+                vc.put("fieldElementsHtml", fieldElementsHtml);
+
+                Map<String, Object> parameterMap = htmlDiv.getParameterMap();
+                Set<String> keySet = parameterMap.keySet();
+                for (String key : keySet) {
+                    vc.put(key, parameterMap.get(key));
+                }
+
+                // Render the component's velocity template as a String
+                StringWriter pageContentWriter = new StringWriter();
+                velocityService.renderTemplate(portalId, htmlDivTemplate, vc,
+                        pageContentWriter);
+
+                divElementsHtml += pageContentWriter.toString();
+            }
+        }
+        return divElementsHtml;
+    }
+
+    private String renderButtonElementsHtml(HtmlForm form) throws Exception {
+        String buttonElementsHtml = "";
+        List<HtmlButton> htmlButtons = form.getHtmlButtons();
+        for (HtmlComponent htmlButton : htmlButtons) {
+            String pageName = "form-components/button-elements/"
+                    + htmlButton.getComponentTemplateName();
+            if (velocityService.resourceExists(portalId, pageName + ".vm") != null) {
+                VelocityContext vc = new VelocityContext();
+
+                Object[] parentKeys = parentVelocityContext.getKeys();
+                for (Object key : parentKeys) {
+                    vc.put((String) key,
+                            parentVelocityContext.get((String) key));
+                }
+
+                Map<String, Object> parameterMap = htmlButton.getParameterMap();
+                Set<String> keySet = parameterMap.keySet();
+                for (String key : keySet) {
+                    vc.put(key, parameterMap.get(key));
+                }
+
+                // Render the component's velocity template as a String
+                StringWriter pageContentWriter = new StringWriter();
+                velocityService.renderTemplate(portalId, pageName, vc,
+                        pageContentWriter);
+
+                buttonElementsHtml += pageContentWriter.toString();
+            }
+        }
+        VelocityContext vc = new VelocityContext();
+        Object[] parentKeys = parentVelocityContext.getKeys();
+        for (Object key : parentKeys) {
+            vc.put((String) key, parentVelocityContext.get((String) key));
+        }
+
+        // Inject this buttonELementsHtml for use in the button-wrapper
+        // template
+        vc.put("buttonHtml", buttonElementsHtml);
+
+        StringWriter pageContentWriter = new StringWriter();
+        velocityService.renderTemplate(portalId,
+                "form-components/button-wrapper", vc, pageContentWriter);
+
+        buttonElementsHtml = pageContentWriter.toString();
+
+        return buttonElementsHtml;
+    }
+
+    private String renderFieldElementsHtml(
+            List<HtmlFieldElement> htmlfieldElements) throws Exception {
         String fieldElementsHtml = "";
 
         for (HtmlFieldElement htmlFieldElement : htmlfieldElements) {
@@ -216,7 +324,7 @@ public class SimpleWorkflowHelper {
                             parentVelocityContext.get((String) key));
                 }
 
-                Map<String, String> parameterMap = htmlFieldElement
+                Map<String, Object> parameterMap = htmlFieldElement
                         .getParameterMap();
                 Set<String> keySet = parameterMap.keySet();
                 for (String key : keySet) {
@@ -241,61 +349,7 @@ public class SimpleWorkflowHelper {
                 fieldElementsHtml += pageContentWriter.toString();
             }
         }
-
-        String buttonElementsHtml = "";
-        List<HtmlButton> htmlButtons = form.getHtmlButtons();
-        for (HtmlComponent htmlButton : htmlButtons) {
-            String pageName = "form-components/button-elements/"
-                    + htmlButton.getComponentTemplateName();
-            if (velocityService.resourceExists(portalId, pageName + ".vm") != null) {
-                VelocityContext vc = new VelocityContext();
-
-                Object[] parentKeys = parentVelocityContext.getKeys();
-                for (Object key : parentKeys) {
-                    vc.put((String) key,
-                            parentVelocityContext.get((String) key));
-                }
-
-                Map<String, String> parameterMap = htmlButton.getParameterMap();
-                Set<String> keySet = parameterMap.keySet();
-                for (String key : keySet) {
-                    vc.put(key, parameterMap.get(key));
-                }
-
-                // Render the component's velocity template as a String
-                StringWriter pageContentWriter = new StringWriter();
-                velocityService.renderTemplate(portalId, pageName, vc,
-                        pageContentWriter);
-
-                buttonElementsHtml += pageContentWriter.toString();
-            }
-        }
-
-        VelocityContext vc = new VelocityContext();
-        Object[] parentKeys = parentVelocityContext.getKeys();
-        for (Object key : parentKeys) {
-            vc.put((String) key, parentVelocityContext.get((String) key));
-        }
-
-        // Inject this buttonELementsHtml for use in the button-wrapper
-        // template
-        vc.put("buttonHtml", buttonElementsHtml);
-
-        StringWriter pageContentWriter = new StringWriter();
-        velocityService.renderTemplate(portalId,
-                "form-components/button-wrapper", vc, pageContentWriter);
-
-        buttonElementsHtml = pageContentWriter.toString();
-        // Now that we have generated the elements we need for the html form.
-        // Wrap it in the general form template
-
-        vc.put("fieldElementsHtml", fieldElementsHtml);
-        vc.put("buttonElementsHtml", buttonElementsHtml);
-        pageContentWriter = new StringWriter();
-        velocityService.renderTemplate(portalId,
-                "form-components/form-template", vc, pageContentWriter);
-
-        return pageContentWriter.toString();
+        return fieldElementsHtml;
     }
 
     private HtmlFieldElement getHtmlComponent(JsonObject jsonObject) {
@@ -303,14 +357,39 @@ public class SimpleWorkflowHelper {
         htmlComponent.setComponentTemplateName((String) jsonObject
                 .get("component-type"));
 
-        Map<String, String> parameterMap = new HashMap<String, String>();
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
         Set<Object> keys = jsonObject.keySet();
         for (Object key : keys) {
-            parameterMap.put((String) key, (String) jsonObject.get(key));
+            parameterMap.put((String) key, jsonObject.get(key));
         }
 
         htmlComponent.setParameterMap(parameterMap);
         return htmlComponent;
+    }
+
+    private HtmlDiv getHtmlDiv(JsonObject jsonObject) {
+        HtmlDiv htmlDiv = new HtmlDiv();
+        String componentTemplateName = (String) jsonObject
+                .get("component-type");
+        if (componentTemplateName != null) {
+            htmlDiv.setComponentTemplateName(componentTemplateName);
+        }
+
+        JSONArray formJsonArray = (JSONArray) jsonObject.get("fields");
+
+        for (int i = 0; i < formJsonArray.size(); i++) {
+            htmlDiv.addHtmlFieldElement(getHtmlComponent((JsonObject) formJsonArray
+                    .get(i)));
+        }
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        Set<Object> keys = jsonObject.keySet();
+        for (Object key : keys) {
+            parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        htmlDiv.setParameterMap(parameterMap);
+        return htmlDiv;
     }
 
     private HtmlButton getHtmlButton(JsonObject jsonObject) {
@@ -318,10 +397,10 @@ public class SimpleWorkflowHelper {
         htmlButton.setComponentTemplateName((String) jsonObject
                 .get("component-type"));
 
-        Map<String, String> parameterMap = new HashMap<String, String>();
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
         Set<Object> keys = jsonObject.keySet();
         for (Object key : keys) {
-            parameterMap.put((String) key, (String) jsonObject.get(key));
+            parameterMap.put((String) key, jsonObject.get(key));
         }
 
         htmlButton.setParameterMap(parameterMap);

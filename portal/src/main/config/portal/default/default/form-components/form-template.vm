@@ -11,6 +11,7 @@
 
 <form id="simpleworkflow-form">
 	$fieldElementsHtml
+	$divElementsHtml
 	$buttonElementsHtml
 </form>
 
