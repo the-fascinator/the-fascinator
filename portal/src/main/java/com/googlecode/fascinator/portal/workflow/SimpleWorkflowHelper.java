@@ -225,6 +225,7 @@ public class SimpleWorkflowHelper {
     private String renderDivElementsHtml(HtmlForm form) throws Exception {
         String divElementsHtml = "";
         List<HtmlDiv> htmlDivs = form.getHtmlDivs();
+        int divorder = 1;
         for (HtmlDiv htmlDiv : htmlDivs) {
             String htmlDivTemplate = "form-components/"
                     + htmlDiv.getComponentTemplateName();
@@ -241,6 +242,7 @@ public class SimpleWorkflowHelper {
                     vc.put((String) key,
                             parentVelocityContext.get((String) key));
                 }
+                vc.put("divorder", divorder++);
                 vc.put("fieldElementsHtml", fieldElementsHtml);
 
                 Map<String, Object> parameterMap = htmlDiv.getParameterMap();

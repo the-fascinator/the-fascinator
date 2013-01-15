@@ -1,7 +1,6 @@
-<label for="$field-name">$label</label>
+<label for="$field-name">$label</label><br>
 <select>
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
+#foreach($option in $options)
+  <option value="$option.get("value")">$option.get("label")</option>
+#end
 </select> 

@@ -1,0 +1,4 @@
+<p>$button-for</p>
+#foreach( $button in $buttons )
+    <label><input name="$field-name" onclick="$button.action" type="radio">$button.label</label>
+#end
