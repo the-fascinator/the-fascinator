@@ -7,8 +7,7 @@ $buttonHtml
 </span>
 <script type="text/javascript">
    function saveData(unmanagedData, isValid,something, serverData) {  
-         serverData["metaList"]= ["title", "description", "mint:newForm", "mint:formVersion"];
-         var url = 'http://localhost:9001/mint/default/workflows/simpleworkflow.ajax?func=action&action='+action+'&oid=$oid';
+         var url = '$portalPath/default/workflows/simpleworkflow.ajax?func=action&action='+action+'&oid=$oid';
          jQuery.ajax({type:"POST", url:url, data:serverData,
 			success:function(){ alert('success');},
 			error:function(xhr, status, e){},
