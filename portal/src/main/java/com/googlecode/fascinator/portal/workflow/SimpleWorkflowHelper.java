@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,11 +107,13 @@ public class SimpleWorkflowHelper {
         // Find out what fields were actually present on this form. We don't
         // want users to be able to poke additional values on the request
         List<String> fieldList = new ArrayList<String>();
-        JSONArray formJsonArray = formConfiguration.getArray("stages",
-                workflowMetadata.getString(null, "step"), "fields");
-        for (int i = 0; i < formJsonArray.size(); i++) {
-            fieldList.add(new JsonSimple((JsonObject) formJsonArray.get(i))
-                    .getString("", "field-name"));
+        
+        List<JsonObject> formJsonArray = getFormFieldArray(formConfiguration
+                .getArray("stages", workflowMetadata.getString(null, "step"),
+                        "divs").toArray());
+
+        for (JsonObject element : formJsonArray) {
+            fieldList.add(new JsonSimple(element).getString("", "field-name"));
         }
 
         for (String field : fieldList) {
@@ -120,6 +123,17 @@ public class SimpleWorkflowHelper {
         digitalObject.updatePayload(pid, new ByteArrayInputStream(tfPackage
                 .toString().getBytes()));
 
+    }
+
+    private List<JsonObject> getFormFieldArray(Object[] divs) {
+        List<JsonObject> formFields = new ArrayList<JsonObject>();
+        for (Object div : divs) {
+            JsonObject jsonObjectDiv = (JsonObject) div;
+            JsonObject[] divFormFields = (JsonObject[]) ((JSONArray) jsonObjectDiv
+                    .get("fields")).toArray(new JsonObject[] {});
+            formFields.addAll(Arrays.asList(divFormFields));
+        }
+        return formFields;
     }
 
     public void reindex(String oid, String step, String username)
@@ -211,10 +225,11 @@ public class SimpleWorkflowHelper {
 
         // Now that we have generated the elements we need for the html form.
         // Wrap it in the general form template
-        VelocityContext vc = new VelocityContext();
+        VelocityContext vc = parentVelocityContext;
         vc.put("fieldElementsHtml", fieldElementsHtml);
         vc.put("buttonElementsHtml", buttonElementsHtml);
         vc.put("divElementsHtml", divElementsHtml);
+
         StringWriter pageContentWriter = new StringWriter();
         velocityService.renderTemplate(portalId,
                 "form-components/form-template", vc, pageContentWriter);
@@ -339,6 +354,16 @@ public class SimpleWorkflowHelper {
                         pageContentWriter);
                 String componentHtml = pageContentWriter.toString();
 
+                if (htmlFieldElement.hasValidation()) {
+                    vc.put("validation", htmlFieldElement.getValidation());
+                    vc.put("elementHtml", componentHtml);
+                    pageContentWriter = new StringWriter();
+                    velocityService.renderTemplate(portalId,
+                            "form-components/validation-wrapper", vc,
+                            pageContentWriter);
+                    componentHtml = pageContentWriter.toString();
+                }
+
                 // Inject this components html for use in the component-wrapper
                 // template
                 vc.put("elementHtml", componentHtml);
@@ -363,6 +388,11 @@ public class SimpleWorkflowHelper {
         Set<Object> keys = jsonObject.keySet();
         for (Object key : keys) {
             parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        if (jsonObject.get("validation") != null) {
+            htmlComponent.setValidation(((JSONArray) jsonObject
+                    .get("validation")).toArray());
         }
 
         htmlComponent.setParameterMap(parameterMap);
