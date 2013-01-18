@@ -16,12 +16,12 @@ var RadioGroupWidgetBuilder = function($, jaffa) {
         },
 
         // Identity has been altered, adjust the DOM for all fields
-        domUpdate: function(from, to) {
-            this._super(from, to);
+        domUpdate: function(from, to, depth) {
+            this._super(from, to, depth);
             // Store, we'll need them to notify Jaffa later
             this.oldField = this.field;
             // Replace the portion of the ID that changed
-            this.field = this.oldField.replace(from, to);
+            this.field = this.oldField.domUpdate(from, to, depth);
             // Update DOM but constrain searches to container, since there may
             //  be very temporary duplicate IDs as sort orders swap
             var container = this.getContainer();
@@ -35,7 +35,7 @@ var RadioGroupWidgetBuilder = function($, jaffa) {
             // Do it all again for labels if they are stored
             if (this.labelField != null) {
                 this.oldLabelField = this.labelField;
-                this.labelField = this.oldLabelField.replace(from, to);
+                this.labelField = this.oldLabelField.domUpdate(from, to, depth);
                 container.find("input[id=\""+this.oldLabelField+"\"]").attr("id", this.labelField);
                 jaffa.form.ignoreField(this.oldLabelField);
             }

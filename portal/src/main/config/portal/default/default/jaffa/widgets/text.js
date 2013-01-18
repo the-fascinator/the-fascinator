@@ -9,12 +9,12 @@ var TextWidgetBuilder = function($, jaffa) {
             this.getContainer().remove();
         },
         // Identity has been altered, adjust the DOM for all fields
-        domUpdate: function(from, to) {
-            this._super(from, to);
+        domUpdate: function(from, to, depth) {
+            this._super(from, to, depth);
             // Store, we'll need them to notify Jaffa later
             this.oldField = this.field;
             // Replace the portion of the ID that changed
-            this.field = this.oldField.replace(from, to);
+            this.field = this.oldField.domUpdate(from, to, depth);
             // Update DOM but constrain searches to container, since there may
             //  be very temporary duplicate IDs as sort orders swap
             var container = this.getContainer();
