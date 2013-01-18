@@ -107,7 +107,7 @@ public class SimpleWorkflowHelper {
         // Find out what fields were actually present on this form. We don't
         // want users to be able to poke additional values on the request
         List<String> fieldList = new ArrayList<String>();
-        
+
         List<JsonObject> formJsonArray = getFormFieldArray(formConfiguration
                 .getArray("stages", workflowMetadata.getString(null, "step"),
                         "divs").toArray());
@@ -209,6 +209,15 @@ public class SimpleWorkflowHelper {
                     .get(i)));
         }
 
+        // TODO: Investigate why JSONSimple call doesn't parse correctly in this
+        // instance
+        String htmlFooter = (String) ((JsonObject) ((JsonObject) formConfiguration
+                .getJsonObject().get("stages")).get(workflowMetadata.getString(
+                null, "step"))).get("form-footer");
+        if (htmlFooter != null) {
+            form.setHtmlFooter(htmlFooter);
+        }
+
         String output = renderFormHtml(form);
 
         return output;
@@ -223,18 +232,36 @@ public class SimpleWorkflowHelper {
 
         String buttonElementsHtml = renderButtonElementsHtml(form);
 
+        String formFooterHtml = renderFormFooterHtml(form.getHtmlFooter());
+
         // Now that we have generated the elements we need for the html form.
         // Wrap it in the general form template
         VelocityContext vc = parentVelocityContext;
         vc.put("fieldElementsHtml", fieldElementsHtml);
         vc.put("buttonElementsHtml", buttonElementsHtml);
         vc.put("divElementsHtml", divElementsHtml);
+        vc.put("formFooterHtml", formFooterHtml);
 
         StringWriter pageContentWriter = new StringWriter();
         velocityService.renderTemplate(portalId,
                 "form-components/form-template", vc, pageContentWriter);
 
         return pageContentWriter.toString();
+    }
+
+    private String renderFormFooterHtml(String htmlFooterTemplate)
+            throws Exception {
+        VelocityContext vc = new VelocityContext();
+        vc.put("velocityContext", parentVelocityContext);
+        if (velocityService.resourceExists(portalId, "form-components/"
+                + htmlFooterTemplate + ".vm") != null) {
+            // Render the component's velocity template as a String
+            StringWriter pageContentWriter = new StringWriter();
+            velocityService.renderTemplate(portalId, "form-components/"
+                    + htmlFooterTemplate, vc, pageContentWriter);
+            return pageContentWriter.toString();
+        }
+        return "";
     }
 
     private String renderDivElementsHtml(HtmlForm form) throws Exception {

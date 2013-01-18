@@ -8,6 +8,7 @@ public class HtmlForm {
     private List<HtmlFieldElement> htmlFieldElements = new ArrayList<HtmlFieldElement>();
     private List<HtmlButton> htmlButtons = new ArrayList<HtmlButton>();
     private List<HtmlDiv> htmlDivs = new ArrayList<HtmlDiv>();
+    private String htmlFooter = null;
 
     public void addHtmlFieldElement(HtmlFieldElement htmlFieldElement) {
         htmlFieldElements.add(htmlFieldElement);
@@ -32,6 +33,14 @@ public class HtmlForm {
 
     public List<HtmlDiv> getHtmlDivs() {
         return htmlDivs;
+    }
+
+    public String getHtmlFooter() {
+        return htmlFooter;
+    }
+
+    public void setHtmlFooter(String htmlFooter) {
+        this.htmlFooter = htmlFooter;
     }
 
 }
