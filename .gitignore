@@ -1,1 +1,4 @@
 target/
+.name
+/.idea
+*.iml
