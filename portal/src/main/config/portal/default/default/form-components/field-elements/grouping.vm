@@ -1,0 +1,10 @@
+#foreach( $element in $elements )
+ 	$element <br>
+ 	$element.entrySet() <br>
+ 	$element.containsKey('component-type') <br>
+ 	#foreach($key in $element.keySet())
+ #set($value = $element.get($key))
+  key = $key, value = $value <br>
+#end
+ 	#set($a='form-components/field-elements/grouping.vm/'+$element.type +".vm")
+#end

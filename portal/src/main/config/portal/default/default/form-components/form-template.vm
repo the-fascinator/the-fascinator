@@ -8,15 +8,18 @@
 <script type="text/javascript" src="$portalPath/jaffa/libs/validatious/validatious.2.0.min.0.9.1.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/jaffa.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/myJaffa.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/text.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
 
-<form id="simpleworkflow-form">
+<!-- form id="simpleworkflow-form" -->
+<div id="simpleworkflow-form">
 	$fieldElementsHtml
 	$divElementsHtml
 	$buttonElementsHtml
-</form>
+</div>	
+<!-- /form -->
 
 <script type="text/javascript">
-
   var jaffa = jaffaFactory({
         debuggingEnabled: true,
         urlDataSource: "$portalPath/workflows/simpleworkflow.ajax?func=get-tfpackage&oid=$oid",
@@ -31,3 +34,5 @@
     }
 
 </script>
+
+$formFooterHtml
