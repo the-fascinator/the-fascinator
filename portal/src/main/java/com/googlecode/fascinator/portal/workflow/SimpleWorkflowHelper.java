@@ -427,10 +427,10 @@ public class SimpleWorkflowHelper {
         StringWriter pageContentWriter = new StringWriter();
         if (velocityService.resourceExists(portalId,
                 "form-components/field-elements/" + groupTemplate + ".vm") != null) {
-            VelocityContext vc = parentVelocityContext;
+            VelocityContext vc = (VelocityContext) parentVelocityContext
+                    .clone();
             vc.put("fieldElementsHtml", fieldElementsHtml);
-            vc.put("velocityContext", parentVelocityContext);
-            Set<String> keys = htmlFieldElement.getParameterMap().keySet();
+			Set<String> keys = htmlFieldElement.getParameterMap().keySet();
             for (String key : keys) {
                 vc.put(key, htmlFieldElement.getParameterMap().get(key));
             }
