@@ -1,4 +1,10 @@
-= Current Release v1.1.1 =
+*Note:* Issues and links listed in v1.1.1 and older refer to the old [GoogleCode site](https://code.google.com/p/the-fascinator/wiki/ReleaseHistory)
+
+----
+
+Current Release v1.1.1
+=====
+
 Bug fix release to support the ReDBox v1.5.1 release.
 
 *Release Date:* 13 August 2012
@@ -6,11 +12,11 @@ Bug fix release to support the ReDBox v1.5.1 release.
  * Fixed resumption token issue in OAI-PMH feed that was causing the ANDS harvester to fail. issue #69, r3248
  * Various Apache Maven configuration changes to make the build more reliable 
 
-
 ----
-= v1.1 =
+v1.1
+=====
 
-Last release under the [http://www.redboxresearchdata.com.au/governance/eif048 EIF048 funding], the bug fixes and improvements from this version, combined with the last few versions were in support of the ReDBox v1.5 release.
+Last release under the [EIF048 funding](http://www.redboxresearchdata.com.au/governance/eif048), the bug fixes and improvements from this version, combined with the last few versions were in support of the ReDBox v1.5 release.
 
 *Release Date:* 23 May 2012
 
@@ -21,7 +27,8 @@ Last release under the [http://www.redboxresearchdata.com.au/governance/eif048 E
  * Bug fix for property substitution when retrieving lists of Strings from Json Library. r3226
 
 ----
-= v1.0.8 =
+v1.0.8
+=====
 
 Yet another minor release primarily in support of projects deployed on the platform.
 
@@ -33,7 +40,8 @@ Yet another minor release primarily in support of projects deployed on the platf
  * Uploaded files can now provide a 'context', allowing identical _filenames_ to be uploaded without being considered identical _files_ (provided they have different contexts). r3198
 
 ----
-= v1.0.7 =
+v1.0.7
+=====
 
 This is another minor release primarily in support of projects deployed on the platform.
 
@@ -44,7 +52,8 @@ This is another minor release primarily in support of projects deployed on the p
  * Security Enhancements.
 
 ----
-= v1.0.6 =
+v1.0.6
+=====
 
 Minor release primarily in support of projects deployed on the platform.
 
@@ -55,7 +64,8 @@ Minor release primarily in support of projects deployed on the platform.
  * !JsonVelocity contrib plugin updated to provide access to system configuration inside templates. r3126
 
 ----
-= v1.0.5 =
+v1.0.5
+=====
 
 Major works on system messaging for robustness and improved functionality. The Solr Event Log Subscriber and the !ReIndex tool also got some long overdue tender loving care.
 
@@ -78,7 +88,8 @@ Major works on system messaging for robustness and improved functionality. The S
  * Objects posting messages to the tool chain can now be configured regarding the specific queue to use. r3085
 
 ----
-= v1.0.4 =
+v1.0.4
+=====
 
 This release focuses on significant updates to the [LoggingFrameworks logging framework] 'plumbing' throughout the platform. There are also a number of bug fixes and the test release of a new restoration process.
 
@@ -98,7 +109,8 @@ This release focuses on significant updates to the [LoggingFrameworks logging fr
  * Fixed Atom Feed bugs resulting from code being out-of-date. (issue #50)
 
 ----
-= v1.0.3 =
+v1.0.3
+=====
 
 This release was concerned with migrating to new build/release infrastructure. Upgrading to v3.3.0 of Solr was required as part of this and some associated changes resulted.
 
@@ -115,18 +127,20 @@ This release was concerned with migrating to new build/release infrastructure. U
  * Addressed some deprecated practices causing log bloat.
 
 ----
-= v1.0.2 =
+v1.0.2
+=====
 
 Aside from some minor bug fixes, this release was mostly to cover the code migration to Google Code and some related alterations to POMs.
 
 *Release Date:* 05 May 2011
 
 ----
-= Pre-migration =
+Pre-migration
+=====
 
 There were numerous releases performed prior to our migration to Google Code. Those releases, and associated tickets are documented on USQ infrastructure (for now).
 
-Links and a brief summary are provided below:
+Links (no longer working) and a brief summary are provided below:
 
  * [https://fascinator.usq.edu.au/trac/wiki/tf2/Version1.0.1 v1.0.1]: *27 April 2011*
    * Overhaul and improvement of OAI feeds against a variety of less common scenarios.
