@@ -1,6 +1,17 @@
 *Note:* Issues and links listed in v1.1.1 and older refer to the old [GoogleCode site](https://code.google.com/p/the-fascinator/wiki/ReleaseHistory)
 
 ----
+Next version: v1.1.2
+=====
+A textual summary/description of the release goes here...
+
+Release Date: TBA... see earlier releases.
+
+Release Notes: (so far... this version is unreleased)
+
+ * 
+
+----
 
 Current Release v1.1.1
 =====
