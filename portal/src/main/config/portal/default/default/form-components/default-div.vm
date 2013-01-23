@@ -1,0 +1,4 @@
+<h1 jaffa-tab-id="tab-$divorder">$heading</h1>
+<div id="tab-$divorder" class="tab">
+	$fieldElementsHtml
+</div>

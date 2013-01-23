@@ -1,0 +1,27 @@
+<div class="jaffaList" id="repeat-textbox-of-$field-name">
+<p>You should see something replace this div</p>
+</div>
+
+<script>
+var widgetListBranding = {
+	"" : "control-group",
+	".jaffaValidationError" : ["alert", "alert-error"]
+};
+$(document).ready(function() {
+$("#repeat-textbox-of-$field-name").jaffaTextRepeatable({
+	"disable-numbers":true,
+	"disable-sorting":true,
+	"base-field":"$field-name",
+	"sub-fields": {
+		"field":""
+	},
+	"add-item-text":"Add",
+	"delete-item-html":"<button>Remove</button>",
+	"min-size":1,
+	"child-config":{
+		"label":"${label}",
+		"field":""
+	},
+	"class-list":widgetListBranding
+});});
+</script>

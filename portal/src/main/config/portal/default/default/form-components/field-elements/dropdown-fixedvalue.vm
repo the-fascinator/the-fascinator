@@ -1,0 +1,6 @@
+<label for="$field-name">$label</label><br>
+<select>
+#foreach($option in $options)
+  <option value="$option.get("value")">$option.get("label")</option>
+#end
+</select> 

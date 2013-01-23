@@ -103,6 +103,14 @@ import se.kb.oai.pmh.ResumptionToken;
  * <td><i>None</i></td>
  * </tr>
  * <tr>
+ * <td>useSetInStorage</td>
+ * <td>If true, and a 'setSpec' is provided, it will be used as part of OID generate for storage.
+ * This allows for a record that would be it two sets to be harvested twice as two objects, rather
+ * than each harvest using the same OID.</td>
+ * <td>No</td>
+ * <td><i>false</i></td>
+ * </tr>
+ * <tr>
  * <td>from</td>
  * <td>Harvest records from this date</td>
  * <td>No</td>
@@ -227,6 +235,7 @@ public class OaiPmhHarvester extends GenericHarvester {
 
     /** OAI-PMH Set */
     private String setSpec;
+    private boolean useSetInStorage;
 
     /**
      * Basic constructor.
@@ -297,6 +306,8 @@ public class OaiPmhHarvester extends GenericHarvester {
 
         setSpec = getJsonConfig().getString(null,
                 "harvester", "oai-pmh", "setSpec");
+        useSetInStorage = getJsonConfig().getBoolean(false,
+                "harvester", "oai-pmh", "useSetInStorage");
     }
 
     /**
@@ -482,6 +493,11 @@ public class OaiPmhHarvester extends GenericHarvester {
             StorageException {
         Storage storage = getStorage();
         String oid = record.getHeader().getIdentifier();
+        // We've been asked to use the SET of the record as part of the storage ID.
+        // Can be used to differentiate between two harvests on overlapping sets.
+        if (useSetInStorage && setSpec != null) {
+            oid += "-"+setSpec;
+        }
         String metadata = null;
         try {
             metadata = record.getMetadataAsString();

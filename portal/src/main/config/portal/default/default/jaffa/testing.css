@@ -1,0 +1,131 @@
+.hidden {
+    display: none;
+}
+.clear-both {
+    clear: both;
+}
+.ui-widget-content p a {
+    text-decoration: none;
+    border-width: 0px 0px 1px 0px;
+    border-style: none none dotted none;
+}
+.row-fluid {
+    margin-top: 1em;
+}
+.well .log-scroller {
+    overflow: auto;
+    height: 170px;
+    background-color: #FFFFFF;
+    font-weight: normal;
+    color: black;
+}
+.well .log-scroller div {
+    border-top: 1px solid #EEEEEE;
+    border-left: 1px solid #EEEEEE;
+    padding: 1px 2px;
+    vertical-align: top;
+    text-align: left;
+}
+.well .log-scroller span {
+    margin: 0px 1px 1px;
+}
+.log-scroller .time, .log-scroller .level, .log-scroller .result {
+    width: 75px;
+    float: left;
+}
+.log-scroller .pass, .log-scroller .fail {
+    background-repeat: no-repeat;
+    background-position: left top;
+    padding-left: 20px;
+}
+.log-scroller .pass {
+    background-image: url(tick.png);
+}
+.log-scroller .fail {
+    background-image: url(cross.png);
+}
+.theme-picker .theme {
+    float: left;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #EEEEEE;
+    padding: 5px;
+    margin: 2px;
+}
+.theme a, .theme img {
+    border: 0px;
+    text-decoration: none;
+    margin: 0px;
+    padding: 0px;
+}
+code.prettyprint {
+    padding: 0.1em 0.5em 0.2em;
+}
+#tab-startup td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0px 5px 5px 0px;
+}
+#tab-startup .control-label {
+    width: 80px;
+}
+#tab-startup pre {
+    margin: 0px 5px 5px 5px;
+    padding: 0.5em 0.5em 0.5em 1em;
+}
+#tab-style h3, #tab-style h4 {
+    margin: 5px 0px;
+}
+.alert pre {
+    text-shadow: none;
+}
+.jaffaList {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+.jaffaList .jaffaSorting {
+    margin-top: 2px;
+}
+.jaffaList .jaffaItemNumber {
+    padding-top: 4px;
+}
+.jaffaList .jaffaDeleteItem {
+    padding: 5px 0px 0px 5px;
+}
+.jaffaList .control-group {
+    margin-bottom: 5px;
+    width: 450px;
+}
+.jaffaAddItem {
+    margin-bottom: 10px;
+}
+.jaffaEmptyList {
+    padding: 3px;
+}
+.jaffaHelpContent {
+    padding: 4px;
+    margin-bottom: 3px;
+}
+.jaffaHelpContent .ui-icon {
+    float: left;
+}
+.jaffaHelpToggle .ui-button-text {
+    padding: 0.6em 1.2em 0.6em 0em;
+}
+.jaffaHelpToggle .ui-icon {
+    left: 0em;
+}
+.jaffaHelpToggle {
+    margin-left: 5px;
+}
+/* Some nesting in list widgets with bootstrap could look more defined */
+.thumbnail .thumbnail {
+    margin-left: 5px;
+    margin-bottom: 10px;
+    background-color: #EEE;
+    color: #222;
+}
+.thumbnail .thumbnail .thumbnail{
+    background-color: #FFF;
+    color: #222;
+}

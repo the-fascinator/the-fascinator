@@ -1,0 +1,132 @@
+{
+    "totalResultsCount":3,
+    "geonames":[{
+            "alternateNames":[{
+                    "name":"http://en.wikipedia.org/wiki/Toowong%2C_Queensland",
+                    "lang":"link"
+                }
+            ],
+            "adminCode2":"31000",
+            "countryName":"Australia",
+            "adminCode1":"04",
+            "fclName":"city, village,...",
+            "score":23.283952713012695,
+            "countryCode":"AU",
+            "lng":152.9894256591797,
+            "adminName2":"Brisbane",
+            "adminName3":"",
+            "fcodeName":"populated place",
+            "adminName4":"",
+            "timezone":{
+                "dstOffset":10,
+                "gmtOffset":10,
+                "timeZoneId":"Australia/Brisbane"
+            },
+            "toponymName":"Toowong",
+            "fcl":"P",
+            "continentCode":"OC",
+            "name":"Toowong",
+            "fcode":"PPL",
+            "geonameId":6943572,
+            "lat":-27.483603492593527,
+            "adminName1":"Queensland",
+            "population":9873
+        },
+        {
+            "alternateNames":[{
+                    "name":"Toowoomba",
+                    "lang":"de"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"en"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"fi"
+                },
+                {
+                    "name":"http://en.wikipedia.org/wiki/Toowoomba",
+                    "lang":"link"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"nl"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"pl"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"pt"
+                },
+                {
+                    "name":"Toowoomba",
+                    "lang":"ro"
+                },
+                {
+                    "name":"Тувумба",
+                    "lang":"ru"
+                }
+            ],
+            "adminCode2":"36910",
+            "countryName":"Australia",
+            "adminCode1":"04",
+            "fclName":"city, village,...",
+            "score":15.158537864685059,
+            "countryCode":"AU",
+            "lng":151.9666667,
+            "adminName2":"Toowoomba",
+            "adminName3":"",
+            "fcodeName":"populated place",
+            "adminName4":"",
+            "timezone":{
+                "dstOffset":10,
+                "gmtOffset":10,
+                "timeZoneId":"Australia/Brisbane"
+            },
+            "toponymName":"Toowoomba",
+            "fcl":"P",
+            "continentCode":"OC",
+            "name":"Toowoomba",
+            "fcode":"PPL",
+            "geonameId":2146268,
+            "lat":-27.55,
+            "adminName1":"Queensland",
+            "population":92800
+        },
+        {
+            "alternateNames":[{
+                    "name":"http://en.wikipedia.org/wiki/Toowoon_Bay%2C_New_South_Wales",
+                    "lang":"link"
+                }
+            ],
+            "adminCode2":"18550",
+            "countryName":"Australia",
+            "adminCode1":"02",
+            "fclName":"city, village,...",
+            "score":11.368903160095215,
+            "countryCode":"AU",
+            "lng":151.49713039398193,
+            "adminName2":"Wyong Shire",
+            "adminName3":"",
+            "fcodeName":"populated place",
+            "adminName4":"",
+            "timezone":{
+                "dstOffset":10,
+                "gmtOffset":11,
+                "timeZoneId":"Australia/Sydney"
+            },
+            "toponymName":"Toowoon Bay",
+            "fcl":"P",
+            "continentCode":"OC",
+            "name":"Toowoon Bay",
+            "fcode":"PPL",
+            "geonameId":6695070,
+            "lat":-33.35811538036093,
+            "adminName1":"New South Wales",
+            "population":0
+        }
+    ]
+}

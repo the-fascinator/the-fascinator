@@ -1,0 +1,8 @@
+<span>$button-for</span><br>
+#foreach( $button in $buttons )
+    <label><input name="$field-name" 
+    #if( $button.action ) onclick="$button.action" #end
+    #if( $button.checked ) checked="checked" #end 
+    type="radio">$button.label</label>
+    #if( $multiline ) <br> #end
+#end

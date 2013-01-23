@@ -1,0 +1,1 @@
+<$type #if ($additional-class) class="$additional-class" #end>$content</$type>

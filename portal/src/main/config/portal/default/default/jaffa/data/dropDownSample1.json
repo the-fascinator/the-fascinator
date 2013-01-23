@@ -1,0 +1,58 @@
+[
+    {
+        "value": "red",
+        "label": "Red",
+        "moreData": {
+            "examples": "Blood, Tomatoes... &amp; Elmo",
+            "hexColor": "#FF0000"
+        }
+    },
+    {
+        "value": "orange",
+        "label": "Orange",
+        "moreData": {
+            "examples": "Carrots, Pumpkins &amp; Basketballs",
+            "hexColor": "#FF7F00"
+        }
+    },
+    {
+        "value": "yellow",
+        "label": "Yellow",
+        "moreData": {
+            "examples": "Bananas, Lemons &amp;  Sunflowers",
+            "hexColor": "#FFFF00"
+        }
+    },
+    {
+        "value": "green",
+        "label": "Green",
+        "moreData": {
+            "examples": "Grass, Spinach &amp; Emeralds",
+            "hexColor": "#00FF00"
+        }
+    },
+    {
+        "value": "blue",
+        "label": "Blue",
+        "moreData": {
+            "examples": "The Ocean, The Sky &amp; Sapphires",
+            "hexColor": "#0000FF"
+        }
+    },
+    {
+        "value": "indigo",
+        "label": "Indigo",
+        "moreData": {
+            "examples": "<a href=\"http://simple.wikipedia.org/wiki/Indigo\">Jeans</a>, Blueberries... yeah I'm stumped.",
+            "hexColor": "#6600FF"
+        }
+    },
+    {
+        "value": "violet",
+        "label": "Violet",
+        "moreData": {
+            "examples": "I've spent enough time on this, I'm sure you'll work it out...",
+            "hexColor": "#8B00FF"
+        }
+    }
+]

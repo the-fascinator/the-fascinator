@@ -1,0 +1,100 @@
+<p>jQuery UI has great flexibility for styling. Take a look at the <a href="http://jqueryui.com/themeroller/">ThemeRoller</a>
+    for a current look at what is on offer, but here are some quick alternatives picked from that page. Implementing one is
+    as simple as adding a stylesheet:</p>
+<div class="theme-picker">
+    <div class="theme">
+        <a href="themes/base/jquery-ui-1.8.18.custom.css">
+            <img src="themes/base/thumbnail.png"/>
+            <br/>Base
+        </a>
+    </div>
+    <div class="theme">
+        <a href="themes/ui-lightness/jquery-ui-1.8.18.custom.css">
+            <img src="themes/ui-lightness/thumbnail.png"/>
+            <br/>'UI lightness'
+        </a>
+    </div>
+    <div class="theme">
+        <a href="themes/start/jquery-ui-1.8.18.custom.css">
+            <img src="themes/start/thumbnail.png"/>
+            <br/>'Start'
+        </a>
+    </div>
+    <div class="theme">
+        <a href="themes/le-frog/jquery-ui-1.8.18.custom.css">
+            <img src="themes/le-frog/thumbnail.png"/>
+            <br/>'Le Frog'
+        </a>
+    </div>
+    <div class="theme">
+        <a href="themes/cupertino/jquery-ui-1.8.18.custom.css">
+            <img src="themes/cupertino/thumbnail.png"/>
+            <br/>'Cupertino'
+        </a>
+    </div>
+    <div class="theme">
+        <a href="themes/vader/jquery-ui-1.8.18.custom.css">
+            <img src="themes/vader/thumbnail.png"/>
+            <br/>'Vader'
+        </a>
+    </div>
+    <div class="clear-both"></div>
+</div>
+<h3>Some Sample UI elements</h3>
+<div class="span6">
+    <h4>Accordian</h4>
+    <div id="sampleAccordian">
+        <h3><a href="#">First header</a></h3>
+        <div>First content</div>
+        <h3><a href="#">Second header</a></h3>
+        <div>Second content</div>
+        <h3><a href="#">Third header</a></h3>
+        <div>Third content</div>
+        <h3><a href="#">Fourth header</a></h3>
+        <div>Fourth content</div>
+    </div>
+    <h4>Tabs</h4>
+    <div class="my-tab-class2">
+        <h3 jaffa-tab-id="sampleTab-1">Tab 1</h3>
+        <div id="sampleTab-1">Content Block 1</div>
+        <h3 jaffa-tab-id="sampleTab-2">Tab 2</h3>
+        <div id="sampleTab-2">Content Block 2</div>
+        <h3 jaffa-tab-id="sampleTab-3">Tab 3</h3>
+        <div id="sampleTab-3">Content Block 3</div>
+    </div>
+    <h4>Slider</h4>
+    <div id="sampleSlider"></div>
+</div>
+<div class="span6">
+    <h4>Datepicker</h4>
+    <div id="sampleDate"></div>
+    <h4>Progress Bar</h4>
+    <div id="sampleProgressbar"></div>
+    <h4>Dialogs &amp; Buttons</h4>
+    <p><button class="sampleDialogBtn" id="sampleDialogBtn">Open a jQuery Dialog</button> &lt;= A jQuery UI Button</p>
+    <p>
+        <button class="sampleDialogBtn btn btn-primary">Open a jQuery Dialog</button> &lt;= A Bootstrap Button
+        <br/>Bootstrap has its own styles of course, which I haven't demo'd here, but you <a href="http://twitter.github.com/bootstrap/components.html">can see for yourself</a>.
+    </p>
+</div>
+<script type="text/javascript">
+    <!--//
+        $(function() {
+            $(".theme a").click(function() {
+                $("#style-link").attr("href", $(this).attr("href"));
+                return false;
+            });
+            $("#sampleAccordian").accordion();
+            $("#sampleSlider").slider({
+                range: true,
+                values: [20, 60]
+            });
+            $("#sampleDate").datepicker();
+            $("#sampleProgressbar").progressbar({value: 37});
+            $("#sampleDialogBtn").button();
+            $(".sampleDialogBtn").click(function() {
+                jaffa.ui.messageBox("A sample dialog from jQuery UI");
+            });
+        });
+    //-->
+</script>

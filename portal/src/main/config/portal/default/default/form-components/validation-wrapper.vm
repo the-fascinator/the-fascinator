@@ -1,0 +1,9 @@
+$elementHtml
+
+<script type="text/javascript">
+jaffa.valid.setSubmitRules("$field-name",  [
+ #foreach($validationType in $validation)
+   "$validationType",
+ #end
+ ]);
+</script>
