@@ -82,6 +82,10 @@ class LayoutData:
     def getSsoProviders(self):
         return self.security.ssoBuildLogonInterface(self.sessionState)
 
+    def getPackageTypes(self):
+        
+        return ''
+    
     def csrfSecurePage(self):
         pageName = self.vc("pageName");
         # Allow only POSTS to CSRF protected pages

@@ -18,12 +18,6 @@
  */
 package com.googlecode.fascinator.messaging;
 
-import com.googlecode.fascinator.common.FascinatorHome;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +33,12 @@ import org.apache.activemq.plugin.StatisticsBrokerPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.common.FascinatorHome;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+
 /**
  * An AMQ Message broker
  * 
@@ -47,8 +47,8 @@ import org.slf4j.LoggerFactory;
 public class MessageBroker {
 
     /** Directory to store operational AMQ data */
-    public static final String DEFAULT_MESSAGING_HOME =
-            FascinatorHome.getPath("activemq-data");
+    public static final String DEFAULT_MESSAGING_HOME = FascinatorHome
+            .getPath("activemq-data");
 
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(MessageBroker.class);
@@ -99,8 +99,7 @@ public class MessageBroker {
 
             // Read configuration
             config = new JsonSimpleConfig();
-            String dataDir = config.getString(
-                    DEFAULT_MESSAGING_HOME,
+            String dataDir = config.getString(DEFAULT_MESSAGING_HOME,
                     "messaging", "home");
             String brokerUrl = config.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
@@ -110,6 +109,7 @@ public class MessageBroker {
             // Build our broker
             broker = new BrokerService();
             broker.setDataDirectory(dataDir);
+            broker.setUseJmx(true);
             try {
                 broker.addConnector(brokerUrl);
             } catch (Exception e) {
@@ -151,16 +151,19 @@ public class MessageBroker {
             // Sanity check
             if (!broker.isStarted()) {
                 log.error("AMQ broker still has not started after 10s.");
-                throw new MessagingException("AMQ Broker is taking too long to boot!");
+                throw new MessagingException(
+                        "AMQ Broker is taking too long to boot!");
             }
 
             // Now start configured message queues, there are some timing issues
-            //  here because Solr is typically started in a seperate context on
-            //  the server. The dev build inside Maven may not notice this.
+            // here because Solr is typically started in a seperate context on
+            // the server. The dev build inside Maven may not notice this.
             // We've delayed first execution by 5s and this is typically enough,
-            //  but we'll retry every 15s if the first one doesn't load.
-            int delay = config.getInteger(5000, "messaging", "startup", "delay");
-            int timeout = config.getInteger(15000, "messaging", "startup", "timer");
+            // but we'll retry every 15s if the first one doesn't load.
+            int delay = config
+                    .getInteger(5000, "messaging", "startup", "delay");
+            int timeout = config.getInteger(15000, "messaging", "startup",
+                    "timer");
             timer = new Timer("StartIndexer", true);
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
@@ -175,7 +178,7 @@ public class MessageBroker {
 
     /**
      * Setup the broker so it will respond to statistics queries.
-     *
+     * 
      * @param broker to enable statistics for
      */
     private void enableAMQStatistics(BrokerService brokerService) {
@@ -183,7 +186,9 @@ public class MessageBroker {
         StatisticsBrokerPlugin statsPlugin = new StatisticsBrokerPlugin();
         // Find what plugins are already present
         BrokerPlugin[] aPlugins = brokerService.getPlugins();
-        if (aPlugins == null) aPlugins = new BrokerPlugin[] {};
+        if (aPlugins == null) {
+            aPlugins = new BrokerPlugin[] {};
+        }
         // Add stats to the list
         List<BrokerPlugin> lPlugins = new ArrayList<BrokerPlugin>();
         lPlugins.addAll(Arrays.asList(aPlugins));
@@ -195,15 +200,15 @@ public class MessageBroker {
 
     /**
      * Startup our message queues.
-     *
+     * 
      */
     private void startMessageQueues() {
         log.info("Starting Message Queues...");
         if (messageQueues == null) {
             messageQueues = new ArrayList<GenericListener>();
         }
-        List<JsonSimple> threadConfig =
-                config.getJsonSimpleList("messaging", "threads");
+        List<JsonSimple> threadConfig = config.getJsonSimpleList("messaging",
+                "threads");
 
         try {
             // Start the AMQ monitor
@@ -228,12 +233,12 @@ public class MessageBroker {
                         queue.start();
                         messageQueues.add(queue);
                     } else {
-                        throw new Exception("Failed to find Listener: '" +
-                            classId + "'");
+                        throw new Exception("Failed to find Listener: '"
+                                + classId + "'");
                     }
                 } else {
-                    throw new Exception("No message classId provided: '" +
-                            thread.toString() + "'");
+                    throw new Exception("No message classId provided: '"
+                            + thread.toString() + "'");
                 }
             }
             log.info("All Message Queues started successfully");
@@ -258,13 +263,13 @@ public class MessageBroker {
 
     /**
      * Get a message listener from the ServiceLoader
-     *
+     * 
      * @param id Listener identifier
      * @return GenericMessageListener implementation matching the ID, if found
      */
     private GenericListener getListener(String id) {
-        ServiceLoader<GenericListener> listeners =
-                ServiceLoader.load(GenericListener.class);
+        ServiceLoader<GenericListener> listeners = ServiceLoader
+                .load(GenericListener.class);
         for (GenericListener listener : listeners) {
             if (id.equals(listener.getId())) {
                 return listener;
