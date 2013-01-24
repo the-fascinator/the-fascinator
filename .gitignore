@@ -2,3 +2,5 @@ target/
 .name
 /.idea
 *.iml
+
+plugins/harvester/filesystem/derby.log

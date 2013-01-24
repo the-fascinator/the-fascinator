@@ -9,6 +9,8 @@
 <script type="text/javascript" src="$portalPath/jaffa/libs/validatious/validatious.2.0.min.0.9.1.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/jaffa.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/myJaffa.js"></script>
+<script type="text/javascript" src="$portalPath/openlayers/OpenLayers.js"></script>
+<script type="text/javascript" src="$portalPath/openlayers/redbox.js"></script>
 
 <div class='simpleworkflow-workflow-form'>
 	$self.getFormHtml($oid)
