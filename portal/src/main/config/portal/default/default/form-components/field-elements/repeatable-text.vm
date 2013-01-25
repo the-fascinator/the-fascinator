@@ -1,4 +1,4 @@
-<div class="jaffaList" id="repeat-textbox-of-$field-name">
+<div id="repeat-textbox-of-$field-name">
 <p>You should see something replace this div</p>
 </div>
 
