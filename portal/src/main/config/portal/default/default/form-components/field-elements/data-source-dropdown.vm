@@ -1,0 +1,20 @@
+<div id="data-source-dropdown-$fieldName"><p>You should see something replace this div</p></div>
+<div id="data-source-dropdown-help-$fieldName">Help!!!</div>
+
+<script>
+var widgetListBranding = {
+    "":"control-group",
+    ".jaffaValidationError":["alert", "alert-error"]
+};
+$(document).ready(function() {
+    $("[id='data-source-dropdown-$fieldName']").jaffaDropDown({
+        "label":"$label",
+        "field":"$fieldName",
+        "label-field":"$fieldNameLabel",
+        "json-data-url":"$portalPath/$sourceUrl",
+        "help-content":"[id='data-source-dropdown-help-$fieldName']",
+        "mandatory":"$mandatory",
+        "class-list":widgetListBranding
+    });
+});
+</script>

@@ -9,6 +9,7 @@
 <script type="text/javascript" src="$portalPath/jaffa/jaffa.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/myJaffa.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/text.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/dropDown.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
 
 <!-- form id="simpleworkflow-form" -->

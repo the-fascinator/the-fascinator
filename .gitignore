@@ -4,3 +4,5 @@ target/
 *.iml
 
 plugins/harvester/filesystem/derby.log
+
+.DS_Store
