@@ -62,9 +62,7 @@ public class RecordsByStage2ChartHandler implements ChartHandler {
             IndexerException {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        ((BarChartData) chartData).setTitle(dateFormat.format(fromDate)
-                + " to " + dateFormat.format(toDate)
-                + "\n Records by Workflow Stage");
+        ((BarChartData) chartData).setTitle("[Insert Title]");
 
         Map<String, Map<String, Integer>> stepCountMap = new HashMap<String, Map<String, Integer>>();
         stepCountMap.put("inbox", getDataTypeCountMap());
@@ -76,6 +74,9 @@ public class RecordsByStage2ChartHandler implements ChartHandler {
 
         Indexer indexer = scriptingServices.getIndexer();
         ByteArrayOutputStream result = new ByteArrayOutputStream();
+        query += "AND date_created:[" + dateFormat.format(fromDate)
+                + "T00:00:00.000Z TO " + dateFormat.format(toDate)
+                + "T23:59:59.999Z]";
         SearchRequest request = new SearchRequest(query);
         int start = 0;
         int pageSize = 10;
