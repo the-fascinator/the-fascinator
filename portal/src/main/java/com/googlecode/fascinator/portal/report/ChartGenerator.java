@@ -10,6 +10,7 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
@@ -62,6 +63,8 @@ public class ChartGenerator {
         plot.setBackgroundPaint(new Color(55, 52, 80));
         plot.setDomainGridlinePaint(Color.white);
         plot.setRangeGridlinePaint(Color.white);
+        plot.getRangeAxis().setStandardTickUnits(
+                NumberAxis.createIntegerTickUnits());
 
         // disable bar outlines...
         final BarRenderer renderer = (BarRenderer) plot.getRenderer();
