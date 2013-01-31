@@ -12,6 +12,12 @@ $(document).ready(function() {
         "field":"$fieldName",
         "label-field":"$fieldNameLabel",
         "json-data-url":"$portalPath/$sourceUrl",
+        #if("$!dataLevel"!="")"data-top-level-id":"$!dataLevel",#end
+        #if("$!idKey"!="")"data-id-key":"$!idKey",#end
+        #if("$!labelKey"!="")"data-label-key":"$!labelKey",#end
+        #if("$!listKey"!="")"data-list-key":"$!listKey",#end
+        #if("$!childrenKey"!="")"data-children-key":"$!childrenKey",#end
+        #if("$!defaultValue"!="")"default-value":"$!defaultValue",#end        
         "help-content":"[id='data-source-dropdown-help-$fieldName']",
         "mandatory":"$mandatory",
         "class-list":widgetListBranding
