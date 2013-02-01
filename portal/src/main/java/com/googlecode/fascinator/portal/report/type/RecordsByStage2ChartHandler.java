@@ -74,7 +74,7 @@ public class RecordsByStage2ChartHandler implements ChartHandler {
 
         Indexer indexer = scriptingServices.getIndexer();
         ByteArrayOutputStream result = new ByteArrayOutputStream();
-        query += "AND date_created:[" + dateFormat.format(fromDate)
+        query += " AND date_created:[" + dateFormat.format(fromDate)
                 + "T00:00:00.000Z TO " + dateFormat.format(toDate)
                 + "T23:59:59.999Z]";
         SearchRequest request = new SearchRequest(query);
