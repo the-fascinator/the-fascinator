@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,6 +202,8 @@ public class SolrIndexer implements Indexer {
     /** Messaging services */
     private MessagingServices messaging;
 
+    private Map<String, SolrServer> solrServerMap;
+
     /**
      * Get the ID of the plugin
      * 
@@ -291,6 +294,21 @@ public class SolrIndexer implements Indexer {
 
             solr = initCore("solr");
             anotar = initCore("anotar");
+
+            // initialise non-hardcoded indexers
+            solrServerMap = new HashMap<String, SolrServer>();
+            JsonObject indexerConfig = config.getObject("indexer");
+
+            List<String> hardcodedValues = Arrays.asList("type", "properties",
+                    "useCache", "buffer", "solr", "anotar");
+            for (Object key : indexerConfig.keySet()) {
+                if (key instanceof String) {
+                    String keyString = (String) key;
+                    if (!hardcodedValues.contains(keyString)) {
+                        solrServerMap.put(keyString, initCore(keyString));
+                    }
+                }
+            }
 
             anotarAutoCommit = config.getBoolean(true, "indexer", "anotar",
                     "autocommit");
@@ -688,6 +706,38 @@ public class SolrIndexer implements Indexer {
             }
         } catch (Exception e) {
             log.error("Indexing failed!\n-----\n", e);
+        }
+    }
+
+    /**
+     * Search the specified solr index (core) and return the result to the
+     * provided stream
+     * 
+     * @param request : The SearchRequest object
+     * @param response : The OutputStream to send responses to
+     * @param indexName : The name of the index
+     * @throws IndexerException if there were errors during indexing
+     */
+    @Override
+    public void searchByIndex(SearchRequest request, OutputStream response,
+            String indexName) throws IndexerException {
+        SolrSearcher searcher = new SolrSearcher(
+                ((CommonsHttpSolrServer) solrServerMap.get(indexName))
+                        .getBaseURL());
+        String username = usernameMap.get(indexName);
+        String password = passwordMap.get(indexName);
+        if (username != null && password != null) {
+            searcher.authenticate(username, password);
+        }
+        InputStream result;
+        try {
+            request.addParam("wt", "json");
+            result = searcher.get(request.getQuery(), request.getParamsMap(),
+                    false);
+            IOUtils.copy(result, response);
+            result.close();
+        } catch (IOException ioe) {
+            throw new IndexerException(ioe);
         }
     }
 

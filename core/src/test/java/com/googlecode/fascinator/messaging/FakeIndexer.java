@@ -18,20 +18,20 @@
  */
 package com.googlecode.fascinator.messaging;
 
+import java.io.File;
+import java.io.OutputStream;
+
 import com.googlecode.fascinator.api.PluginDescription;
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.indexer.IndexerException;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
 
-import java.io.File;
-import java.io.OutputStream;
-
 /**
  * A fake Indexer plugin for unit testing against. This isn't even an
  * implementation in RAM, it just fakes the interface and reports activity to
- * STDOUT. It's usage outside of unit tests is pointless, and even in unit
- * tests you cannot trust what it is *doing*, just that it is being called.
+ * STDOUT. It's usage outside of unit tests is pointless, and even in unit tests
+ * you cannot trust what it is *doing*, just that it is being called.
  * 
  * @author Greg Pendlebury
  */
@@ -40,10 +40,11 @@ public class FakeIndexer implements Indexer {
     public void log(String message) {
         log(null, message);
     }
+
     public void log(String title, String message) {
         String titleLog = "";
         if (title != null) {
-            titleLog += "===\n"+title+"\n===\n";
+            titleLog += "===\n" + title + "\n===\n";
         }
         System.err.println(titleLog + message);
     }
@@ -129,5 +130,12 @@ public class FakeIndexer implements Indexer {
     public void annotateSearch(SearchRequest request, OutputStream response)
             throws IndexerException {
         log(" * INDEXER: annotateSearch()");
+    }
+
+    @Override
+    public void searchByIndex(SearchRequest request, OutputStream response,
+            String indexName) throws IndexerException {
+        log(" * INDEXER: searchByIndex()");
+
     }
 }

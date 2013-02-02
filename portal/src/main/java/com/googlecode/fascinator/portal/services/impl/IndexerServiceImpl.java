@@ -18,18 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.common.messaging.MessagingServices;
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.indexer.IndexerException;
-import com.googlecode.fascinator.api.indexer.SearchRequest;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.portal.JsonSessionState;
-import com.googlecode.fascinator.portal.services.IndexerService;
-
 import java.io.File;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
@@ -39,6 +27,18 @@ import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.ApplicationStateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.indexer.SearchRequest;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.portal.JsonSessionState;
+import com.googlecode.fascinator.portal.services.IndexerService;
 
 public class IndexerServiceImpl implements IndexerService {
 
@@ -190,5 +190,12 @@ public class IndexerServiceImpl implements IndexerService {
         } catch (MessagingException ex) {
             log.error("Error sending message: ", ex);
         }
+    }
+
+    @Override
+    public void searchByIndex(SearchRequest request, OutputStream response,
+            String indexName) throws IndexerException {
+        indexer.searchByIndex(request, response, indexName);
+
     }
 }

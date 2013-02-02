@@ -117,4 +117,17 @@ public interface Indexer extends Plugin {
      * @throws IndexerException if an error occurred while indexing
      */
     public void remove(String oid, String pid) throws IndexerException;
+
+    /**
+     * Searches the index specified using the specified request. The search
+     * results are written into the specified output stream and should generally
+     * be in a JSON or XML format
+     * 
+     * @param request search request
+     * @param result search results
+     * @param indexName the name of the index to search
+     * @throws IndexerException if an error occurred performing the search
+     */
+    void searchByIndex(SearchRequest request, OutputStream response,
+            String indexName) throws IndexerException;
 }
