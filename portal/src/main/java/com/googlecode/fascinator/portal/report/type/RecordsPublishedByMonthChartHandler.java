@@ -99,56 +99,59 @@ public class RecordsPublishedByMonthChartHandler implements ChartHandler {
             resultObject = new SolrResult(result.toString());
         }
 
-        String eventLogQuery = "oid:(";
-        for (int i = 0; i < publishedOids.size(); i++) {
-            String publishedOid = publishedOids.get(i);
-            eventLogQuery += publishedOid;
-            if (i < publishedOids.size() - 1) {
-                eventLogQuery += " OR ";
-            }
-        }
-        eventLogQuery += ") AND eventType:\"Publication flag set\"";
-
-        request = new SearchRequest(eventLogQuery);
-        result = new ByteArrayOutputStream();
-        start = 0;
-        pageSize = 10;
-        request.setParam("start", "" + start);
-        request.setParam("rows", "" + pageSize);
-        indexer.searchByIndex(request, result, "eventLog");
-        resultObject = new SolrResult(result.toString());
-        numFound = resultObject.getNumFound();
-
         Map<Integer, Integer> monthCountMap = new HashMap<Integer, Integer>();
 
-        while (true) {
-            List<SolrDoc> results = resultObject.getResults();
-            for (SolrDoc docObject : results) {
-                String eventTimeString = docObject.getString(null, "eventTime");
-                try {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(dateFormat.parse(eventTimeString));
-                    int month = calendar.get(Calendar.MONTH);
-                    if (monthCountMap.get(month) == null) {
-                        monthCountMap.put(month, 1);
-                    } else {
-                        monthCountMap.put(month, monthCountMap.get(month) + 1);
-                    }
-
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
+        if (publishedOids.size() > 0) {
+            String eventLogQuery = "oid:(";
+            for (int i = 0; i < publishedOids.size(); i++) {
+                String publishedOid = publishedOids.get(i);
+                eventLogQuery += publishedOid;
+                if (i < publishedOids.size() - 1) {
+                    eventLogQuery += " OR ";
                 }
             }
-            start += pageSize;
-            if (start > numFound) {
-                break;
-            }
-            request.setParam("start", "" + start);
-            result = new ByteArrayOutputStream();
-            indexer.search(request, result);
-            resultObject = new SolrResult(result.toString());
-        }
+            eventLogQuery += ") AND eventType:\"Publication flag set\"";
 
+            request = new SearchRequest(eventLogQuery);
+            result = new ByteArrayOutputStream();
+            start = 0;
+            pageSize = 10;
+            request.setParam("start", "" + start);
+            request.setParam("rows", "" + pageSize);
+            indexer.searchByIndex(request, result, "eventLog");
+            resultObject = new SolrResult(result.toString());
+            numFound = resultObject.getNumFound();
+
+            while (true) {
+                List<SolrDoc> results = resultObject.getResults();
+                for (SolrDoc docObject : results) {
+                    String eventTimeString = docObject.getString(null,
+                            "eventTime");
+                    try {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(dateFormat.parse(eventTimeString));
+                        int month = calendar.get(Calendar.MONTH);
+                        if (monthCountMap.get(month) == null) {
+                            monthCountMap.put(month, 1);
+                        } else {
+                            monthCountMap.put(month,
+                                    monthCountMap.get(month) + 1);
+                        }
+
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                start += pageSize;
+                if (start > numFound) {
+                    break;
+                }
+                request.setParam("start", "" + start);
+                result = new ByteArrayOutputStream();
+                indexer.search(request, result);
+                resultObject = new SolrResult(result.toString());
+            }
+        }
         String dataType = "2012 - Records \n Published by \n Month";
         chartData
                 .addEntry(monthCountMap.get(Calendar.JANUARY), dataType, "Jan");
