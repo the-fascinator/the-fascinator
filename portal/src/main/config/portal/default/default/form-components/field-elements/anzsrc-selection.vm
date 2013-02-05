@@ -1,0 +1,99 @@
+<div id="anzsrc-selection-1-$anzsrcType" class="$additional-classes"></div>
+<div id="anzsrc-selection-2-$anzsrcType" class="$additional-classes"></div>
+<div id="anzsrc-selection-3-$anzsrcType" class="$additional-classes"></div>
+<input id="$fieldName" class="jaffa-field" type="hidden">
+<input id="$fieldNameLabel" class="jaffa-field" type="text" style="display:none" readonly>
+<button id="button$fieldName" value="select" onClick="selectAnzsrc$anzsrcType()" style="display:none">Select</button>    
+        
+<script>
+var widgetListBranding = {
+    "":"control-group",
+    ".jaffaValidationError":["alert", "alert-error"]
+};
+
+$(document).ready(function() {
+
+    buildCombo('anzsrc-selection-1-$anzsrcType', '$label', 'anzsrc-field-1-$anzsrcType', 'first-$anzsrcType', '$portalPath/$sourceUrl',   
+                '$dataLevel', '$idKey', '$labelKey', '$listKey', '$childrenKey', '$defaultValue', 'anzsrc-selection-help-$anzsrcType',
+                $mandatory, 'optionSelection$anzsrcType()');
+});
+
+//Called to build each of the three combos that make up the ANZSRC selection
+function buildCombo(id, fieldLabel, fieldName, fieldNameLabel, url, dataLevel, idKey, labelKey, listKey, childrenKey, defaultValue, helpId, mandatory, functionToCall){
+
+    var myCombo= {};
+    myCombo["label"] = fieldLabel;
+    myCombo["field"] = fieldName;
+    myCombo["label-field"] = fieldNameLabel;
+    myCombo["json-data-url"] = url;
+    if  (dataLevel != "")
+        myCombo["data-top-level-id"] = dataLevel;
+    if  (idKey != "")
+        myCombo["data-id-key"] = idKey;
+    if  (labelKey != "")
+        myCombo["data-label-key"] = labelKey;
+    if  (listKey != "")
+        myCombo["data-list-key"] = listKey;
+    if  (childrenKey != "")
+        myCombo["data-children-key"] = childrenKey;
+    if  (defaultValue != "")
+        myCombo["default-value"] = defaultValue;
+                
+    myCombo["help-content"] = "[id='" + helpId + "']";
+    myCombo["mandatory"] = mandatory;
+    myCombo["class-list"] = 'widgetListBranding';
+    myCombo["function"] = functionToCall;
+        
+    $("[id='" + id + "']").jaffaAnzsrcSelection(myCombo);
+}
+
+//Called when the user selects an option on the first combo
+function optionSelection$anzsrcType(){
+    
+    if  (document.getElementById('anzsrc-field-3-$anzsrcType') != null)
+        document.getElementById('anzsrc-field-3-$anzsrcType').style.display='none';
+
+    var e = document.getElementById("anzsrc-field-1-$anzsrcType");
+    var value = e.options[e.selectedIndex].value;
+
+    buildCombo('anzsrc-selection-2-$anzsrcType', '', 'anzsrc-field-2-$anzsrcType', 'second-$anzsrcType', '$portalPath/$sourceUrl',   
+                value, '$idKey', '$labelKey', '$listKey', '$childrenKey', '$defaultValue', 'anzsrc-selection-help-$anzsrcType',
+                $mandatory, 'optionSelection2$anzsrcType()');
+}
+
+//Called when the user selects an option on the second combo
+function optionSelection2$anzsrcType(){
+
+    var e = document.getElementById("anzsrc-field-2-$anzsrcType");
+    var value = e.options[e.selectedIndex].value;
+
+    buildCombo('anzsrc-selection-3-$anzsrcType', '', 'anzsrc-field-3-$anzsrcType', 'third-$anzsrcType', '$portalPath/$sourceUrl',   
+                value, '$idKey', '$labelKey', '$listKey', '$childrenKey', '$defaultValue', 'anzsrc-selection-help-$anzsrcType',
+                $mandatory, 'optionSelection3$anzsrcType()');
+}
+
+//Called when the user selects an option on the third combo
+//Populates the fields $fieldName and $fieldNameLabel used to store the final user selection
+function optionSelection3$anzsrcType(){
+
+    var e = document.getElementById("anzsrc-field-3-$anzsrcType");
+    var value = e.options[e.selectedIndex].value;
+    var text = e.options[e.selectedIndex].text;
+    
+    document.getElementById("$fieldName").value = value;
+    document.getElementById("$fieldNameLabel").value = text;
+    document.getElementById("$fieldNameLabel").size = text.length;
+    
+    document.getElementById("button$fieldName").style.display="";
+}
+
+//Called when the user hits the Select button.
+function selectAnzsrc$anzsrcType(){
+
+    document.getElementById("anzsrc-field-1-$anzsrcType").style.display="none";
+    document.getElementById("anzsrc-field-2-$anzsrcType").style.display="none";
+    document.getElementById("anzsrc-field-3-$anzsrcType").style.display="none";
+    document.getElementById("button$fieldName").style.display="none";
+    document.getElementById("$fieldNameLabel").style.display="";
+}
+</script>
