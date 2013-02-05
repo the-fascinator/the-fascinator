@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.portal.services.ScriptingServices;
 
 public interface ChartHandler {
@@ -26,5 +27,7 @@ public interface ChartHandler {
 
     public abstract void setScriptingServices(
             ScriptingServices scriptingServices);
+
+    void setSystemConfig(JsonSimple systemConfig);
 
 }
