@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.indexer.IndexerException;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
+import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.common.solr.SolrResult;
 import com.googlecode.fascinator.portal.report.BarChartData;
@@ -26,7 +27,7 @@ import com.googlecode.fascinator.portal.services.ScriptingServices;
 public class RecordsByStageChartHandler implements ChartHandler {
 
     private ScriptingServices scriptingServices;
-
+    private JsonSimple systemConfig;
     private ChartData chartData;
     private String query = "*:*";
     private int imgW = 550;
@@ -140,5 +141,10 @@ public class RecordsByStageChartHandler implements ChartHandler {
     @Override
     public void setScriptingServices(ScriptingServices scriptingServices) {
         this.scriptingServices = scriptingServices;
+    }
+
+    @Override
+    public void setSystemConfig(JsonSimple systemConfig) {
+        this.systemConfig = systemConfig;
     }
 }

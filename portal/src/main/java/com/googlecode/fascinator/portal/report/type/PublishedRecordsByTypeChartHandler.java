@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 
@@ -16,7 +15,6 @@ import com.googlecode.fascinator.api.indexer.IndexerException;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
 import com.googlecode.fascinator.common.BasicHttpClient;
 import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.common.solr.SolrResult;
 import com.googlecode.fascinator.portal.report.BarChartData;
 import com.googlecode.fascinator.portal.report.ChartData;
@@ -33,6 +31,7 @@ public class PublishedRecordsByTypeChartHandler implements ChartHandler {
     private int imgH = 400;
     private Date fromDate = null;
     private Date toDate = null;
+    private JsonSimple systemConfig;
 
     public PublishedRecordsByTypeChartHandler() {
         chartData = new BarChartData("", "", "", BarChartData.LabelPos.HIDDEN,
@@ -82,8 +81,6 @@ public class PublishedRecordsByTypeChartHandler implements ChartHandler {
         int datasetCount = 0;
 
         while (true) {
-            List<SolrDoc> results = resultObject.getResults();
-
             datasetCount += resultObject.getResults().size();
 
             start += pageSize;
@@ -96,14 +93,14 @@ public class PublishedRecordsByTypeChartHandler implements ChartHandler {
             resultObject = new SolrResult(result.toString());
         }
 
-        BasicHttpClient client = new BasicHttpClient(
-                "http://localhost:9001/mint/default/api/query.script?callType=test&dateFrom="
-                        + dateFormat.format(fromDate) + "&dateTo="
-                        + dateFormat.format(toDate));
-        GetMethod get = new GetMethod(
-                "http://localhost:9001/mint/default/api/query.script?callType=test&dateFrom="
-                        + dateFormat.format(fromDate) + "&dateTo="
-                        + dateFormat.format(toDate));
+        String url = systemConfig.getString("http://localhost:9001/mint",
+                "proxy-urls", "Published_Records_By_Type")
+                + "&dateFrom="
+                + dateFormat.format(fromDate)
+                + "&dateTo="
+                + dateFormat.format(toDate);
+        BasicHttpClient client = new BasicHttpClient(url);
+        GetMethod get = new GetMethod(url);
         client.executeMethod(get);
 
         JsonSimple mintResult = new JsonSimple(get.getResponseBodyAsString());
@@ -136,5 +133,11 @@ public class PublishedRecordsByTypeChartHandler implements ChartHandler {
     @Override
     public void setScriptingServices(ScriptingServices scriptingServices) {
         this.scriptingServices = scriptingServices;
+    }
+
+    @Override
+    public void setSystemConfig(JsonSimple systemConfig) {
+        this.systemConfig = systemConfig;
+
     }
 }

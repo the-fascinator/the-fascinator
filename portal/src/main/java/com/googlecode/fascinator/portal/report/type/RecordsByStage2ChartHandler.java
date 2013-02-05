@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.indexer.IndexerException;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
+import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.common.solr.SolrResult;
 import com.googlecode.fascinator.portal.report.BarChartData;
@@ -220,5 +221,10 @@ public class RecordsByStage2ChartHandler implements ChartHandler {
 
     public void setScriptingServices(ScriptingServices scriptingServices) {
         this.scriptingServices = scriptingServices;
+    }
+
+    @Override
+    public void setSystemConfig(JsonSimple systemConfig) {
+        // Not used
     }
 }
