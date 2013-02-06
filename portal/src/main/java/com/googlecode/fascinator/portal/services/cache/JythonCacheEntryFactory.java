@@ -18,18 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.cache;
 
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.portal.services.ByteRangeRequestCache;
-import com.googlecode.fascinator.portal.services.DatabaseServices;
-import com.googlecode.fascinator.portal.services.DynamicPageService;
-import com.googlecode.fascinator.portal.services.HarvestManager;
-import com.googlecode.fascinator.portal.services.HouseKeepingManager;
-import com.googlecode.fascinator.portal.services.PortalManager;
-import com.googlecode.fascinator.portal.services.ScriptingServices;
-import com.googlecode.fascinator.portal.services.VelocityService;
-import com.googlecode.fascinator.portal.velocity.JythonLogger;
-
 import java.io.InputStream;
 import java.util.List;
 
@@ -44,9 +32,22 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.portal.services.ByteRangeRequestCache;
+import com.googlecode.fascinator.portal.services.DatabaseServices;
+import com.googlecode.fascinator.portal.services.DynamicPageService;
+import com.googlecode.fascinator.portal.services.FascinatorService;
+import com.googlecode.fascinator.portal.services.HarvestManager;
+import com.googlecode.fascinator.portal.services.HouseKeepingManager;
+import com.googlecode.fascinator.portal.services.PortalManager;
+import com.googlecode.fascinator.portal.services.ScriptingServices;
+import com.googlecode.fascinator.portal.services.VelocityService;
+import com.googlecode.fascinator.portal.velocity.JythonLogger;
+
 /**
  * Factory class for instantiating jython scripts to be cached.
- *
+ * 
  * @author Oliver Lucido
  */
 public class JythonCacheEntryFactory implements CacheEntryFactory {
@@ -71,16 +72,16 @@ public class JythonCacheEntryFactory implements CacheEntryFactory {
 
     /**
      * Constructs the factory.
-     *
+     * 
      * @param portalManager a PortalManager instance
      * @param velocityService a VelocityService instance
      * @param scriptingServices a ScriptingServices instance
      */
     public JythonCacheEntryFactory(PortalManager portalManager,
-            VelocityService velocityService,
-            ScriptingServices scriptingServices) {
+            VelocityService velocityService, ScriptingServices scriptingServices) {
         this.velocityService = velocityService;
-        this.scriptingServices = new DeprecatedServicesWrapper(scriptingServices);
+        this.scriptingServices = new DeprecatedServicesWrapper(
+                scriptingServices);
         defaultPortal = portalManager.getDefaultPortal();
         portalPath = portalManager.getHomeDir().toString();
         skinPriority = portalManager.getSkinPriority();
@@ -95,7 +96,7 @@ public class JythonCacheEntryFactory implements CacheEntryFactory {
      */
     @Override
     public Object createEntry(Object key) throws Exception {
-        //log.debug("createEntry({})", key);
+        // log.debug("createEntry({})", key);
         String path = key.toString();
         int qmarkPos = path.lastIndexOf("?");
         if (qmarkPos != -1) {
@@ -111,16 +112,17 @@ public class JythonCacheEntryFactory implements CacheEntryFactory {
             // add current and default portal directories to python sys.path
             addSysPaths(portalId, Py.getSystemState());
             // setup the python interpreter
-            PythonInterpreter python = PythonInterpreter.threadLocalStateInterpreter(null);
+            PythonInterpreter python = PythonInterpreter
+                    .threadLocalStateInterpreter(null);
             // expose services for backward compatibility - deprecated
             python.set("Services", scriptingServices);
-            //python.setLocals(scriptObject);
+            // python.setLocals(scriptObject);
             JythonLogger jythonLogger = new JythonLogger(path);
             python.setOut(jythonLogger);
             python.setErr(jythonLogger);
             python.execfile(in, path);
-            String scriptClassName = StringUtils.capitalize(
-                    FilenameUtils.getBaseName(path)) + "Data";
+            String scriptClassName = StringUtils.capitalize(FilenameUtils
+                    .getBaseName(path)) + "Data";
             PyObject scriptClass = python.get(scriptClassName);
             if (scriptClass != null) {
                 scriptObject = scriptClass.__call__();
@@ -135,7 +137,7 @@ public class JythonCacheEntryFactory implements CacheEntryFactory {
     /**
      * Add class paths for the jython interpreter to find other modules within
      * the portal directory structure.
-     *
+     * 
      * @param portalId a portal id
      * @param sys jython system state
      */
@@ -165,65 +167,72 @@ public class JythonCacheEntryFactory implements CacheEntryFactory {
 
         @Override
         public DatabaseServices getDatabase() {
-            log.warn("WARN: getDatabase(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getDatabase(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getDatabase();
         }
 
         @Override
         public DynamicPageService getPageService() {
-            log.warn("WARN: getPageService(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getPageService(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getPageService();
         }
 
         @Override
         public Indexer getIndexer() {
-            log.warn("WARN: getIndexer(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getIndexer(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getIndexer();
         }
 
         @Override
         public Storage getStorage() {
-            log.warn("WARN: getStorage(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getStorage(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getStorage();
         }
 
         @Override
         public HarvestManager getHarvestManager() {
-            log.warn("WARN: getHarvestManager(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getHarvestManager(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getHarvestManager();
         }
 
         @Override
         public HouseKeepingManager getHouseKeepingManager() {
-            log.warn("WARN: getHouseKeepingManager(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getHouseKeepingManager(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getHouseKeepingManager();
         }
 
         @Override
         public PortalManager getPortalManager() {
-            log.warn("WARN: getPortalManager(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getPortalManager(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getPortalManager();
         }
 
         @Override
         public ByteRangeRequestCache getByteRangeCache() {
-            log.warn("WARN: getByteRangeCache(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getByteRangeCache(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getByteRangeCache();
         }
 
         @Override
         public VelocityService getVelocityService() {
-            log.warn("WARN: getVelocityService(): " +
-                    "Global scope Services is deprecated, use the context");
+            log.warn("WARN: getVelocityService(): "
+                    + "Global scope Services is deprecated, use the context");
             return scriptingServices.getVelocityService();
+        }
+
+        @Override
+        public FascinatorService getService(String serviceName) {
+            log.warn("WARN: getService(): "
+                    + "Global scope Services is deprecated, use the context");
+            return scriptingServices.getService(serviceName);
         }
     }
 }

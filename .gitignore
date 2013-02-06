@@ -6,3 +6,4 @@ target/
 plugins/harvester/filesystem/derby.log
 
 .DS_Store
+*.prefs

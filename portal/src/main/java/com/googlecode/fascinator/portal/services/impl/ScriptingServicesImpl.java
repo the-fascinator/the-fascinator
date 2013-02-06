@@ -18,18 +18,27 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.tapestry5.ioc.annotations.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.portal.services.ByteRangeRequestCache;
 import com.googlecode.fascinator.portal.services.DatabaseServices;
 import com.googlecode.fascinator.portal.services.DynamicPageService;
+import com.googlecode.fascinator.portal.services.FascinatorService;
 import com.googlecode.fascinator.portal.services.HarvestManager;
 import com.googlecode.fascinator.portal.services.HouseKeepingManager;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.ScriptingServices;
 import com.googlecode.fascinator.portal.services.VelocityService;
-
-import org.apache.tapestry5.ioc.annotations.Inject;
 
 public class ScriptingServicesImpl implements ScriptingServices {
 
@@ -59,6 +68,37 @@ public class ScriptingServicesImpl implements ScriptingServices {
 
     @Inject
     private VelocityService velocityService;
+
+    private Map<String, FascinatorService> services;
+
+    private Logger log = LoggerFactory.getLogger(ScriptingServicesImpl.class);
+
+    public ScriptingServicesImpl() {
+        try {
+            services = new HashMap<String, FascinatorService>();
+            JsonSimpleConfig config = new JsonSimpleConfig();
+            List<JsonSimple> serviceConfigs = config
+                    .getJsonSimpleList("services");
+            if (serviceConfigs != null) {
+                for (JsonSimple serviceConfig : serviceConfigs) {
+                    String srvId = serviceConfig.getString(null, "id");
+                    String srvClass = serviceConfig
+                            .getString(null, "className");
+                    log.debug("Creating FascinatorService with ID:" + srvId
+                            + ", using class:" + srvClass);
+                    FascinatorService service = (FascinatorService) Class
+                            .forName(srvClass).newInstance();
+                    service.setConfig(serviceConfig);
+                    service.init();
+                    services.put(srvId, service);
+                }
+            } else {
+                log.debug("No Fascinator services defined.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public DatabaseServices getDatabase() {
@@ -103,5 +143,10 @@ public class ScriptingServicesImpl implements ScriptingServices {
     @Override
     public VelocityService getVelocityService() {
         return velocityService;
+    }
+
+    @Override
+    public FascinatorService getService(String serviceName) {
+        return services.get(serviceName);
     }
 }

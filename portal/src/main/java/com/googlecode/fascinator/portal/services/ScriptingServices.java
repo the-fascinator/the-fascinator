@@ -40,4 +40,6 @@ public interface ScriptingServices {
     public ByteRangeRequestCache getByteRangeCache();
 
     public VelocityService getVelocityService();
+
+    public FascinatorService getService(String serviceName);
 }
