@@ -251,8 +251,7 @@ public class SimpleWorkflowHelper {
 
     private String renderFormFooterHtml(String htmlFooterTemplate)
             throws Exception {
-        VelocityContext vc = new VelocityContext();
-        vc.put("velocityContext", parentVelocityContext);
+        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
         if (velocityService.resourceExists(portalId, "form-components/"
                 + htmlFooterTemplate + ".vm") != null) {
             // Render the component's velocity template as a String
@@ -430,7 +429,7 @@ public class SimpleWorkflowHelper {
             VelocityContext vc = (VelocityContext) parentVelocityContext
                     .clone();
             vc.put("fieldElementsHtml", fieldElementsHtml);
-			Set<String> keys = htmlFieldElement.getParameterMap().keySet();
+            Set<String> keys = htmlFieldElement.getParameterMap().keySet();
             for (String key : keys) {
                 vc.put(key, htmlFieldElement.getParameterMap().get(key));
             }
