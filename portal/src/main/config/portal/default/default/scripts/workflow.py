@@ -5,6 +5,7 @@ from com.googlecode.fascinator.portal import FormData
 from java.io import ByteArrayInputStream
 from java.lang import String
 from java.net import URLDecoder
+from java.util import Properties
 
 import locale
 
@@ -31,6 +32,7 @@ class WorkflowData:
         self.localFormData = None
         self.metadata = None
         self.object = None
+        self.tfObjMeta = None
         self.pageService = self.vc("Services").getPageService()
         self.renderer = self.vc("toolkit").getDisplayComponent(self.pageService)
         self.template = None
@@ -123,6 +125,18 @@ class WorkflowData:
                     #    formData = self.vc("formData")
                         #{targetStep=[live], upload-file-file=[About Stacks.pdf], title=[About Stacks], submit=[Upload], oid=[], description=[PDF describing the Stacks feature of Mac OS X], upload-file-workflow=[basicUpload]}
         return self.metadata
+
+    def getTfObjMetaProperties(self):  
+        if self.tfObjMeta is None:    
+            if self.getObject() is not None:    
+                try:
+                    objMetaPayload = self.object.getPayload("TF-OBJ-META")
+                    self.tfObjMeta = Properties();
+                    self.tfObjMeta.load(objMetaPayload.open())    
+                    objMetaPayload.close()    
+                except StorageException, e:
+                    pass   
+        return self.tfObjMeta
 
     def getOid(self):
         if self.getObject() is None:
@@ -238,6 +252,14 @@ class WorkflowData:
         for role in user_roles:
             if role in workflow_security:
                 valid = True
+        if not valid:
+            # now check if the record owner is allowed to edit it
+            if currentStage.getBoolean(False, "owner_edit_allowed"):      
+                self.getTfObjMetaProperties()    
+                owner = self.tfObjMeta.getProperty("owner") 
+                current_user = self.vc("page").authentication.get_username()
+                if current_user == owner:    
+                    valid = True 
         if not valid:
             self.errorMsg = "Sorry, but your current security permissions don't allow you to administer this item"
             return False

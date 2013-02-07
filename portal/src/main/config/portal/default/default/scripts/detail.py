@@ -140,6 +140,13 @@ class DetailData:
         return self.__inPackage
 
     def isAccessDenied(self):
+        # check if the current user is the record owner
+        if self.getObject() is not None:    
+            current_user = self.page.authentication.get_username()    
+            owner = self.getProperty("owner")
+            if current_user == owner: 
+                return False
+        # check using role-based security
         myRoles = self.page.authentication.get_roles_list()
         allowedRoles = self.getAllowedRoles()
         if myRoles is None or allowedRoles is None:
