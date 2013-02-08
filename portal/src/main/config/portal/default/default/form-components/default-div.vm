@@ -1,4 +1,4 @@
-<h1 jaffa-tab-id="tab-$divorder">$heading</h1>
+<h1 class='tab-heading' jaffa-tab-id="tab-$divorder">$heading</h1>
 <div id="tab-$divorder" class="tab">
 	$fieldElementsHtml
 </div>
