@@ -305,6 +305,9 @@ function jaffaWidgets(jaffaObject) {
         //  is any JSON data to load prior to the UI getting built.
         startLoading: function() {
             var jsonDataUrl = this.getConfig("json-data-url");
+            var topLevelId = this.getConfig("data-top-level-id");
+            if (topLevelId != null)
+            	jsonDataUrl += topLevelId;
             // We have data to load
             if (jsonDataUrl != null) {
                 var ui = this.getContainer();

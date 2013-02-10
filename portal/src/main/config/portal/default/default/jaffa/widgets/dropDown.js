@@ -91,13 +91,41 @@ var DropDownWidgetBuilder = function($, jaffa) {
             if (allowEmpty) {
                 select.append($("<option value=\"\">"+emptyText+"</option>"));
             }
+            var dataIdKey = this.getConfig("data-id-key");
+            var dataLabelKey = this.getConfig("data-label-key");
+            var dataListKey = this.getConfig("data-list-key");
+            
+            if  (dataListKey != null){
+                this.dropDownData = this.dropDownData[dataListKey];
+            }
             var len = this.dropDownData.length;
-            for (var i = 0; i < len; i++) {
-                if (defaultValue == this.dropDownData[i].value) {
-                    select.append($("<option value=\""+this.dropDownData[i].value+"\" selected=\"selected\">"+this.dropDownData[i].label+"</option>"));
-                } else {
-                    select.append($("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>"));
-                }
+            
+            if ((dataListKey != null) && (dataIdKey != null) && (dataLabelKey != null)){
+	            for (var i = 0; i < len; i++) {
+	                if (defaultValue == this.dropDownData[i][dataIdKey]) {
+	                	var option = $("<option selected=\"selected\">"+this.dropDownData[i][dataLabelKey]+"</option>");
+                		option.attr('value', this.dropDownData[i][dataIdKey]);
+                    	select.append(option);
+	                } else {
+	                	var option = $("<option>"+this.dropDownData[i][dataLabelKey]+"</option>");
+                		option.attr('value', this.dropDownData[i][dataIdKey]);
+                    	select.append(option);
+	                }
+	            }
+            	
+            }
+            else{
+	            for (var i = 0; i < len; i++) {
+	                if (defaultValue == this.dropDownData[i].value) {
+	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
+                	option.attr('value', this.dropDownData[i].value);
+                    select.append(option);
+	                } else {
+	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
+                		option.attr('value', this.dropDownData[i].value);
+                    	select.append(option);
+	                }
+	            }
             }
             ui.append(select);
             jaffa.form.addField(this.field, this.id());
