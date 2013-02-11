@@ -8,7 +8,7 @@ var widgetListBranding = {
 	".jaffaValidationError" : ["alert", "alert-error"]
 };
 $(document).ready(function() {
-$("#repeat-textbox-of-$field-name").jaffaTextRepeatable({
+$("[id='repeat-textbox-of-$field-name']").jaffaTextRepeatable({
 	"disable-numbers":true,
 	"disable-sorting":true,
 	"base-field":"$field-name",

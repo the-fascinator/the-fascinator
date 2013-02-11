@@ -1,0 +1,8 @@
+<span>$box-for</span>
+#if( $multiline ) <br> #end
+#foreach( $box in $boxes )
+    <label><input name="$field-name" 
+    #if( $box.checked ) checked="checked" #end 
+    type="checkbox" value="$box.label">$box.label</label>
+    #if( $multiline ) <br> #end
+#end
