@@ -1,2 +1,2 @@
-<label class="$additional-classes" for="$field-name">$label</label>
-<textarea cols="80" rows="4" id="$field-name">$content</textarea>
+<label for="$field-name">$label</label>
+<textarea class="jaffa-field $additional-classes" cols="80" rows="4" id="$field-name">$content</textarea>
