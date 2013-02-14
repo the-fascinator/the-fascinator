@@ -256,7 +256,7 @@ public class HarvestClient {
                 for (String oid : harvester.getObjectIdList()) {
                     try {
                         processObject(oid);
-			logHarvest();
+                        logHarvest();
                     } catch (MessagingException e) {
                         log.error("Could not queue the object: '{}'", oid, e);
                     }
