@@ -256,6 +256,7 @@ public class HarvestClient {
                 for (String oid : harvester.getObjectIdList()) {
                     try {
                         processObject(oid);
+			logHarvest();
                     } catch (MessagingException e) {
                         log.error("Could not queue the object: '{}'", oid, e);
                     }
@@ -271,6 +272,9 @@ public class HarvestClient {
                     }
                 }
             } while (harvester.hasMoreDeletedObjects());
+	    
+            // TODO harvester.getLoggingData(); this should return an enum. Then
+            // send a msg to eventlog?
         }
 
         // Shutdown the harvester
@@ -367,6 +371,13 @@ public class HarvestClient {
         if (messaging != null) {
             messaging.release();
         }
+    }
+
+    /**
+     * Log harvest results. Format is TODO
+     */
+    private void logHarvest() {
+
     }
 
     /**
