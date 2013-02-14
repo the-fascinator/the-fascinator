@@ -18,6 +18,25 @@
  */
 package com.googlecode.fascinator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.harvester.Harvester;
@@ -34,23 +53,6 @@ import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -70,8 +72,7 @@ public class HarvestClient {
     private static final String DEFAULT_STORAGE_TYPE = "file-system";
 
     /** Default tool chain queue */
-    private static final String DEFAULT_TOOL_CHAIN_QUEUE =
-            HarvestQueueConsumer.HARVEST_QUEUE;
+    private static final String DEFAULT_TOOL_CHAIN_QUEUE = HarvestQueueConsumer.HARVEST_QUEUE;
 
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(HarvestClient.class);
@@ -108,6 +109,18 @@ public class HarvestClient {
 
     /** Tool Chain entry queue */
     private String toolChainEntry;
+
+    /** Row count */
+    private long rowCount;
+
+    /** Modified count */
+    private long modifiedCount;
+
+    /** Un modified count */
+    private long unModifiedCount;
+
+    /** New record count */
+    private long newRecordCount;
 
     /**
      * Harvest Client Constructor
@@ -147,8 +160,8 @@ public class HarvestClient {
                 config = new JsonSimpleConfig();
             } else {
                 config = new JsonSimpleConfig(configFile);
-                String rules = config.getString(null,
-                        "indexer", "script", "rules");
+                String rules = config.getString(null, "indexer", "script",
+                        "rules");
                 rulesFile = new File(configFile.getParent(), rules);
             }
         } catch (IOException ioe) {
@@ -157,8 +170,8 @@ public class HarvestClient {
         }
 
         // initialise storage system
-        String storageType = config.getString(DEFAULT_STORAGE_TYPE,
-                "storage", "type");
+        String storageType = config.getString(DEFAULT_STORAGE_TYPE, "storage",
+                "type");
         storage = PluginManager.getStorage(storageType);
         if (storage == null) {
             throw new HarvesterException("Storage plugin '" + storageType
@@ -191,7 +204,8 @@ public class HarvestClient {
     private DigitalObject updateHarvestFile(File file) throws StorageException {
         // Check the file in storage
         DigitalObject object = StorageUtils.checkHarvestFile(storage, file);
-        //log.info("=== Check harvest file: '{}'=> '{}'", file.getName(), object);
+        // log.info("=== Check harvest file: '{}'=> '{}'", file.getName(),
+        // object);
         if (object != null) {
             // If we got an object back its new or updated
             JsonObject message = new JsonObject();
@@ -206,7 +220,7 @@ public class HarvestClient {
             // Otherwise grab the existing object
             String oid = StorageUtils.generateOid(file);
             object = StorageUtils.getDigitalObject(storage, oid);
-            //log.info("=== Try again: '{}'=> '{}'", file.getName(), object);
+            // log.info("=== Try again: '{}'=> '{}'", file.getName(), object);
         }
         return object;
     }
@@ -272,9 +286,11 @@ public class HarvestClient {
                     }
                 }
             } while (harvester.hasMoreDeletedObjects());
-	    
-            // TODO harvester.getLoggingData(); this should return an enum. Then
-            // send a msg to eventlog?
+
+            // TODO harvester.getLoggingData(); This method should go in
+            // Harvester interface.
+            // this should send a msg to eventlog?
+            logHarvest();
         }
 
         // Shutdown the harvester
@@ -378,6 +394,20 @@ public class HarvestClient {
      */
     private void logHarvest() {
 
+        try {
+            String logStr = "Total records harvested : " + rowCount
+                    + "\nNew records created : " + newRecordCount
+                    + "\nNumber of modified records : " + modifiedCount
+                    + "\nNumber of not modified records : " + unModifiedCount
+                    + "\nTotal number of records in storage :";
+
+            BufferedWriter out = new BufferedWriter(new FileWriter(
+                    config.getString(null, "logFile"), true));
+            out.write(logStr);
+            out.close();
+        } catch (IOException e) {
+            log.error("Failed to write log file", e);
+        }
     }
 
     /**
@@ -411,8 +441,8 @@ public class HarvestClient {
         Properties props = object.getMetadata();
         // TODO - objectId is redundant now?
         props.setProperty("objectId", object.getId());
-        props.setProperty("scriptType", config.getString(null,
-                "indexer", "script", "type"));
+        props.setProperty("scriptType",
+                config.getString(null, "indexer", "script", "type"));
         // Set our config and rules data as properties on the object
         props.setProperty("rulesOid", rulesObject.getId());
         props.setProperty("rulesPid", rulesObject.getSourceId());
@@ -426,6 +456,17 @@ public class HarvestClient {
         for (Object key : params.keySet()) {
             props.setProperty(key.toString(), params.get(key).toString());
         }
+
+        // check this object's status (i.e. new or modified) and count
+        if ((Boolean) props.get("isNew")) {
+            newRecordCount++;
+        } else if ((Boolean) props.get("isModified")) {
+            modifiedCount++;
+        } else {
+            unModifiedCount++;
+        }
+
+        rowCount++;
 
         // done with the object
         object.close();
@@ -487,8 +528,7 @@ public class HarvestClient {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
             json.put("deleted", "true");
-            messaging.queueMessage(toolChainEntry,
-                    json.toString());
+            messaging.queueMessage(toolChainEntry, json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
             throw new MessagingException(ioe);
