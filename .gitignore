@@ -2,8 +2,8 @@ target/
 .name
 /.idea
 *.iml
-plugins/harvester/filesystem/derby.log
-.DS_Store
+*.log
+*.DS_Store
 *.prefs
 *.classpath
 *.log
