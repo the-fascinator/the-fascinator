@@ -270,7 +270,6 @@ public class HarvestClient {
                 for (String oid : harvester.getObjectIdList()) {
                     try {
                         processObject(oid);
-                        logHarvest();
                     } catch (MessagingException e) {
                         log.error("Could not queue the object: '{}'", oid, e);
                     }
@@ -395,7 +394,7 @@ public class HarvestClient {
     private void logHarvest() {
 
         try {
-            String logStr = "Total records harvested : " + rowCount
+            String logStr = "\nTotal records harvested : " + rowCount
                     + "\nNew records created : " + newRecordCount
                     + "\nNumber of modified records : " + modifiedCount
                     + "\nNumber of not modified records : " + unModifiedCount
@@ -458,13 +457,20 @@ public class HarvestClient {
         }
 
         // check this object's status (i.e. new or modified) and count
-        if ((Boolean) props.get("isNew")) {
+        if (props.containsKey("isNew")
+                && Boolean.parseBoolean(props.getProperty("isNew"))) {
             newRecordCount++;
-        } else if ((Boolean) props.get("isModified")) {
-            modifiedCount++;
-        } else {
-            unModifiedCount++;
+        } else if (props.containsKey("isModified")) {
+            if (Boolean.parseBoolean(props.getProperty("isModified"))) {
+                modifiedCount++;
+            } else {
+                unModifiedCount++;
+            }
         }
+
+        // now remove these properties. We don't need them anymore
+        props.remove("isNew");
+        props.remove("isModified");
 
         rowCount++;
 
