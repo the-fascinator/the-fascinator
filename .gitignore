@@ -7,5 +7,6 @@ plugins/harvester/filesystem/derby.log
 *.prefs
 *.classpath
 *.log
+*.pid
 *~
 
