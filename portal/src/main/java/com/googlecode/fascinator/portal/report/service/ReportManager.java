@@ -5,8 +5,11 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,9 @@ public class ReportManager implements FascinatorService {
     private JsonSimple config;
     private File reportDir;
     private TreeMap<String, Report> reports;
+    private HashMap<String, Report> reportsByLabel;
+    private Random random;
+    private SimpleDateFormat dtFormatter;
 
     @Override
     public JsonSimple getConfig() {
@@ -37,6 +43,9 @@ public class ReportManager implements FascinatorService {
     @Override
     public void init() {
         log.debug("Initializing ReportManager...");
+        random = new Random(System.currentTimeMillis());
+        dtFormatter = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss:SSSS");
+
         reportDir = new File(config.getString(null, "config", "home"));
         if (!reportDir.exists()) {
             log.debug("Creating report directory structure...");
@@ -78,6 +87,7 @@ public class ReportManager implements FascinatorService {
             saveReport(rptEmbargoed);
         }
         reports = new TreeMap<String, Report>();
+        reportsByLabel = new HashMap<String, Report>();
         try {
             loadReports();
         } catch (Exception e) {
@@ -95,12 +105,28 @@ public class ReportManager implements FascinatorService {
                 return !file.isDirectory() && !name.equals(".svn");
             }
         })) {
-            loadReport(reportConfigFile);
+            loadAndAddReport(reportConfigFile);
         }
     }
 
-    private void loadReport(File reportConfigFile) throws Exception {
+    private void loadAndAddReport(File reportConfigFile) throws Exception {
         JsonSimple reportConfig = new JsonSimple(reportConfigFile);
+        String reportName = reportConfig.getString(null, "report", "name");
+        String reportLabel = reportConfig.getString(null, "report", "label");
+        String reportClass = reportConfig
+                .getString(null, "report", "className");
+        log.debug("Loading report: " + reportName + ", using class:"
+                + reportClass);
+        Report report = (Report) Class.forName(reportClass).newInstance();
+        report.setConfig(reportConfig);
+        report.setConfigPath(reportConfigFile.getAbsolutePath());
+        reports.put(reportName, report);
+        reportsByLabel.put(reportLabel, report);
+        log.debug("Successfully loaded and added report:" + reportName);
+    }
+
+    private Report loadReport(String configPath) throws Exception {
+        JsonSimple reportConfig = new JsonSimple(new File(configPath));
         String reportName = reportConfig.getString(null, "report", "name");
         String reportClass = reportConfig
                 .getString(null, "report", "className");
@@ -108,28 +134,46 @@ public class ReportManager implements FascinatorService {
                 + reportClass);
         Report report = (Report) Class.forName(reportClass).newInstance();
         report.setConfig(reportConfig);
-        reports.put(reportName, report);
+        report.setConfigPath(configPath);
         log.debug("Successfully loaded report:" + reportName);
+        return report;
     }
 
     public synchronized void addReport(Report report) {
         reports.put(report.getReportName(), report);
+        reportsByLabel.put(report.getLabel(), report);
     }
 
     public synchronized void saveReport(Report report) {
-        String name = report.getReportName();
-        File reportConfigFile = new File(reportDir, name + ".json");
+        String name = generateConfigFilename(report);
+        File reportConfigFile = new File(reportDir, name);
         try {
             FileWriter writer = new FileWriter(reportConfigFile);
             writer.write(report.toJsonString());
             writer.close();
+            if (report.getConfigPath() == null) {
+                report.setConfigPath(reportConfigFile.getAbsolutePath());
+            }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
     }
 
+    public synchronized void duplicateReport(String reportName)
+            throws Exception {
+        Report rptSource = getReport(reportName);
+        Report rptCopy = loadReport(rptSource.getConfigPath());
+        String copyLabel = getNextCopyLabel(rptCopy.getLabel());
+        rptCopy.setReportName(copyLabel.replaceAll(" ", ""));
+        rptCopy.setLabel(copyLabel);
+        rptCopy.setConfigPath(null);
+        saveReport(rptCopy);
+        addReport(rptCopy);
+    }
+
     public synchronized void deleteReport(String reportName) {
-        File reportConfigFile = new File(reportDir, reportName + ".json");
+        Report report = getReport(reportName);
+        File reportConfigFile = new File(report.getConfigPath());
         if (reportConfigFile.delete()) {
             log.debug("Successfully deleted report:" + reportName);
         } else {
@@ -141,5 +185,34 @@ public class ReportManager implements FascinatorService {
 
     public synchronized TreeMap<String, Report> getReports() {
         return reports;
+    }
+
+    public synchronized Report getReport(String reportName) {
+        return reports.get(reportName);
+    }
+
+    public synchronized Report getReportByLabel(String label) {
+        return reportsByLabel.get(label);
+    }
+
+    private String getNextCopyLabel(String label) {
+        int copynum = 0;
+        Report curCopy = null;
+        String nextLabel = null;
+        do {
+            copynum++;
+            nextLabel = (copynum == 1 ? "Copy" : "Copy-" + copynum) + " Of "
+                    + label;
+            curCopy = getReportByLabel(nextLabel);
+        } while (curCopy != null);
+        return nextLabel;
+    }
+
+    private String generateConfigFilename(Report report) {
+        Calendar curCal = Calendar.getInstance();
+        String path = DigestUtils.md5Hex(report.getReportName()
+                + dtFormatter.format(curCal.getTime()) + random.nextFloat())
+                + ".json";
+        return path;
     }
 }

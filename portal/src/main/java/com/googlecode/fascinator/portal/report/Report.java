@@ -12,6 +12,7 @@ public abstract class Report {
     protected String reportName;
     protected String label;
     protected JsonObject query;
+    protected String configPath;
 
     protected static String FLD_QUERY = "query";
     protected static String FLD_QUERY_FILTER = "filter";
@@ -104,5 +105,13 @@ public abstract class Report {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
     }
 }
