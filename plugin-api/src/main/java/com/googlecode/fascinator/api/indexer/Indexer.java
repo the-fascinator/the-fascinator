@@ -42,6 +42,18 @@ public interface Indexer extends Plugin {
             throws IndexerException;
 
     /**
+     * Searches the index using the specified request. The search results are
+     * written into the specified output stream and in the specified format.
+     * 
+     * @param request search request
+     * @param result search results
+     * @param format result format
+     * @throws IndexerException if an error occurred performing the search
+     */
+    public void search(SearchRequest request, OutputStream result, String format)
+            throws IndexerException;
+
+    /**
      * Adds an object to the index
      * 
      * @param oid an object identifier

@@ -431,6 +431,36 @@ public class SolrIndexer implements Indexer {
             throw new IndexerException(ioe);
         }
     }
+    
+    /**
+     * Perform a Solr search and stream the results into the provided output format
+     * 
+     * @param request : A prepared SearchRequest object
+     * @param response : The OutputStream to send results to
+     * @param format : Output format - passed directly to SOlr as the "wt" parameter
+     * @throws IndexerException if there were errors during the search
+     */
+    @Override
+    public void search(SearchRequest request, OutputStream response, String format)
+            throws IndexerException {
+        SolrSearcher searcher = new SolrSearcher(
+                ((CommonsHttpSolrServer) solr).getBaseURL());
+        String username = usernameMap.get("solr");
+        String password = passwordMap.get("solr");
+        if (username != null && password != null) {
+            searcher.authenticate(username, password);
+        }
+        InputStream result;
+        try {
+            request.addParam("wt", format);
+            result = searcher.get(request.getQuery(), request.getParamsMap(),
+                    false);
+            IOUtils.copy(result, response);
+            result.close();
+        } catch (IOException ioe) {
+            throw new IndexerException(ioe);
+        }
+    }
 
     /**
      * Remove the specified object from the index
