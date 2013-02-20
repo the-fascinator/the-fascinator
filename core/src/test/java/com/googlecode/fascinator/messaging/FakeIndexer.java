@@ -138,4 +138,10 @@ public class FakeIndexer implements Indexer {
         log(" * INDEXER: searchByIndex()");
 
     }
+
+    @Override
+    public void search(SearchRequest request, OutputStream result, String format)
+            throws IndexerException {
+        log(" * INDEXER: search()");
+    }
 }
