@@ -289,7 +289,11 @@ public class HarvestClient {
             // TODO harvester.getLoggingData(); This method should go in
             // Harvester interface.
             // this should send a msg to eventlog?
-            logHarvest();
+            String repoType = config.getString("", "indexer", "params",
+                    "repository.type");
+            String repoName = config.getString("", "indexer", "params",
+                    "repository.name");
+            logHarvest(repoType, repoName);
         }
 
         // Shutdown the harvester
@@ -389,16 +393,40 @@ public class HarvestClient {
     }
 
     /**
-     * Log harvest results. Format is TODO
+     * Log harvest results.
      */
-    private void logHarvest() {
+    private void logHarvest(String repoType, String repoName) {
 
         try {
+
+            DigitalObject object;
+            Properties props;
+            long total = 0;
+
+            Set<String> set = storage.getObjectIdList();
+            set.size();
+            for (String oid : set) {
+                try {
+                    object = storage.getObject(oid);
+                    props = object.getMetadata();
+
+                    if (repoType.equals(props.getProperty("repository.type"))
+                            && repoName.equals(props
+                                    .getProperty("repository.name"))) {
+                        total++;
+                    }
+
+                } catch (StorageException e) {
+                    log.error("Could not retrieve the object: '{}'", oid, e);
+                }
+            }
+
             String logStr = "\nTotal records harvested : " + rowCount
                     + "\nNew records created : " + newRecordCount
                     + "\nNumber of modified records : " + modifiedCount
                     + "\nNumber of not modified records : " + unModifiedCount
-                    + "\nTotal number of records in storage :";
+                    + "\nTotal number of records in " + repoType + " "
+                    + repoName + " : " + total;
 
             BufferedWriter out = new BufferedWriter(new FileWriter(
                     config.getString(null, "logFile"), true));
