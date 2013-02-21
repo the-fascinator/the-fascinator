@@ -198,4 +198,11 @@ public class IndexerServiceImpl implements IndexerService {
         indexer.searchByIndex(request, response, indexName);
 
     }
+
+    @Override
+    public void search(SearchRequest request, OutputStream result, String format)
+            throws IndexerException {
+        indexer.search(request, result, format);
+
+    }
 }
