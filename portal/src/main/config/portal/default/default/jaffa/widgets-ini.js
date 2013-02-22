@@ -4,6 +4,22 @@
  */
 var widgets = {};
 
+function prepareHelps() {
+	var help_contents = $('.pre-help-content');
+	for (var i = 0; i < help_contents.length; i++ ) {
+		$(help_contents[i]).hide().attr("class","help-content");
+		var helpToggleHtml = "<button class=\"jaffaHelpToggle\"></button>";
+	    helpToggle = $(helpToggleHtml);
+	    helpToggle.button({icons: {primary:'ui-icon-help'}});
+
+	    // Setup click logic
+	    helpToggle.click(function(){$(this).next().toggle('fast');});
+
+	    // And attach to our container
+	    helpToggle.insertBefore(help_contents[i]);	
+	}
+}
+
 (function($){
 
 function datepickerOnClose(dateText, inst) {

@@ -1,1 +1,23 @@
-<label for="$field-name">$label</label> <input class="jaffa-field $additional-classes" type="text" id="$field-name" />
+#if( $additional-classes )
+## may not be a simple text-input: date control	
+	<label for="$field-name">$label</label> <input class="jaffa-field $additional-classes" type="text" id="$field-name" />
+	#if ($help)
+		<div id="${field-name}-help" class="pre-help-content">$help</div>
+	#end	
+#else	
+<div id="${field-name}-container">input text here</div>
+#if($help)
+	<div id="${field-name}-container-help"  class="help-content">$help</div>
+#end
+<script>
+$(function() {
+	$("#${field-name}-container").jaffaText({
+	    "label": "$label: ",
+	    "field": "$field-name"
+	    	#if($help)
+	    		,"help-content": "#${field-name}-container-help"
+	    	#end		
+	});
+});
+</script>
+#end

@@ -1,2 +1,27 @@
-<label for="$field-name">$label</label>
-<textarea class="jaffa-field $additional-classes" cols="80" rows="4" id="$field-name">$content</textarea>
+#if( $validator )	
+<div id="${field-name}-container">input text here</div>
+#if($help)
+	<div id="${field-name}-container-help" class="help-content">$help</div>
+#end
+<script>
+$(function() {
+	$("#${field-name}-container").jaffaText({
+	    "label": "$label: ",
+	    "textarea": {"rows":4, "cols":80},
+	    "field": "$field-name",
+	    "v2Rules": {
+	        "mandatory": { "validator": "required" }}	    
+	#if($help)
+		,"help-content": "#${field-name}-container-help"
+	#end		
+	});
+});
+</script>
+#else
+## may not be a simple text-input: date control	
+	<label for="$field-name">$label</label>
+	<textarea class="jaffa-field $!additional-classes" cols="80" rows="4" id="$field-name">$content</textarea>
+	#if ($help)
+		<div id="${field-name}-help" class="pre-help-content">$help</div>
+	#end	
+#end
