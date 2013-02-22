@@ -19,4 +19,20 @@
     <from>/workflow/</from>
     <set type="content-type">text/html; charset=UTF-8</set>
   </rule>
+  <rule>
+    <from>^/.*\.script$</from>
+    <name>No cache for scripts</name>
+    <note>Set no cache on the response header for scripts</note>
+    <set type="response-header" name="Cache-Control">max-age=0,no-cache,no-store,post-check=0,pre-check=0</set>
+    <set type="response-header" name="Expires">Mon, 26 Jul 1979 12:12:00 GMT</set>
+    <set type="response-header" name="Pragma">no-cache</set>    
+  </rule>
+  <rule>
+    <from>^/.*\.ajax$</from>
+    <name>No cache for ajax</name>
+    <note>Set no cache on the response header for ajax</note>
+    <set type="response-header" name="Cache-Control">max-age=0,no-cache,no-store,post-check=0,pre-check=0</set>
+    <set type="response-header" name="Expires">Mon, 26 Jul 1979 12:12:00 GMT</set>
+    <set type="response-header" name="Pragma">no-cache</set>    
+  </rule>
 </urlrewrite>
