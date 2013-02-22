@@ -130,6 +130,9 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
     /** Default display template */
     private String defaultDisplay;
 
+    /** Default version string */
+    private String versionString;
+
     /**
      * Constructs and configures the service.
      * 
@@ -143,6 +146,7 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
             config = new JsonSimpleConfig();
             layoutName = config.getString(DEFAULT_LAYOUT, "portal", "layout");
             urlBase = config.getString(null, "urlBase");
+            versionString = config.getString(null, "version.string");
             toolkit = new GUIToolkit();
             portalPath = portalManager.getHomeDir().getAbsolutePath();
             defaultPortal = portalManager.getDefaultPortal();
@@ -244,7 +248,12 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         bindings.put("portalDir", portalPath + "/" + portalId);
         bindings.put("portalId", portalId);
         bindings.put("urlBase", urlBase);
-        bindings.put("portalPath", urlBase + portalId);
+        if (versionString == null) {
+            bindings.put("portalPath", urlBase + portalId);
+        } else {
+            bindings.put("portalPath", urlBase + "verNum" + versionString + "/"
+                    + portalId);
+        }
         bindings.put("defaultPortal", defaultPortal);
         bindings.put("pageName", pageName);
         bindings.put("serverPort", serverPort);

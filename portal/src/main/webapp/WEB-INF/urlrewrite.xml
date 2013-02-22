@@ -13,6 +13,12 @@
     <from>^(/amq/.*)$</from>
     <to last="true">$1</to>
   </rule>
+  <rule match-type="regex">
+    <name>Page name redirect</name>
+    <note>Redirect page names to their clean form</note>	 
+    <from>^/verNum[0-9A-Za-z_.\-]+/([^\.]+)$</from>
+    <to type="permanent-redirect">%{context-path}/$1</to>
+  </rule>
   <rule>
     <name>UTF-8 Encoding</name>
     <note>Set UTF-8 Encoding header on some pages</note>
@@ -35,4 +41,10 @@
     <set type="response-header" name="Expires">Mon, 26 Jul 1979 12:12:00 GMT</set>
     <set type="response-header" name="Pragma">no-cache</set>    
   </rule>
+  <rule match-type="regex">
+  	<name>Static Content forward</name>
+    <note>Solution to cache static content but not across versions of the app</note>	
+    <from>^/verNum[0-9A-Za-z_.\-]+(/.*)$</from>
+    <to>$1</to>
+</rule>
 </urlrewrite>
