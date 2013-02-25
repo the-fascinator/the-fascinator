@@ -174,4 +174,8 @@ public class RedboxReport extends Report {
         this.strDateFormat = strDateFormat;
     }
 
+    public JsonSimple getConfig() {
+        return config;
+    }
+
 }
