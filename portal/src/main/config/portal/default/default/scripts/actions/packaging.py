@@ -96,7 +96,7 @@ class PackagingData:
         # clean up
         self.__deselect()
         # return url to workflow screen
-        return '{"status": "ok", "url": "%s/workflow/%s" }' % (self.vc("portalPath"), manifestId)
+        return '{"status": "ok", "url": "%s/workflow/%s", "oid": "%s" }' % (self.vc("portalPath"), manifestId,manifestId)
 
     def __createFromSelected(self):
         self.vc("log").debug("Creating package from selected...")
