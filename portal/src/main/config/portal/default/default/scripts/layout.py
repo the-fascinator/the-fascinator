@@ -2,6 +2,7 @@ import md5
 from authentication import AuthenticationData
 from java.net import URLDecoder
 from org.apache.commons.lang import StringEscapeUtils
+from java.lang import String
 
 class LayoutData:
     def __init__(self):
@@ -84,6 +85,7 @@ class LayoutData:
 
     def csrfSecurePage(self):
         pageName = self.vc("pageName");
+        
         # Allow only POSTS to CSRF protected pages
         method = self.request.getMethod()
         if method != "POST":
@@ -92,6 +94,10 @@ class LayoutData:
         # Allow only pages refered by use <= NOTE, this can be spoofed
         referer = self.request.getHeader("Referer")
         validReferer = self.vc("portalPath")
+        validRefererClean = String(self.vc("portalPath")).replaceAll("verNum[0-9A-Za-z_.\\-]+/","")
+        
+        if referer is not None and referer.startswith(validRefererClean) :
+            return True
         if referer is None or not referer.startswith(validReferer):
             self.log.error("The secure page '{}' requires a valid HTTP Header Referer to use. REFERER: {}", pageName, referer)
             return False
