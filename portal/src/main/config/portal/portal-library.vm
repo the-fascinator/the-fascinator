@@ -24,3 +24,17 @@
 #macro(renderObject $metadata $template)
     $Services.pageService.renderObject($velocityContext, $template, $metadata)
 #end
+
+
+##
+## Display a string based on the message code
+##
+## $message : the message code
+##
+#macro(displayMessage $message)
+     #set($languageService = $Services.getService("languageService"))
+     #if($languageService)
+     	#set($message = $languageService.displayMessage($message))
+     #end
+     $message
+#end
