@@ -193,6 +193,17 @@ class AuthenticationData:
         except AccessControlException, e:
             self.error_message = self.parse_error(e)
 
+    def grant_user_access(self, recordId, newUser):
+        try:
+            newAccess = self.access.getEmptySchema()
+            newAccess.init(recordId)
+            newAccess.set("user", newUser)
+            self.access.applySchema(newAccess)
+            self.has_error = False
+        except AccessControlException, e:
+            self.error_message = self.parse_error(e)
+
+
     def has_role(self, role):
         if self.current_user is not None:
             my_roles = self.get_roles_list()

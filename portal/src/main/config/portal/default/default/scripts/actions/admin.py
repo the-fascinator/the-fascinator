@@ -205,13 +205,22 @@ class AdminData:
     def grant_access(self):
         record = self.vc("formData").get("record")
         role   = self.vc("formData").get("role")
+        user   = self.vc("formData").get("user")
         source = self.vc("formData").get("source")
         self.vc("page").authentication.set_access_plugin(source)
-        self.vc("page").authentication.grant_access(record, role)
+        
+        if role is not None:
+            self.vc("page").authentication.grant_access(record, role)
+        
+        if user is not None:
+            self.vc("page").authentication.grant_user_access(record, user)
 
         err = self.vc("page").authentication.get_error()
         if err is None:
-            self.writer.println(role)
+            if role is not None:
+                self.writer.println(role)
+            if user is not None:
+                self.writer.println(user)
             self.writer.close()
             self.reindex_record(record)
 
@@ -282,16 +291,24 @@ class AdminData:
     def revoke_access(self):
         record = self.vc("formData").get("record")
         role   = self.vc("formData").get("role")
+        user   = self.vc("formData").get("user")
         source = self.vc("formData").get("source")
         self.vc("page").authentication.set_access_plugin(source)
-        self.vc("page").authentication.revoke_access(record, role)
+        
+        if role is not None:
+            self.vc("page").authentication.revoke_access(record, role)
+        
+        if user is not None:
+            self.vc("page").authentication.revoke_user_access(record, user)
 
         err = self.vc("page").authentication.get_error()
         if err is None:
-            self.writer.println(role)
+            if role is not None:
+                self.writer.println(role)
+            if user is not None:
+                self.writer.println(user)
             self.writer.close()
             self.reindex_record(record)
-
         else:
             self.throw_error(err)
 
