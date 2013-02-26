@@ -139,7 +139,7 @@ public class AccessManager implements AccessControlManager {
     public void shutdown() throws AccessControlException {
         Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (AccessControl) i.next();
+            p = i.next();
             try {
                 p.shutdown();
             } catch (PluginException e) {
@@ -234,8 +234,49 @@ public class AccessManager implements AccessControlManager {
         // Loop through each plugin
         Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (AccessControl) i.next();
+            p = i.next();
             result = p.getRoles(recordId);
+            // Null objects mean the plugin
+            // has managed this object before
+            if (result != null) {
+                valid = true;
+                // But it could be empty,
+                // ie. had access revoked.
+                if (result.size() > 0) {
+                    found.addAll(result);
+                }
+            }
+        }
+
+        if (valid) {
+            return found;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Different from getSchemas() in that is returns just the users of the
+     * schemas, and it queries all plugins, not just the active plugin.
+     * 
+     * Useful during index and/or audit when this is the only data required.
+     * 
+     * @param recordId The record to retrieve user for.
+     * @return A list of Strings containing user names.
+     * @throws AccessControlException if there was an error during retrieval.
+     */
+    @Override
+    public List<String> getUsers(String recordId) throws AccessControlException {
+        // Test for actual return values found
+        Boolean valid = false;
+        List<String> found = new ArrayList<String>();
+        List<String> result;
+
+        // Loop through each plugin
+        Iterator<AccessControl> i = plugins.values().iterator();
+        while (i.hasNext()) {
+            p = i.next();
+            result = p.getUsers(recordId);
             // Null objects mean the plugin
             // has managed this object before
             if (result != null) {
@@ -290,7 +331,7 @@ public class AccessManager implements AccessControlManager {
         // Make sure it exists
         Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (AccessControl) i.next();
+            p = i.next();
             if (pluginId.equals(p.getId())) {
                 active = pluginId;
             }
@@ -321,7 +362,7 @@ public class AccessManager implements AccessControlManager {
         // Loop through each plugin
         Iterator<AccessControl> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (AccessControl) i.next();
+            p = i.next();
             result = new PluginDescription(p);
             schema = p.getEmptySchema();
             result.setMetadata(schema.describeMetadata());
@@ -330,4 +371,5 @@ public class AccessManager implements AccessControlManager {
 
         return found;
     }
+
 }

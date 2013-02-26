@@ -29,6 +29,9 @@ import com.googlecode.fascinator.common.access.GenericSchema;
 public class DerbySchema extends GenericSchema {
     /** Role name */
     public String role;
+    
+    /** User name */
+    public String user;
 
     /**
      * Initialization method

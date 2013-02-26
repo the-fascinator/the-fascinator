@@ -18,37 +18,36 @@
  */
 package com.googlecode.fascinator.api.access;
 
-import com.googlecode.fascinator.api.PluginDescription;
 import java.util.List;
 
+import com.googlecode.fascinator.api.PluginDescription;
+
 /**
- * A simple extension of Access Control defining
- * some methods that general plugins won't need
- * to concern themselves with.
- *
+ * A simple extension of Access Control defining some methods that general
+ * plugins won't need to concern themselves with.
+ * 
  * @author Greg Pendlebury
  */
 public interface AccessControlManager extends AccessControl {
 
     /**
-     * Specifies which plugin the access control manager should use
-     * when managing schemas. This won't effect reading of data, just
-     * writing.
-     *
+     * Specifies which plugin the access control manager should use when
+     * managing schemas. This won't effect reading of data, just writing.
+     * 
      * @param pluginId The id of the plugin.
      */
     public void setActivePlugin(String pluginId);
 
     /**
      * Return the current active plugin.
-     *
+     * 
      * @return The currently active plugin.
      */
     public String getActivePlugin();
 
     /**
      * Return the list of plugins being managed.
-     *
+     * 
      * @return A list of plugins.
      */
     public List<PluginDescription> getPluginList();
