@@ -13,9 +13,11 @@
 <script type="text/javascript" src="$portalPath/jaffa/widgets/container.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/people.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/libs/nameLookup2.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/libs/jquery/jquery.blockUI.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrcSelection.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrc-Selection.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
+
 
 <!-- form id="simpleworkflow-form" -->
 <div id="simpleworkflow-form">
@@ -31,14 +33,34 @@
         urlDataSource: "$portalPath/workflows/simpleworkflow.ajax?func=get-tfpackage&oid=$oid",
         formSelector: "#simpleworkflow-form",
         functionSaveData: saveData,
-        callbackPreSave: preSave
+        callbackPreSave: preSave,
+        callbackStartupComplete: startupComplete
     });
     
-     
+    function startupComplete(jaffa) {
+		var dataSource = jaffa.config("urlDataSource");
+
+		if (dataSource != null && dataSource != "") {
+			// Get the JSON Data and run this callback
+			jaffa.util.loadJsonUrl(dataSource, function(data) {
+				
+				for (var field in data) {
+					jaffa.serverData[field] = data[field];
+				}
+				jaffa.form.synch(true);
+				$('#simpleworkflow-form').unblock();
+			});
+		}
+	}
+    
+    
     function preSave() {
     	return true;
     }
 
+ $(document).ready(function() {
+ 	$('#simpleworkflow-form').block();
+ });
 </script>
 
 $formFooterHtml

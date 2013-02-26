@@ -1,5 +1,5 @@
 <label for="$field-name">$label</label>
-<select>
+<select class="jaffa-field" id="$field-name">
 #foreach($option in $options)
   <option value="$option.get("value")">$option.get("label")</option>
 #end

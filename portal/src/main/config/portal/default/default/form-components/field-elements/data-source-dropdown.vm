@@ -1,5 +1,5 @@
-<div id="data-source-dropdown-$fieldName"><p>You should see something replace this div</p></div>
-<div id="data-source-dropdown-help-$fieldName">Help!!!</div>
+<div id="data-source-dropdown-$field-name"><p>You should see something replace this div</p></div>
+<div id="data-source-dropdown-help-$field-name">Help!!!</div>
 
 <script>
 var widgetListBranding = {
@@ -7,10 +7,10 @@ var widgetListBranding = {
     ".jaffaValidationError":["alert", "alert-error"]
 };
 $(document).ready(function() {
-    $("[id='data-source-dropdown-$fieldName']").jaffaDropDown({
+    $("[id='data-source-dropdown-$field-name']").jaffaDropDown({
         "label":"$label",
-        "field":"$fieldName",
-        "label-field":"$fieldNameLabel",
+        "field":"$field-name",
+        "label-field":"$label",
         "json-data-url":"$portalPath/$sourceUrl",
         #if("$!dataLevel"!="")"data-top-level-id":"$!dataLevel",#end
         #if("$!idKey"!="")"data-id-key":"$!idKey",#end
