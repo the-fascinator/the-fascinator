@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeMap;
@@ -14,10 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.portal.report.CustomReport;
 import com.googlecode.fascinator.portal.report.Report;
 import com.googlecode.fascinator.portal.services.FascinatorService;
-import com.ibm.icu.util.Calendar;
 
 public class ReportManager implements FascinatorService {
 
@@ -53,38 +52,6 @@ public class ReportManager implements FascinatorService {
                 log.error("Error creating report directory structure");
                 return;
             }
-            // TODO: remove these "default" reports when done...
-            // creating the "default" reports...
-            CustomReport rptWithoutCitations = new CustomReport(
-                    "ReportWithoutCitations", "Records Without Citations");
-            SimpleDateFormat dtFormatterWithoutCitations = new SimpleDateFormat(
-                    rptWithoutCitations.getStrDateFormat());
-
-            Calendar curCal = Calendar.getInstance();
-            curCal.set(Calendar.DATE, 1);
-            curCal.set(Calendar.MONTH, Calendar.JANUARY);
-
-            rptWithoutCitations.setQueryFilterVal("dateCreatedFrom",
-                    dtFormatterWithoutCitations.format(curCal.getTime()),
-                    "createFrom", "Date Created - From");
-            rptWithoutCitations.setQueryFilterVal("dateCreatedTo",
-                    dtFormatterWithoutCitations.format(curCal.getTime()),
-                    "createTo", "Date Created - To");
-            rptWithoutCitations.setQueryFilterVal("reportStatus",
-                    "All Records", "rptStatus", "Show Records");
-            saveReport(rptWithoutCitations);
-
-            CustomReport rptEmbargoed = new CustomReport("EmbargoedReports",
-                    "Embargoed Reports");
-            rptEmbargoed.setQueryFilterVal("dateCreatedFrom",
-                    dtFormatterWithoutCitations.format(curCal.getTime()),
-                    "createFrom", "Date Created - From");
-            rptEmbargoed.setQueryFilterVal("dateCreatedTo",
-                    dtFormatterWithoutCitations.format(curCal.getTime()),
-                    "createTo", "Date Created - To");
-            rptEmbargoed.setQueryFilterVal("reportStatus", "All Records",
-                    "rptStatus", "Show Records");
-            saveReport(rptEmbargoed);
         }
         reports = new TreeMap<String, Report>();
         reportsByLabel = new HashMap<String, Report>();
