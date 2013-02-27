@@ -1,0 +1,2 @@
+#set($pageTitle = "Harvest Log")
+<h2 id="data"><span>Harvest logs go here...</span></h2>
