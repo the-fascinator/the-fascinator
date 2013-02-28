@@ -1,2 +1,18 @@
 #set($pageTitle = "Harvest Log")
-<h2 id="data"><span>Harvest logs go here...</span></h2>
+<div class="grid_6">
+  #set($menuTitle = "Harvest logs")
+  <div class="block">
+    #if($self.latest.isEmpty())
+      &nbsp;
+    #else
+      <ol>
+      #foreach($item in $self.latest)
+        #set($itemTitle = $item.getFirst('eventTime'))
+        <li class="">
+          <a href="$portalPath/detail/$itemTitle">$itemTitle</a>
+        </li>
+      #end
+      </ol>
+    #end
+  </div>
+</div>

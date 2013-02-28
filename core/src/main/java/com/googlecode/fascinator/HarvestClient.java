@@ -122,6 +122,9 @@ public class HarvestClient {
     /** New record count */
     private long newRecordCount;
 
+    /** New record count */
+    private long totalRecordCount;
+
     /**
      * Harvest Client Constructor
      * 
@@ -235,6 +238,13 @@ public class HarvestClient {
         String now = df.format(new Date());
         long start = System.currentTimeMillis();
         log.info("Started at " + now);
+
+        // Generate harvest id. This is just a string representation of current
+        // date and time
+        String harvestId = Long.toString(start);
+
+        // TODO put in event log
+        sentMessage("-1", "harvestStart");
 
         // cache harvester config and indexer rules
         configObject = updateHarvestFile(configFile);
@@ -401,7 +411,6 @@ public class HarvestClient {
 
             DigitalObject object;
             Properties props;
-            long total = 0;
 
             Set<String> set = storage.getObjectIdList();
             set.size();
@@ -413,7 +422,7 @@ public class HarvestClient {
                     if (repoType.equals(props.getProperty("repository.type"))
                             && repoName.equals(props
                                     .getProperty("repository.name"))) {
-                        total++;
+                        totalRecordCount++;
                     }
 
                 } catch (StorageException e) {
@@ -426,7 +435,7 @@ public class HarvestClient {
                     + "\nNumber of modified records : " + modifiedCount
                     + "\nNumber of not modified records : " + unModifiedCount
                     + "\nTotal number of records in " + repoType + " "
-                    + repoName + " : " + total;
+                    + repoName + " : " + totalRecordCount;
 
             BufferedWriter out = new BufferedWriter(new FileWriter(
                     config.getString(null, "logFile"), true));
@@ -464,6 +473,9 @@ public class HarvestClient {
         // get the object
         DigitalObject object = storage.getObject(oid);
 
+        String isNew = "false";
+        String isModified = "false";
+
         // update object metadata
         Properties props = object.getMetadata();
         // TODO - objectId is redundant now?
@@ -488,9 +500,11 @@ public class HarvestClient {
         if (props.containsKey("isNew")
                 && Boolean.parseBoolean(props.getProperty("isNew"))) {
             newRecordCount++;
+            isNew = "true";
         } else if (props.containsKey("isModified")) {
             if (Boolean.parseBoolean(props.getProperty("isModified"))) {
                 modifiedCount++;
+                isModified = "true";
             } else {
                 unModifiedCount++;
             }
