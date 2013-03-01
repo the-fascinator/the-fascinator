@@ -536,7 +536,7 @@ public class DerbyAccessControl implements AccessControl {
 
 		// Remove from security database
 		try {
-			revokeRoleAccess(recordId, user);
+			revokeUserAccess(recordId, user);
 		} catch (Exception ex) {
 			log.error("Error updating security database: ", ex);
 			throw new AccessControlException("Error updating security database");

@@ -278,6 +278,16 @@ class AuthenticationData:
         except AccessControlException, e:
             self.error_message = self.parse_error(e)
 
+    def revoke_user_access(self, recordId, newUser):
+        try:
+            oldAccess = self.access.getEmptySchema()
+            oldAccess.init(recordId)
+            oldAccess.set("user", newUser)
+            self.access.removeSchema(oldAccess)
+            self.has_error = False
+        except AccessControlException, e:
+            self.error_message = self.parse_error(e)
+
     def search_roles(self, query, source):
         try:
             self.active_role_plugin = source
