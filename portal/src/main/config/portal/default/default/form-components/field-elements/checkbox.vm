@@ -3,6 +3,6 @@
 #foreach( $box in $boxes )
     <label><input name="$field-name" 
     #if( $box.checked ) checked="checked" #end 
-    type="checkbox" value="$box.label">$box.label</label>
+    type="checkbox" value= #if( $box.value ) "$box.value" #else "$box.label" #end >$box.label</label>
     #if( $multiline ) <br> #end
 #end

@@ -12,7 +12,7 @@
 	<script>
 	$(function() {
 		$("[id='${field-name}-container']").jaffaText({
-			"label": "$label: ",
+			"label": "$label ",
 			"field": "$field-name"
 				#if($help)
 					,"help-content": "[id='${field-name}-container-help']"
