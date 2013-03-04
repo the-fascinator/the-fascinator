@@ -383,6 +383,10 @@ function jaffaForm(jaffaObject) {
         if (fieldId in form.textual) {
             // Basic text value
             element = form.textual[fieldId];
+            if(element.parent().length == 0 ) {
+ 				element = $("[id='"+element.attr('id')+"']");
+ 				form.textual[fieldId] = element;
+			}
             if (value != null) {
                 element.val(value);
                 element.trigger("change");
@@ -437,6 +441,11 @@ function jaffaForm(jaffaObject) {
 
         // SELECT
         if (fieldId in form.selects) {
+        	element = form.selects[fieldId];
+            if(element.parent().length == 0 ) {
+ 				element = $("[id='"+element.attr('id')+"']");
+ 				form.selects[fieldId] = element;
+			}
             if (value != null) {
                 return form.select(fieldId, value);
             }
