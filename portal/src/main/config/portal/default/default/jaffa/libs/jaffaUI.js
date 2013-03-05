@@ -57,9 +57,11 @@ function jaffaUI(jaffaObject) {
     jaffa.defaultConfig["functionUserFeedback"] = function(message) {
         ui.messageBox(message+"", "Alert");
     }
-
-    ui.changeToTabLayout = function(rootElement, headingSelector, swapCallback) {
+    ui.changeToTabLayout = function(rootElement, headingSelector, swapCallback, id) {
         var li, ul = $("<ul></ul>");
+        if(id != null) {
+         ul.attr('id', id);
+        }
         var heading, hId, hText, hTarget;
 
         var tabHeadings = rootElement.find(headingSelector);

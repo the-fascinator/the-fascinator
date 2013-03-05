@@ -1,4 +1,5 @@
 var wizard_def; // used for holding steps of a wizard
+var wizardTabIdentifier;
 
 function formSubmit(transitionAction) {
 	if (transitionAction) {
@@ -7,9 +8,10 @@ function formSubmit(transitionAction) {
 	}	
 }
 
-function wizard_init(content_selector, tab_heading_selector, json_url) {
-	jaffa.ui.changeToTabLayout($(content_selector), tab_heading_selector);
-	$('.ui-tabs-nav').hide();
+function wizard_init(content_selector, tab_heading_selector, json_url, tabIdentifier) {
+	jaffa.ui.changeToTabLayout($(content_selector), tab_heading_selector, "h1.heading-selector", tabIdentifier);
+	$('[id="'+tabIdentifier+'"]').hide();
+	wizardTabIdentifier = tabIdentifier;
 	jQuery.getJSON(json_url, function(data) {	wizard_def = data; });
 }
 
@@ -19,7 +21,7 @@ function transition_click(e)  {
 		// go to portal home
 		window.location = $(e).attr('close-transition');
 	} else {
-		var stateName = $('.ui-tabs-nav > li.ui-state-active').text();
+		var stateName = $('[id="'+wizardTabIdentifier+'"] > li.ui-state-active').text();
 		var transitionName = $(e).attr('transition-name');
 		var targetState = wizard_def["steps"][stateName][transitionName];
 		// Mimic the click on one of ui-tab-nav tab

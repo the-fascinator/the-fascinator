@@ -112,12 +112,12 @@ public class SimpleWorkflowHelper {
                 .getArray("stages", workflowMetadata.getString(null, "step"),
                         "divs").toArray());
 
-        for (JsonObject element : formJsonArray) {
-            fieldList.add(new JsonSimple(element).getString("", "field-name"));
-        }
-
-        for (String field : fieldList) {
-            tfPackage.getJsonObject().put(field, formData.get(field));
+        Set<String> fields = formData.getFormFields();
+        for (String field : fields) {
+            String fieldValue = formData.get(field);
+            if (fieldValue != null) {
+                tfPackage.getJsonObject().put(field, fieldValue);
+            }
         }
 
         digitalObject.updatePayload(pid, new ByteArrayInputStream(tfPackage

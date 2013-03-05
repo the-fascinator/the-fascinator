@@ -38,29 +38,77 @@
     });
     
     function startupComplete(jaffa) {
+    	//discover the prefixes for all the multivalued fields
+    	var prefixes = [];
+		$(".jaffaList").each(function() {
+                                var listId= $(this).attr('id');
+                                var multiVariablePrefix = listId.substring(0, listId.length - 16);
+                                prefixes.push(multiVariablePrefix);
+                                }
+        					 );
+    	
+    	
+    	
 		var dataSource = jaffa.config("urlDataSource");
-
+		
 		if (dataSource != null && dataSource != "") {
 			// Get the JSON Data and run this callback
 			jaffa.util.loadJsonUrl(dataSource, function(data) {
-				
+				var prefixCounts = {};		
 				for (var field in data) {
 					jaffa.serverData[field] = data[field];
+					var prefix = matchesPrefix(field,prefixes);
+					if(prefix != null) {
+						var index = field.substring(prefix.length+1,prefix.length+2);
+						var count = prefixCounts[prefix];
+						if (count == null) {
+							count = 0;
+						}
+						if(count < index) {
+							prefixCounts[prefix] = index;
+						}
+					}
 				}
+				
+				//Click the add button to initialise the correct number of repeatable elements to populate
+				for(prefix in prefixCounts) {
+					for(var i=1; i<prefixCounts[prefix];i++) {
+						$("[id='"+prefix+".1.ContainerItem']").parent().find('.jaffaAddItem button').click();
+					}
+				}
+				
+				//final population of data
 				jaffa.form.synch(true);
+				//unblock form for editing
 				$('#simpleworkflow-form').unblock();
 			});
 		}
+		
 	}
     
+    function matchesPrefix(field,prefixes) {
+    	
+    	for(var i=0;i<prefixes.length; i++) {
+    		var prefix = prefixes[i];
+    		if(field.indexOf(prefix) ==0) {
+    			return prefix;
+    		}
+    	}
+    	
+    	return null;
+    }
     
     function preSave() {
     	return true;
     }
 
- $(document).ready(function() {
- 	$('#simpleworkflow-form').block();
- });
 </script>
 
 $formFooterHtml
+
+<script type="text/javascript">
+ $(document).ready(function() {
+ 	$('#ui-datepicker-div').hide();
+ 	$('#simpleworkflow-form').block();
+ });
+</script>
