@@ -2,6 +2,7 @@ package com.googlecode.fascinator.portal.report.type;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Date;
 
 import com.googlecode.fascinator.api.indexer.IndexerException;
@@ -30,4 +31,6 @@ public interface ChartHandler {
 
     void setSystemConfig(JsonSimple systemConfig);
 
+    public abstract void renderCsv(Writer writer, String chartKey)
+            throws IOException, IndexerException;
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -106,13 +107,24 @@ public class ReportManager implements FascinatorService {
         return report;
     }
 
-    public synchronized void addReport(Report report) {
+    /**
+     * Method to add report to the map. Must be called before saveReport()
+     * 
+     * @param report
+     */
+    public synchronized void addReport(Report report) throws Exception {
+        report.setReportName(getUniqueReportName(report.getReportName()));
         reports.put(report.getReportName(), report);
         reportsByLabel.put(report.getLabel(), report);
     }
 
+    /**
+     * Make sure to call addReport() before saving...
+     * 
+     * @param report
+     */
     public synchronized void saveReport(Report report) {
-        String name = generateConfigFilename(report);
+        String name = report.getReportName() + ".json";
         File reportConfigFile = new File(reportDir, name);
         try {
             FileWriter writer = new FileWriter(reportConfigFile);
@@ -175,11 +187,12 @@ public class ReportManager implements FascinatorService {
         return nextLabel;
     }
 
-    private String generateConfigFilename(Report report) {
+    public String getUniqueReportName(String reportName) throws Exception {
         Calendar curCal = Calendar.getInstance();
-        String path = DigestUtils.md5Hex(report.getReportName()
-                + dtFormatter.format(curCal.getTime()) + random.nextFloat())
-                + ".json";
-        return path;
+        String name = URLEncoder.encode(
+                DigestUtils.md5Hex(reportName
+                        + dtFormatter.format(curCal.getTime())
+                        + random.nextFloat()), "utf-8");
+        return name;
     }
 }
