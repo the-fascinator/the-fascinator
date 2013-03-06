@@ -81,16 +81,18 @@ class NavigationData:
         return None
 
     def getWorkflowConfig(self):
-        try:
-            objMeta = self.getObjectMetadata()
-            jsonObject = self.Services.storage.getObject(objMeta.get("jsonConfigOid"))
-            jsonPayload = jsonObject.getPayload(jsonObject.getSourceId())
-            config = JsonSimple(jsonPayload.open())
-            jsonPayload.close()
-            return config
-        except Exception, e:
-            self.errorMsg = "Error retrieving workflow configuration: " + e.getMessage()
-            return None
+        objMeta = self.getObjectMetadata()    
+        if objMeta is not None:    
+            try:
+                jsonObject = self.Services.storage.getObject(objMeta.get("jsonConfigOid"))
+                jsonPayload = jsonObject.getPayload(jsonObject.getSourceId())
+                config = JsonSimple(jsonPayload.open())
+                jsonPayload.close()
+                return config
+            except Exception, e:
+                self.errorMsg = "Error retrieving workflow configuration"
+                pass
+        return None
 
     def getStageConfig(self, targetStep):
         if targetStep is None:

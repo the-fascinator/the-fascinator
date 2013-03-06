@@ -59,7 +59,7 @@ class DownloadData:
         #print "URI='%s' OID='%s' PID='%s'" % (uri, object.getId(), payload.getId())
 
         # Security check
-        if self.isAccessDenied():
+        if self.isAccessDenied(uri):
             # Redirect to the object page for standard access denied error
             self.response.sendRedirect(context["portalPath"] + "/detail/" + object.getId())
             return
@@ -114,11 +114,23 @@ class DownloadData:
     def getMetadata(self):
         return self.__metadata
 
-    def isAccessDenied(self):
+    def isAccessDenied(self,uri):
         # Admins always have access
         if self.page.authentication.is_admin():
             return False
-
+        
+        slash = uri.find("/")
+        if slash == -1:
+            return None, None
+        oid = uri[:slash]
+        objectMetadata = self.services.getStorage().getObject(oid).getMetadata()
+        
+        if objectMetadata is not None:    
+            current_user = self.page.authentication.get_username()    
+            owner = objectMetadata.getProperty("owner")
+            if current_user == owner: 
+                return False
+            
         # Check for normal access
         myRoles = self.page.authentication.get_roles_list()
         allowedRoles = self.getAllowedRoles()
