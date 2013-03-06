@@ -1,6 +1,7 @@
 package com.googlecode.fascinator.portal.workflow;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +11,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.apache.tapestry5.internal.KeyValue;
 import org.apache.velocity.VelocityContext;
 import org.json.simple.JSONArray;
 
@@ -90,6 +93,24 @@ public class SimpleWorkflowHelper {
         digitalObject
                 .updatePayload("workflow.metadata", new ByteArrayInputStream(
                         workflowMetadata.toString().getBytes()));
+    }
+
+    public void updateObjectMetadata(String oid, List<KeyValue> data)
+            throws StorageException, IOException {
+
+        DigitalObject digitalObject = StorageUtils.getDigitalObject(storage,
+                oid);
+        Properties tfObjMeta = digitalObject.getMetadata();
+        for (KeyValue keyValue : data) {
+            tfObjMeta.setProperty(keyValue.getKey(), keyValue.getValue());
+        }
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        tfObjMeta.store(output, null);
+        ByteArrayInputStream input = new ByteArrayInputStream(
+                output.toByteArray());
+        StorageUtils.createOrUpdatePayload(digitalObject, "TF-OBJ-META", input);
+
     }
 
     public void updateTFPackage(String oid, FormData formData)
@@ -453,8 +474,8 @@ public class SimpleWorkflowHelper {
         }
 
         if (jsonObject.get("validation") != null) {
-            htmlComponent.setValidation(((JSONArray) jsonObject
-                    .get("validation")).toArray());
+            htmlComponent.setValidation(((JsonObject) jsonObject
+                    .get("validation")));
         }
 
         htmlComponent.setParameterMap(parameterMap);

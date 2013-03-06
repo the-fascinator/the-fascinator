@@ -3,10 +3,12 @@ package com.googlecode.fascinator.portal.workflow.components;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.googlecode.fascinator.common.JsonObject;
+
 public class HtmlFieldElement implements HtmlComponent {
 
     private String componentTemplateName = null;
-    private Object[] validation = null;
+    private JsonObject validation = null;
 
     private Map<String, Object> parameterMap = new HashMap<String, Object>();
 
@@ -18,11 +20,11 @@ public class HtmlFieldElement implements HtmlComponent {
         this.componentTemplateName = componentTemplateName;
     }
 
-    public Object[] getValidation() {
+    public JsonObject getValidation() {
         return validation;
     }
 
-    public void setValidation(Object[] validation) {
+    public void setValidation(JsonObject validation) {
         this.validation = validation;
     }
 

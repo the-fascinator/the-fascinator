@@ -2,6 +2,8 @@ from com.googlecode.fascinator.portal.workflow import SimpleWorkflowHelper
 from org.apache.commons.lang import StringEscapeUtils
 from org.apache.velocity import VelocityContext
 from org.apache.commons.lang import StringEscapeUtils
+from java.util import ArrayList
+from org.apache.tapestry5.internal import KeyValue
 
 class SimpleworkflowData:
     def __init__(self):
@@ -24,6 +26,7 @@ class SimpleworkflowData:
        self.log.debug("parameters:     " +formData.toString())
        
        func = self.vc("formData").get("func", "")
+       
        # Allow for URL GET paramaters
        if self.vc("request").method == "GET" and func != "":
             func = ""
@@ -41,12 +44,28 @@ class SimpleworkflowData:
        if func == "action":
             oid = request.getParameter("oid")
             action = request.getParameter("action")
+            objMeta = request.getParameter("objMeta")
+            
             self.simpleWorkflowHelper.updateTFPackage(oid,self.vc("formData"))
             targetStep = None
             if action != "save":
                 targetStep = self.simpleWorkflowHelper.updateWorkflowMetadata(oid,action)
+            
+            if objMeta is not None:
+                
+                paramList = ArrayList()
+                objMetaArray = objMeta.split(",")
+                
+                for objMetaParam in objMetaArray:
+                    objMetaParamArray = objMetaParam.split(";")
+                    paramList.add(KeyValue(objMetaParamArray[0],objMetaParamArray[1]))
+                self.simpleWorkflowHelper.updateObjectMetadata(oid,paramList)
+                
+            
             self.simpleWorkflowHelper.reindex(oid,targetStep,self.vc("page").authentication.get_username())  
-            response.sendRedirect("/home")            
+            writer = response.getPrintWriter("text/plain; charset=UTF-8")
+            writer.println("{\"success\":\"true\"}")
+            writer.close()
             return None
         
        
