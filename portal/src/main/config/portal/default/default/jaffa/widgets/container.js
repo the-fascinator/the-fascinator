@@ -57,8 +57,12 @@ var ContainerWidgetBuilder = function($, jaffa) {
 
             // Control
             var input = null;
-            
-            input = $("<div id=\""+this.field+"\"> </div>");
+            var containerHtml = "<div> </div>";
+            if(this.getConfig("container-html")) {
+             containerHtml = this.getConfig("container-html");
+            }
+            input = $(containerHtml);
+            input.attr('id',this.field);
             
             //read all the sub elements and add div placeholders to the dom
             var inputDivs = {};
