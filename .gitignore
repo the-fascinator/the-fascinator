@@ -7,3 +7,6 @@ plugins/harvester/filesystem/derby.log
 
 .DS_Store
 *.prefs
+portal/src/main/config/portal/default/default/form-components/field-elements/Jayrepeatable-text.vm
+
+portal/src/main/config/portal/default/default/form-components/field-elements/Jayanzsrc-selection.vm

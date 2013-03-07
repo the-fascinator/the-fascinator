@@ -3,7 +3,7 @@
 <input type="hidden" class="nlaLookup-url" value="$portalPath/proxyGet.script?ns=NLA_SRU&qs={searchTerms}" />
 </div>
 
-<div id="$containter-for">to be replaced</div>
+<div id="$containter-for" class="$!additional-classes">to be replaced</div>
 <script>
 	$(document).ready(function() {
 	   $("[id='$containter-for']").jaffaContainerRepeatable({
@@ -13,8 +13,8 @@
 		"sub-fields": {
 			"field":""
 		},
-		"add-item-text":"Add",
-		
+        #if("$!add-item-text"!="")"add-item-text":"$!add-item-text",
+        #else"add-item-text":"Add",#end
 		"delete-item-html":"<button>Remove</button>",
 		"min-size":1,
 		"child-config":{
@@ -23,7 +23,6 @@
 			"sub-elements": $sub-elements.settings	
 		},
 		"class-list":"widgetListBranding"
-	});
-	   	
-	   	});
+        });
+    });
 </script>

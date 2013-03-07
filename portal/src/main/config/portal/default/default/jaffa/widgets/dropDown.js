@@ -81,6 +81,10 @@ var DropDownWidgetBuilder = function($, jaffa) {
 
             // Control
             var select = $("<select id=\""+this.field+"\"></select>");
+            var classList = this.getConfig("class-list");
+            if  (classList != null){
+            	select.attr('class', classList);
+            }
             this.dropDownData = this.getJsonData() || this.getConfig("option-data");
             var defaultValue = this.getConfig("default-value");
             var allowEmpty = this.getConfig("allow-empty");

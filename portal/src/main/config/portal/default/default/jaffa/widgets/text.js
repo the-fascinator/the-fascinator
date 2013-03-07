@@ -67,6 +67,21 @@ var TextWidgetBuilder = function($, jaffa) {
             } else {
                 var type = this.getConfig("type") || "text";
                 input = $("<input type=\""+type+"\" id=\""+this.field+"\" />");
+
+                var placeHolder = this.getConfig("placeholder");
+                if  (placeHolder != null) {
+                	input.attr("placeholder", placeHolder);
+                }
+
+                var size = this.getConfig("size");
+                if  (size != null){
+                	input.attr("size", size);
+                }
+
+                var classList = this.getConfig("class-list");
+                if  (classList != null){
+                	input.attr("class", classList)
+                }
             }
             ui.append(input);
             // Are we tying any data lookups to the control?
@@ -142,7 +157,7 @@ var TextWidgetBuilder = function($, jaffa) {
             if (defaultValue != null) {
                 input.val(defaultValue);
             }
-            // TODO: Placeholder
+
             jaffa.form.addField(this.field, this.id());
 
             // Add help content

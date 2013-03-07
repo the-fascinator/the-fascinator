@@ -10,7 +10,11 @@ $(document).ready(function() {
     $("[id='data-source-dropdown-$field-name']").jaffaDropDown({
         "label":"$label",
         "field":"$field-name",
+        #if("$field-name-label"!="")
+        "label-field":"$!field-name-label",
+        #else
         "label-field":"$label",
+        #end
         "json-data-url":"$portalPath/$sourceUrl",
         #if("$!dataLevel"!="")"data-top-level-id":"$!dataLevel",#end
         #if("$!idKey"!="")"data-id-key":"$!idKey",#end
