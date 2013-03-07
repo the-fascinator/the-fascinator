@@ -26,13 +26,13 @@
 		<ul>
 </div>
 	
-<!-- form id="simpleworkflow-form" -->
+
 <div id="simpleworkflow-form">
 	$fieldElementsHtml
 	$divElementsHtml
 	$buttonElementsHtml
 </div>	
-<!-- /form -->
+
 
 <script type="text/javascript">
   var jaffa = jaffaFactory({
@@ -105,7 +105,6 @@
 	}
     
     function matchesPrefix(field,prefixes) {
-    	
     	for(var i=0;i<prefixes.length; i++) {
     		var prefix = prefixes[i];
     		if(field.indexOf(prefix) ==0) {
@@ -125,7 +124,7 @@
 	function validateTab() {
 		$(".errorbox").hide();
     	$("#errorbox-list").html(''); 
-		var activeTabHref = $("#dmptTabs > li.ui-state-active > a").attr('href');
+		var activeTabHref = $("[id='"+ wizardTabIdentifier +"'] > li.ui-state-active > a").attr('href');
 		var tabId = activeTabHref.substring(1,activeTabHref.length);
 		var ids = [];
 

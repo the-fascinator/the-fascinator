@@ -1,5 +1,5 @@
 <div id="data-source-dropdown-$field-name"><p>You should see something replace this div</p></div>
-<div id="data-source-dropdown-help-$field-name">Help!!!</div>
+<div id="data-source-dropdown-help-$field-name"></div>
 
 <script>
 var widgetListBranding = {

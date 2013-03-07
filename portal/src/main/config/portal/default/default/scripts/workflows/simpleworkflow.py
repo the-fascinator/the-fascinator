@@ -54,11 +54,12 @@ class SimpleworkflowData:
             if objMeta is not None:
                 
                 paramList = ArrayList()
-                objMetaArray = objMeta.split(",")
+                objMetaArray = objMeta.split(":")
                 
                 for objMetaParam in objMetaArray:
                     objMetaParamArray = objMetaParam.split(";")
-                    paramList.add(KeyValue(objMetaParamArray[0],objMetaParamArray[1]))
+                    if len(objMetaParamArray) == 2:
+                        paramList.add(KeyValue(objMetaParamArray[0],objMetaParamArray[1]))
                 self.simpleWorkflowHelper.updateObjectMetadata(oid,paramList)
                 
             
