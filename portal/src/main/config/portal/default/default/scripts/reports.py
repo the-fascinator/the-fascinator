@@ -7,14 +7,16 @@ from com.googlecode.fascinator.api.indexer import SearchRequest
 from com.googlecode.fascinator.common.solr import SolrResult
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 
-class ReportData:
+class ReportsData:
     def __init__(self):
         pass
 
     def __activate__(self, context):
+        #import pydevd;pydevd.settrace()
         self.velocityContext = context
         self.vc("sessionState").remove("fq")
         self.services = self.vc("Services")
+        self.log = context["log"]
         self.__latest = None
         self.__search()
 
@@ -28,6 +30,8 @@ class ReportData:
 
     def __search(self):
         indexer = self.services.getIndexer()
+        self.log.info("In reports.py search method.......")
+        self.log.info("Indexer attributes are : " + str(dir(indexer)))
         portalQuery = self.services.getPortalManager().get(self.vc("portalId")).getQuery()
         portalSearchQuery = self.services.getPortalManager().get(self.vc("portalId")).getSearchQuery()
         
@@ -39,14 +43,14 @@ class ReportData:
 
         req = SearchRequest('eventType:"harvestStart"')
         req.setParam("fq", 'item_type:"object"')
-        if portalQuery:
-            req.addParam("fq", portalQuery)
-        if portalSearchQuery:
-            req.addParam("fq", portalSearchQuery)
+        #if portalQuery:
+            #req.addParam("fq", portalQuery)
+        #if portalSearchQuery:
+            #req.addParam("fq", portalSearchQuery)
         req.setParam("rows", "10")
         req.setParam("sort", "eventTime desc");
         out = ByteArrayOutputStream()
-        indexer.search(req, out)
+        indexer.searchByIndex(req, out, 'eventLog')
         self.__latest = SolrResult(ByteArrayInputStream(out.toByteArray()))
 
         
