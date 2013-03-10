@@ -1,1 +1,3 @@
-<$type #if ($additional-class) class="$additional-class" #end>$content</$type>
+<$type #if ($additional-class) class="$additional-class" #end>#displayMessage($content)#if ($help)
+		<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
+#end</$type>

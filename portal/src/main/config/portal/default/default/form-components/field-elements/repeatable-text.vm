@@ -1,6 +1,9 @@
 <div id="repeat-textbox-of-$field-name">
 <p>You should see something replace this div</p>
 </div>
+#if ($help)
+		<div id="${field-name}-help" class="help-content">#displayMessage($help)</div>
+#end
 
 <script>
 var widgetListBranding = {
@@ -22,6 +25,9 @@ $("[id='repeat-textbox-of-$field-name']").jaffaTextRepeatable({
 		"label":"${label}",
 		"field":""
 	},
-	"class-list":widgetListBranding
+	"class-list":widgetListBranding,
+	#if ($help)
+	"help-content": "[id='${field-name}-help']"
+	#end
 });});
 </script>

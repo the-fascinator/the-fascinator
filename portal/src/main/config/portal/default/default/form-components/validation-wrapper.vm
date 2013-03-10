@@ -8,6 +8,7 @@ $(document).ready(function() {
    				"$validationType",
  			#end
 	 ], null, validationFail);});
+	 
 	 var validationMessages = jQuery.parseJSON('$validation.get("validation-messages")');
 	 var focusId = '$validation.get("focus-id")';
 	 var validation = {};

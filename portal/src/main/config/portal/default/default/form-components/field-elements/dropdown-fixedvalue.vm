@@ -1,4 +1,4 @@
-<label for="$field-name">$label</label>
+<label for="$field-name">#displayMessage($label)</label>
 <select class="jaffa-field" id="$field-name">
 #foreach($option in $options)
   #if( $option.get("default")) 

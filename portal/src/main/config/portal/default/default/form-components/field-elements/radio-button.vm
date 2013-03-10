@@ -1,4 +1,4 @@
-<span>$button-for</span><br>
+<span>#displayMessage($button-for)</span><br>
 #foreach( $button in $buttons )
     <label><input name="$field-name" 
     #if( $button.action ) onclick="$button.action" #end

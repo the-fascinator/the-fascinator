@@ -1,1 +1,1 @@
-<p class="$additional-class">$content</p>
+<p class="$additional-class">#displayMessage($content)</p>

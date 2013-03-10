@@ -33,4 +33,4 @@
 ##
 #macro(displayMessage $message)
 ## All on one line to avoid line breaks
-#set($languageService = $Services.getService("languageService"))#if($languageService)#set($message = $languageService.displayMessage($message))#end$message#end
+#set($languageService = $Services.getService("languageService"))#if($languageService && $message)#set($message = $languageService.displayMessage($message))#end$message#end
