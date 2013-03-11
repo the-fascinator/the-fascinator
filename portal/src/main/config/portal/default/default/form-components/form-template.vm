@@ -8,6 +8,7 @@
 <script type="text/javascript" src="$portalPath/jaffa/libs/validatious/validatious.2.0.min.0.9.1.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/jaffa.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/myJaffa.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/text.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/dropDown.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/container.js"></script>
@@ -16,7 +17,7 @@
 <script type="text/javascript" src="$portalPath/jaffa/libs/jquery/jquery.blockUI.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrcSelection.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrc-Selection.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
+
 <script type="text/javascript">
 	var validationFieldMap = {};
 </script>
@@ -41,7 +42,8 @@
         formSelector: "#simpleworkflow-form",
         functionSaveData: saveData,
         callbackPreSave: preSave,
-        callbackStartupComplete: startupComplete
+        callbackStartupComplete: startupComplete,
+        debuggingEnabled: true
     });
     
     function startupComplete(jaffa) {
@@ -83,6 +85,13 @@
 						$("[id='"+prefix+".1.ContainerItem']").parent().find('.jaffaAddItem button').click();
 					}
 				}
+				
+				$("#simpleworkflow-form").find("input.dateYMD, input.date").datepicker({
+																	dateFormat: "yy-mm-dd",
+																	changeMonth: true,
+																	changeYear: true,
+																	showButtonPanel: false
+																	}); 
 				
 				//final population of data
 				jaffa.form.synch(true);
