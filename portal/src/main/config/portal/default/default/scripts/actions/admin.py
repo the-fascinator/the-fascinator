@@ -10,8 +10,10 @@ class AdminData:
         self.velocityContext = context
         self.writer = self.vc("response").getPrintWriter("text/html; charset=UTF-8")
         self.log = context["log"]
+        
+        action = self.vc("formData").get("verb")
 
-        if self.vc("page").authentication.is_logged_in() and self.vc("page").authentication.is_admin():
+        if (self.vc("page").authentication.is_logged_in() and self.vc("page").authentication.is_admin()) or action == "grant-access" or action == "revoke-access":
             self.process()
         else:
             self.throw_error("Only administrative users can access this feature")
