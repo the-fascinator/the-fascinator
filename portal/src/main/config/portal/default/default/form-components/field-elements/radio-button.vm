@@ -1,6 +1,6 @@
 <span>#displayMessage($button-for)</span><br>
 #foreach( $button in $buttons )
-    <label><input name="$field-name" 
+    <label><input name="$field-name" class="jaffa-field"
     #if( $button.action ) onclick="$button.action" #end
     #if( $button.checked ) checked="checked" #end 
     type="radio">$button.label</label>

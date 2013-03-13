@@ -110,33 +110,21 @@ function jaffaForm(jaffaObject) {
             element.trigger("change");
             return form.value(fieldId);
         }
-        // Radio Group
+        // Radio Group: 
         if (fieldId in form.radio) {
             if (value == null) {
                 jaffa.logWarning("Cannot 'check' a radio group without providing a value. Ignoring request for field '"+fieldId+"'.");
                 return null;
             } else {
                 element = form.radio[fieldId];
-
-                // Unchecked... check
-                if (value === false) {
-                    element.filter(":checked").removeAttr("checked");
-                    element.trigger("change");
-                    return false;
-
-                // Checked... change
-                } else {
-                    var selection = element.filter("[value="+value+"]");
-                    if (selection.size() == 1) {
-                        selection.attr("checked", "checked");
-                        element.trigger("change");
-                        return form.value(fieldId);
-                    // Oops
-                    } else {
-                        jaffa.logWarning("Cannot find selection '"+value+"' in radio group '"+fieldId+"'.");
-                        return null;
-                    }
-                }
+                // Radio group uses name - so should be an array
+            	for(var i = 0; i < element.length; i++) {
+            		element[i].checked = false;
+            		if(element[i].value == value) {
+            			element[i].checked = true;
+            		}
+            	}
+            	return value; // a none null value
             }
         }
         return null;
@@ -410,7 +398,7 @@ function jaffaForm(jaffaObject) {
             // Setting value of checkbox
             if (value != null) {
                 // Checking
-                if (value === true) {
+                if (value && value != 'null') {
                     if (form.isChecked(fieldId)) {
                         // No change required
                         return true;
@@ -419,7 +407,7 @@ function jaffaForm(jaffaObject) {
                     }
                 }
                 // Unckecking
-                if (value === false) {
+                if (value === false || value == 'null') {
                     if (form.isChecked(fieldId)) {
                         return form.uncheck(fieldId);
                     } else {

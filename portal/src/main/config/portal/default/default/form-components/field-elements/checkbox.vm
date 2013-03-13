@@ -1,8 +1,10 @@
 <span>#displayMessage($box-for)</span>
 #if( $multiline ) <br> #end
+#set($checkbox_id = 1)
 #foreach( $box in $boxes )
-    <label><input name="$field-name" 
+    <label><input name="$field-name" id="${field-name}.${checkbox_id}" class="jaffa-field"
     #if( $box.checked ) checked="checked" #end 
     type="checkbox" value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
     #if( $multiline ) <br> #end
+    #set($checkbox_id = $checkbox_id + 1)
 #end
