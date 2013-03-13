@@ -98,8 +98,12 @@ public class PublishedRecordsByTypeAPICallHandlerImpl implements APICallHandler 
                 for (SolrDoc docObject : results) {
                     String oid = docObject.getString(null, "oid");
                     if (oid != null) {
-                        int count = typeCountMap.get(publishedOidMap.get(oid));
-                        typeCountMap.put(publishedOidMap.get(oid), ++count);
+                        Integer oidInt = typeCountMap.get(publishedOidMap
+                                .get(oid));
+                        if (oidInt != null) {
+                            int count = oidInt.intValue();
+                            typeCountMap.put(publishedOidMap.get(oid), ++count);
+                        }
                     }
                 }
                 start += pageSize;
