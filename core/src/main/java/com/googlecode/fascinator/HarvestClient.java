@@ -19,6 +19,7 @@
 package com.googlecode.fascinator;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -41,6 +42,9 @@ import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.harvester.Harvester;
 import com.googlecode.fascinator.api.harvester.HarvesterException;
+import com.googlecode.fascinator.api.indexer.Indexer;
+import com.googlecode.fascinator.api.indexer.IndexerException;
+import com.googlecode.fascinator.api.indexer.SearchRequest;
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Payload;
 import com.googlecode.fascinator.api.storage.Storage;
@@ -51,6 +55,7 @@ import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.common.solr.SolrResult;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 
@@ -247,9 +252,9 @@ public class HarvestClient {
         harvestId = now;
 
         // Put in event log
-        Map<String, String> pa = new LinkedHashMap<String, String>();
-        pa.put("harvestId", harvestId);
-        sentMessage("-1", "harvestStart", pa);
+        Map<String, String> startMsgs = new LinkedHashMap<String, String>();
+        startMsgs.put("harvestId", harvestId);
+        sentMessage("-1", "harvestStart", startMsgs);
 
         // cache harvester config and indexer rules
         configObject = updateHarvestFile(configFile);
@@ -308,7 +313,14 @@ public class HarvestClient {
                     "repository.type");
             String repoName = config.getString("", "indexer", "params",
                     "repository.name");
-            logHarvest(repoType, repoName);
+            // logHarvest(repoType, repoName);
+
+            // Send harvest end message to event log
+            Map<String, String> endMsgs = new LinkedHashMap<String, String>();
+            endMsgs.put("harvestId", harvestId);
+            endMsgs.put("totalRecords",
+                    Integer.toString(getTotalRecordCount(repoType, repoName)));
+            sentMessage("-1", "harvestEnd", endMsgs);
         }
 
         // Shutdown the harvester
@@ -318,6 +330,7 @@ public class HarvestClient {
 
         log.info("Completed in "
                 + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
+
     }
 
     /**
@@ -405,6 +418,38 @@ public class HarvestClient {
         if (messaging != null) {
             messaging.release();
         }
+    }
+
+    /**
+     * Get total records count of a particular type TODO need to init the
+     * indexer properly
+     */
+
+    private int getTotalRecordCount(String repoType, String repoName) {
+
+        Indexer indexer = PluginManager.getIndexer(config.getString("solr",
+                "indexer", "type"));
+
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        String query = "repository_type:" + repoType + "AND repository_name:"
+                + repoName;
+
+        SearchRequest searchRequest = new SearchRequest(query);
+
+        // int start = 0;
+        // int pageSize = 10;
+        // searchRequest.setParam("start", "" + start);
+        // searchRequest.setParam("rows", "" + pageSize);
+        try {
+            indexer.search(searchRequest, result);
+            SolrResult resultObject = new SolrResult(result.toString());
+            return resultObject.getNumFound();
+        } catch (IndexerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**

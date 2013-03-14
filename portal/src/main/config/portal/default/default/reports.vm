@@ -9,7 +9,7 @@
       #foreach($item in $self.latest)
         #set($harvestId = $item.getFirst('harvestId'))
         <li class="">
-          <a href="$portalPath/detail/$harvestId">$harvestId</a>
+          <a href="$portalPath/harvestreport/$harvestId">$harvestId</a>
         </li>
       #end
       </ol>

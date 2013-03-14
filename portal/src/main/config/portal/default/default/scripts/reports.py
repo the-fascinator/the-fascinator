@@ -7,6 +7,8 @@ from com.googlecode.fascinator.api.indexer import SearchRequest
 from com.googlecode.fascinator.common.solr import SolrResult
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 
+import traceback, sys
+
 class ReportsData:
     def __init__(self):
         pass
@@ -32,6 +34,7 @@ class ReportsData:
         indexer = self.services.getIndexer()
         self.log.info("In reports.py search method.......")
         self.log.info("Indexer attributes are : " + str(dir(indexer)))
+        print "--- Indexer is %s ---" % str(indexer)
         portalQuery = self.services.getPortalManager().get(self.vc("portalId")).getQuery()
         portalSearchQuery = self.services.getPortalManager().get(self.vc("portalId")).getSearchQuery()
         
@@ -41,16 +44,21 @@ class ReportsData:
             print "ERROR: User is not an admin '"
             return None
 
-        req = SearchRequest('eventType:"harvestStart"')
-        req.setParam("fq", 'item_type:"object"')
+        req = SearchRequest('eventType:harvestStart')
+        #req.setParam("fq", 'item_type:"object"')
         #if portalQuery:
             #req.addParam("fq", portalQuery)
         #if portalSearchQuery:
             #req.addParam("fq", portalSearchQuery)
         req.setParam("rows", "10")
-        req.setParam("sort", "eventTime desc");
+        #req.setParam("sort", "eventTime desc");
         out = ByteArrayOutputStream()
-        indexer.searchByIndex(req, out, 'eventLog')
+        try:
+            indexer.searchByIndex(req, out, "eventLog")
+        except:
+            print traceback.format_exc();
+            print repr(traceback.print_exc())
+            traceback.print_stack(file=sys.stdout)
         self.__latest = SolrResult(ByteArrayInputStream(out.toByteArray()))
 
         
