@@ -21,7 +21,9 @@ package com.googlecode.fascinator.common.messaging;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -490,10 +492,16 @@ public class MessagingServices {
         if (username == null) {
             username = "guest";
         }
-        json.put("oid", param.get("oid"));
-        json.put("eventType", param.get("eventType"));
-        json.put("context", param.get("context"));
-        json.put("user", username);
+        Set<String> keys = param.keySet();
+        Iterator<String> iter = keys.iterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            if ("username".equals(key)) {
+                json.put("user", username);
+            } else {
+                json.put(key, param.get(key));
+            }
+        }
         queueMessage(SUBSCRIBER_QUEUE, json.toString());
     }
 }

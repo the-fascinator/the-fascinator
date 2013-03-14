@@ -125,6 +125,9 @@ public class HarvestClient {
     /** New record count */
     private long totalRecordCount;
 
+    /** Harvest id for reports */
+    private String harvestId;
+
     /**
      * Harvest Client Constructor
      * 
@@ -241,10 +244,12 @@ public class HarvestClient {
 
         // Generate harvest id. This is just a string representation of current
         // date and time
-        String harvestId = Long.toString(start);
+        harvestId = now;
 
-        // TODO put in event log
-        sentMessage("-1", "harvestStart");
+        // Put in event log
+        Map<String, String> pa = new LinkedHashMap<String, String>();
+        pa.put("harvestId", harvestId);
+        sentMessage("-1", "harvestStart", pa);
 
         // cache harvester config and indexer rules
         configObject = updateHarvestFile(configFile);
@@ -520,7 +525,11 @@ public class HarvestClient {
         object.close();
 
         // put in event log
-        sentMessage(oid, "modify");
+        Map<String, String> msgs = new LinkedHashMap<String, String>();
+        msgs.put("harvestId", harvestId);
+        msgs.put("isNew", isNew);
+        msgs.put("isModified", isModified);
+        sentMessage(oid, "modify", msgs);
 
         // queue the object for indexing
         queueHarvest(oid, configFile, commit);
@@ -604,12 +613,15 @@ public class HarvestClient {
      * @param context where the event happened
      * @param jsonFile Configuration file
      */
-    private void sentMessage(String oid, String eventType) {
+    private void sentMessage(String oid, String eventType,
+            Map<String, String> optionalParams) {
         Map<String, String> param = new LinkedHashMap<String, String>();
         param.put("oid", oid);
         param.put("eventType", eventType);
         param.put("username", "system");
         param.put("context", "HarvestClient");
+
+        param.putAll(optionalParams);
         try {
             messaging.onEvent(param);
         } catch (MessagingException ex) {

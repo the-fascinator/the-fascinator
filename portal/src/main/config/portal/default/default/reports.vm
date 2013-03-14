@@ -2,14 +2,14 @@
 <div class="grid_6">
   #set($menuTitle = "Harvest logs")
   <div class="block">
-    #if($self.latest.isEmpty())
+    #if(!$self.latest)
       &nbsp;
     #else
       <ol>
       #foreach($item in $self.latest)
-        #set($itemTitle = $item.getFirst('eventTime'))
+        #set($harvestId = $item.getFirst('harvestId'))
         <li class="">
-          <a href="$portalPath/detail/$itemTitle">$itemTitle</a>
+          <a href="$portalPath/detail/$harvestId">$harvestId</a>
         </li>
       #end
       </ol>
