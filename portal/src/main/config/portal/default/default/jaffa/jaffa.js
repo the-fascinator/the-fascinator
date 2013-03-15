@@ -56,9 +56,10 @@ function jaffaFactory(newConfig) {
         callbackPostSubmission: null,
 
         /** For ease of maintenance, all standard functions below here */
+        /** console object in IE has different methods **/
         functionLog: function(type, message) {
             message = "(JAFFA): " + message;
-            if (typeof(console) != "undefined") {
+            if (typeof(console) != "undefined" && typeof(console[type]) != "undefined") {
                 console[type](message);
             }
         },

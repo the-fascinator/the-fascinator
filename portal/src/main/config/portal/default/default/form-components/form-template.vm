@@ -24,7 +24,7 @@
 <div class="errorbox">
 		#displayMessage("reports.create.report.validation.message")
 		<ul id="errorbox-list">
-		<ul>
+		</ul>
 </div>
 	
 
