@@ -635,10 +635,15 @@ function jaffaForm(jaffaObject) {
         return false;
     }
 
-    // Start the save process
-    form.save = function() {
-        jaffa.logInfo("Sending with 'save' context");
-        var result = sendData(jaffa.valid.okToSave(), "PreSave", "SaveData", "PostSave");
+    form.save = function(hasValidated) {
+    	var result;
+    	if (hasValidated == true) {
+    		jaffa.logInfo("Trying to send data with 'save' context with trusted data");
+    		result = sendData(true, "PreSave", "SaveData", "PostSave");
+    	} else {
+            jaffa.logInfo("Trying to send data with 'save' context");
+            result = sendData(jaffa.valid.okToSave(), "PreSave", "SaveData", "PostSave");
+    	}
         // TODO: Global validation handling
         return result;
     }

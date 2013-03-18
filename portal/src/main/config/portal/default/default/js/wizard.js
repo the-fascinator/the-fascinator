@@ -13,7 +13,8 @@ function formSubmit(transitionAction, objectMetaParams,closeURL) {
 		}
 		var validationPassed = validateTab(); 
 		if(validationPassed) {
-			jaffa.form.save();
+			// We do not want jaffa to validate data again: we have done it by validateTab()
+			jaffa.form.save(true);
 		}
 		
 		return validationPassed;
