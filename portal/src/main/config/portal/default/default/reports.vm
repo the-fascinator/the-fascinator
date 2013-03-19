@@ -8,8 +8,10 @@
       <ol>
       #foreach($item in $self.latest)
         #set($harvestId = $item.getFirst('harvestId'))
+        #set($repoType = $item.getFirst('repoType'))
+        #set($repoName = $item.getFirst('repoName'))
         <li class="">
-          <a href="$portalPath/harvestreport/$harvestId">$harvestId</a>
+          <a href="$portalPath/harvestreport/$harvestId">$repoType $repoName - $harvestId</a>
         </li>
       #end
       </ol>

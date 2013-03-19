@@ -7,8 +7,6 @@ from com.googlecode.fascinator.api.indexer import SearchRequest
 from com.googlecode.fascinator.common.solr import SolrResult
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 
-import traceback, sys
-
 class ReportsData:
     def __init__(self):
         pass
@@ -32,11 +30,6 @@ class ReportsData:
 
     def __search(self):
         indexer = self.services.getIndexer()
-        self.log.info("In reports.py search method.......")
-        self.log.info("Indexer attributes are : " + str(dir(indexer)))
-        print "--- Indexer is %s ---" % str(indexer)
-        portalQuery = self.services.getPortalManager().get(self.vc("portalId")).getQuery()
-        portalSearchQuery = self.services.getPortalManager().get(self.vc("portalId")).getSearchQuery()
         
         # Security prep work
         isAdmin = self.vc("page").authentication.is_admin()
@@ -45,25 +38,11 @@ class ReportsData:
             return None
 
         req = SearchRequest('eventType:harvestStart')
-        #req.setParam("fq", 'item_type:"object"')
-        #if portalQuery:
-            #req.addParam("fq", portalQuery)
-        #if portalSearchQuery:
-            #req.addParam("fq", portalSearchQuery)
-        req.setParam("rows", "10")
-        #req.setParam("sort", "eventTime desc");
+        req.setParam("rows", "100")
         out = ByteArrayOutputStream()
-        try:
-            indexer.searchByIndex(req, out, "eventLog")
-        except:
-            print traceback.format_exc();
-            print repr(traceback.print_exc())
-            traceback.print_stack(file=sys.stdout)
+        indexer.searchByIndex(req, out, "eventLog")
         self.__latest = SolrResult(ByteArrayInputStream(out.toByteArray()))
 
-        
-        #self.vc("sessionState").set("fq", 'item_type:"object"')
-        #sessionState.set("query", portalQuery.replace("\"", "'"))
     
     def getLatest(self):
         return self.__latest.getResults()

@@ -7,7 +7,7 @@ from com.googlecode.fascinator.api.indexer import SearchRequest
 from com.googlecode.fascinator.common.solr import SolrResult
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
 
-import traceback, sys, re, os
+import traceback, sys, os
 
 from java.net import URLDecoder
 
@@ -24,10 +24,7 @@ class HarvestreportData:
         self.__records = None
         
         uri = URLDecoder.decode(self.request.getAttribute("RequestURI"))
-        print "--- URI is %s ---" % uri
         self.__harvestId = os.path.basename(uri)
-        print "--- harvest id is %s ---" % os.path.basename(uri)
-        
         self.__search()
 
     # Get from velocity context
@@ -80,7 +77,37 @@ class HarvestreportData:
         out = ByteArrayOutputStream()
         indexer.searchByIndex(req, out, "eventLog")
         self.__unmodified = SolrResult(ByteArrayInputStream(out.toByteArray()))
-
+        
+        req = SearchRequest('harvestId:"' + self.__harvestId + '"')
+        req.setParam("fq", 'eventType:harvestEnd')
+        out = ByteArrayOutputStream()
+        indexer.searchByIndex(req, out, "eventLog")
+        endItem = SolrResult(ByteArrayInputStream(out.toByteArray()))
+        endTimeList = endItem.getFieldList('eventTime')
+        
+        date = None;
+        repoType = None;
+        repoName = None;
+        
+        if(endTimeList.size() > 0):
+            date = endTimeList.get(0)
+        
+        repoTypeList = endItem.getFieldList('repoType')
+        if(repoTypeList.size() > 0):
+            repoType = repoTypeList.get(0)
+            
+        repoNameList = endItem.getFieldList('repoName')
+        if(repoTypeList.size() > 0):
+            repoName = repoNameList.get(0)
+        
+        req = SearchRequest("last_modified:[* TO " + date + "]")
+        req.setParam("fq", 'item_type:"object"')
+        req.setParam("fq", 'repository_type:"' + repoType + '"')
+        req.setParam("fq", 'repository_name:"' + repoName + '"')
+        out = ByteArrayOutputStream()
+        indexer.search(req, out)
+        self.__allRecords = SolrResult(ByteArrayInputStream(out.toByteArray()))
+        
 
     def getNewcount(self):
         return self.__latest.getNumFound()
@@ -91,10 +118,11 @@ class HarvestreportData:
     def getUnmodifiedcount(self):
         return self.__unmodified.getNumFound()
     
-    def getRecords(self):
-        return self.__records.getResults()
-
     def getItemcount(self):
         return self.__records.getNumFound()
+    
+    def getTotalcount(self):
+        return self.__allRecords.getNumFound()
+    
 
     

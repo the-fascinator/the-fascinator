@@ -106,6 +106,9 @@ public class HarvestClient {
     /** Json configuration */
     private JsonSimpleConfig config;
 
+    /** JSON configuration */
+    private JsonSimpleConfig globalConfig;
+
     /** Storage to store the digital object */
     private Storage storage;
 
@@ -167,6 +170,7 @@ public class HarvestClient {
         fileOwner = owner;
 
         try {
+            globalConfig = new JsonSimpleConfig();
             if (configFile == null) {
                 config = new JsonSimpleConfig();
             } else {
@@ -251,9 +255,16 @@ public class HarvestClient {
         // date and time
         harvestId = now;
 
+        String repoType = config.getString("", "indexer", "params",
+                "repository.type");
+        String repoName = config.getString("", "indexer", "params",
+                "repository.name");
+
         // Put in event log
         Map<String, String> startMsgs = new LinkedHashMap<String, String>();
         startMsgs.put("harvestId", harvestId);
+        startMsgs.put("repoType", repoType);
+        startMsgs.put("repoName", repoName);
         sentMessage("-1", "harvestStart", startMsgs);
 
         // cache harvester config and indexer rules
@@ -306,20 +317,11 @@ public class HarvestClient {
                 }
             } while (harvester.hasMoreDeletedObjects());
 
-            // TODO harvester.getLoggingData(); This method should go in
-            // Harvester interface.
-            // this should send a msg to eventlog?
-            String repoType = config.getString("", "indexer", "params",
-                    "repository.type");
-            String repoName = config.getString("", "indexer", "params",
-                    "repository.name");
-            // logHarvest(repoType, repoName);
-
             // Send harvest end message to event log
             Map<String, String> endMsgs = new LinkedHashMap<String, String>();
             endMsgs.put("harvestId", harvestId);
-            endMsgs.put("totalRecords",
-                    Integer.toString(getTotalRecordCount(repoType, repoName)));
+            endMsgs.put("repoType", repoType);
+            endMsgs.put("repoName", repoName);
             sentMessage("-1", "harvestEnd", endMsgs);
         }
 
@@ -421,32 +423,38 @@ public class HarvestClient {
     }
 
     /**
-     * Get total records count of a particular type TODO need to init the
-     * indexer properly
+     * Get total records count of a particular type
      */
 
     private int getTotalRecordCount(String repoType, String repoName) {
 
-        Indexer indexer = PluginManager.getIndexer(config.getString("solr",
-                "indexer", "type"));
-
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        String query = "repository_type:" + repoType + "AND repository_name:"
-                + repoName;
-
-        SearchRequest searchRequest = new SearchRequest(query);
-
-        // int start = 0;
-        // int pageSize = 10;
-        // searchRequest.setParam("start", "" + start);
-        // searchRequest.setParam("rows", "" + pageSize);
         try {
+
+            Indexer indexer = PluginManager.getIndexer(globalConfig.getString(
+                    "solr", "indexer", "type"));
+
+            File sysFile = JsonSimpleConfig.getSystemFile();
+            indexer.init(sysFile);
+
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            String query = "repository_type:" + repoType
+                    + "AND repository_name:" + repoName;
+
+            SearchRequest searchRequest = new SearchRequest(query);
+
+            // int start = 0;
+            // int pageSize = 10;
+            // searchRequest.setParam("start", "" + start);
+            // searchRequest.setParam("rows", "" + pageSize);
+
             indexer.search(searchRequest, result);
             SolrResult resultObject = new SolrResult(result.toString());
             return resultObject.getNumFound();
         } catch (IndexerException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (PluginException e) {
             e.printStackTrace();
         }
         return 0;
