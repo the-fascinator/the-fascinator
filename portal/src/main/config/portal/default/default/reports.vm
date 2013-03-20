@@ -1,20 +1,40 @@
 #set($pageTitle = "Harvest Log")
+<script type="text/javascript" src="$portalPath/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="$portalPath/js/jquery.tablesorter.min.js"></script> 
+<script type="text/javascript">
+<!--
+	$(document).ready(function() {
+		$("#harvestTable").tablesorter();
+	});
+-->
+</script>
+
 <div class="grid_6">
+  <div><h3> List of harvests </h3></div>
   #set($menuTitle = "Harvest logs")
   <div class="block">
     #if(!$self.latest)
       &nbsp;
     #else
-      <ol>
+      <table id="harvestTable" class="tablesorter" border="1">
+      <thead>
+      <tr>
+      	<th>Source</th>
+      	<th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
       #foreach($item in $self.latest)
         #set($harvestId = $item.getFirst('harvestId'))
         #set($repoType = $item.getFirst('repoType'))
         #set($repoName = $item.getFirst('repoName'))
-        <li class="">
-          <a href="$portalPath/harvestreport/$harvestId">$repoType $repoName - $harvestId</a>
-        </li>
+        <tr>
+          <td><a href="$portalPath/harvestreport/$harvestId">$repoType $repoName</a></td>
+          <td><a href="$portalPath/harvestreport/$harvestId">$harvestId</a></td>
+        </tr>
       #end
-      </ol>
+      </tbody>
+      </table>
     #end
   </div>
 </div>
