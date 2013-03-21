@@ -2,11 +2,14 @@ package com.googlecode.fascinator.portal.api.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.tapestry5.services.Request;
+import org.json.simple.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.indexer.SearchRequest;
@@ -19,33 +22,40 @@ import com.googlecode.fascinator.portal.services.ScriptingServices;
 public class PublishedRecordsByTypeAPICallHandlerImpl implements APICallHandler {
 
     private ScriptingServices scriptingServices;
+    private Logger log = LoggerFactory
+            .getLogger(PublishedRecordsByTypeAPICallHandlerImpl.class);
 
     @Override
     public String handleRequest(Request request) throws Exception {
         // DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateFromString = request.getParameter("dateFrom");
         String dateToString = request.getParameter("dateTo");
+
+        HashSet<String> publishedOidSet = new HashSet<String>();
         Indexer indexer = scriptingServices.getIndexer();
         ByteArrayOutputStream result = new ByteArrayOutputStream();
-        String query = "published:true";
+        String eventLogQuery = "context:\"Curation\" AND eventType:\"Curation completed.\" AND eventTime:["
+                + dateFromString
+                + "T00:00:00.000Z TO "
+                + dateToString
+                + "T23:59:59.999Z]";
 
-        SearchRequest searchRequest = new SearchRequest(query);
-
+        SearchRequest searchRequest = new SearchRequest(eventLogQuery);
         int start = 0;
         int pageSize = 10;
         searchRequest.setParam("start", "" + start);
         searchRequest.setParam("rows", "" + pageSize);
-        indexer.search(searchRequest, result);
+        indexer.searchByIndex(searchRequest, result, "eventLog");
         SolrResult resultObject = new SolrResult(result.toString());
         int numFound = resultObject.getNumFound();
-
-        Map<String, String> publishedOidMap = new HashMap<String, String>();
 
         while (true) {
             List<SolrDoc> results = resultObject.getResults();
             for (SolrDoc docObject : results) {
-                publishedOidMap.put(docObject.get("storage_id"),
-                        (String) docObject.getArray("oai_set").toArray()[0]);
+                String oid = docObject.getString(null, "oid");
+                if (oid != null) {
+                    publishedOidSet.add(oid);
+                }
             }
             start += pageSize;
             if (start > numFound) {
@@ -53,57 +63,59 @@ public class PublishedRecordsByTypeAPICallHandlerImpl implements APICallHandler 
             }
             searchRequest.setParam("start", "" + start);
             result = new ByteArrayOutputStream();
-            indexer.search(searchRequest, result);
+            indexer.searchByIndex(searchRequest, result, "eventLog");
             resultObject = new SolrResult(result.toString());
         }
 
+        // now pull the types ...
         Map<String, Integer> typeCountMap = new HashMap<String, Integer>();
         typeCountMap.put("Activities", 0);
         typeCountMap.put("Parties_People", 0);
-        typeCountMap.put("Parties", 0);
+        typeCountMap.put("Parties_Groups", 0);
         typeCountMap.put("Services", 0);
 
-        if (publishedOidMap.size() > 0) {
-            Set<String> publishedOids = publishedOidMap.keySet();
-            String eventLogQuery = "oid:(";
-            int i = 0;
-            for (String publishedOid : publishedOids) {
-
-                eventLogQuery += publishedOid;
-                if (i < publishedOidMap.size() - 1) {
-                    eventLogQuery += " OR ";
+        if (publishedOidSet.size() > 0) {
+            StringBuilder query = new StringBuilder();
+            query.append("id:(");
+            for (String publishedOid : publishedOidSet) {
+                if (query.length() > 4) {
+                    query.append(" OR ");
                 }
-                i++;
+                query.append(publishedOid);
             }
-            eventLogQuery += ")";
+            query.append(" )");
+            searchRequest = new SearchRequest(query.toString());
 
-            eventLogQuery += "AND eventTime:["
-                    + dateFromString
-                    + "T00:00:00.000Z TO "
-                    + dateToString
-                    + "T23:59:59.999Z] AND eventType:modify AND context:HarvestClient";
-
-            searchRequest = new SearchRequest(eventLogQuery);
             result = new ByteArrayOutputStream();
             start = 0;
             pageSize = 10;
             searchRequest.setParam("start", "" + start);
             searchRequest.setParam("rows", "" + pageSize);
-            indexer.searchByIndex(searchRequest, result, "eventLog");
+            indexer.search(searchRequest, result);
             resultObject = new SolrResult(result.toString());
             numFound = resultObject.getNumFound();
-
             while (true) {
                 List<SolrDoc> results = resultObject.getResults();
                 for (SolrDoc docObject : results) {
-                    String oid = docObject.getString(null, "oid");
-                    if (oid != null) {
-                        Integer oidInt = typeCountMap.get(publishedOidMap
-                                .get(oid));
-                        if (oidInt != null) {
-                            int count = oidInt.intValue();
-                            typeCountMap.put(publishedOidMap.get(oid), ++count);
+                    JSONArray oaiSetArr = docObject.getArray("oai_set");
+                    if (oaiSetArr != null && oaiSetArr.size() > 0) {
+                        String oaiSet = (String) oaiSetArr.get(0);
+                        log.debug("OAI Set for "
+                                + docObject.getString("<>", "id") + " is:"
+                                + oaiSet);
+                        if (oaiSet != null) {
+                            Integer curCount = typeCountMap.get(oaiSet);
+                            // only interested on those 4 above
+                            if (curCount != null) {
+                                log.debug("CurCount is:" + curCount.intValue());
+                                typeCountMap.put(oaiSet,
+                                        new Integer(curCount.intValue() + 1));
+                            } else {
+                                log.debug("CurCount is NULL");
+                            }
                         }
+                    } else {
+                        log.debug("NULL OAISET");
                     }
                 }
                 start += pageSize;
@@ -116,6 +128,7 @@ public class PublishedRecordsByTypeAPICallHandlerImpl implements APICallHandler 
                 resultObject = new SolrResult(result.toString());
             }
         }
+
         return (new JsonObject(typeCountMap)).toJSONString();
     }
 

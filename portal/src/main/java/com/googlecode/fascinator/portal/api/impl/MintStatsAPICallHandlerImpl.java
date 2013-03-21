@@ -81,13 +81,68 @@ public class MintStatsAPICallHandlerImpl implements APICallHandler {
         if (statMap == null) {
             init();
         }
-        String appendFilter = request.getParameter("appendFilter");
-        appendFilter = appendFilter == null ? "" : " AND " + appendFilter;
+        String customQuery = null;
+        String dateFromString = request.getParameter("dateFrom");
+        String dateToString = request.getParameter("dateTo");
         Indexer indexer = scriptingServices.getIndexer();
+
+        if ("true".equals(request.getParameter("published"))) {
+            customQuery = "context:\"Curation\" AND eventType:\"Curation completed.\" AND eventTime:["
+                    + dateFromString
+                    + "T00:00:00.000Z TO "
+                    + dateToString
+                    + "T23:59:59.999Z]";
+            int start = 0;
+            int pageSize = 10;
+            HashSet<String> publishedOidSet = new HashSet<String>();
+            SearchRequest searchRequest = new SearchRequest(customQuery);
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            searchRequest.setParam("start", "" + start);
+            searchRequest.setParam("rows", "" + pageSize);
+            indexer.searchByIndex(searchRequest, result, "eventLog");
+            SolrResult resultObject = new SolrResult(result.toString());
+            int numFound = resultObject.getNumFound();
+
+            while (true) {
+                List<SolrDoc> results = resultObject.getResults();
+                for (SolrDoc docObject : results) {
+                    String oid = docObject.getString(null, "oid");
+                    if (oid != null) {
+                        publishedOidSet.add(oid);
+                    }
+                }
+                start += pageSize;
+                if (start > numFound) {
+                    break;
+                }
+                searchRequest.setParam("start", "" + start);
+                result = new ByteArrayOutputStream();
+                indexer.searchByIndex(searchRequest, result, "eventLog");
+                resultObject = new SolrResult(result.toString());
+            }
+            StringBuilder query = new StringBuilder();
+            query.append("id:(");
+            if (publishedOidSet.size() > 0) {
+                for (String publishedOid : publishedOidSet) {
+                    if (query.length() > 4) {
+                        query.append(" OR ");
+                    }
+                    query.append(publishedOid);
+                }
+            } else {
+                query.append("empty");
+            }
+            query.append(" )");
+            customQuery = query.toString();
+        } else {
+            customQuery = "last_modified:[" + dateFromString
+                    + "T00:00:00.000Z TO " + dateToString + "T23:59:59.999Z]";
+        }
+
         for (String key : statMap.keySet()) {
             Stat stat = statMap.get(key);
             stat.resetCounts();
-            String query = stat.getQuery() + appendFilter;
+            String query = (customQuery == null ? stat.getQuery() : customQuery);
             log.debug("Using query:" + query);
             SearchRequest solrReq = new SearchRequest(query);
             int start = 0;
