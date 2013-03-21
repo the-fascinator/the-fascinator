@@ -252,8 +252,7 @@ public class HarvestClient {
 
         // Generate harvest id. This is just a string representation of current
         // date and time
-        DateFormat df2 = new SimpleDateFormat(DATE_FORMAT + "hh:mm:ss");
-        harvestId = df2.format(new Date());
+        harvestId = now;
 
         repoType = config.getString("", "indexer", "params", "repository.type");
         repoName = config.getString("", "indexer", "params", "repository.name");
