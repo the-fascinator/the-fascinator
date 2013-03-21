@@ -4,5 +4,5 @@
   <br>New records created : $self.newcount</br>
   <br>Number of modified records : $self.modifiedcount</br>
   <br>Number of not modified records : $self.unmodifiedcount</br>
-  <br>Number of not total records after harvest : $self.totalcount</br>
+  <br>Number of total records after harvest : $self.totalcount</br>
 </div>

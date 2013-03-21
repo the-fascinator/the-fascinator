@@ -18,11 +18,9 @@
  */
 package com.googlecode.fascinator;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -130,11 +128,12 @@ public class HarvestClient {
     /** New record count */
     private long newRecordCount;
 
-    /** New record count */
-    private long totalRecordCount;
-
     /** Harvest id for reports */
     private String harvestId;
+
+    private String repoType;
+
+    private String repoName;
 
     /**
      * Harvest Client Constructor
@@ -253,18 +252,17 @@ public class HarvestClient {
 
         // Generate harvest id. This is just a string representation of current
         // date and time
-        harvestId = now;
+        DateFormat df2 = new SimpleDateFormat(DATE_FORMAT + "hh:mm:ss");
+        harvestId = df2.format(new Date());
 
-        String repoType = config.getString("", "indexer", "params",
-                "repository.type");
-        String repoName = config.getString("", "indexer", "params",
-                "repository.name");
+        repoType = config.getString("", "indexer", "params", "repository.type");
+        repoName = config.getString("", "indexer", "params", "repository.name");
 
         // Put in event log
         Map<String, String> startMsgs = new LinkedHashMap<String, String>();
         startMsgs.put("harvestId", harvestId);
-        startMsgs.put("repoType", repoType);
-        startMsgs.put("repoName", repoName);
+        startMsgs.put("repository_type", repoType);
+        startMsgs.put("repository_name", repoName);
         sentMessage("-1", "harvestStart", startMsgs);
 
         // cache harvester config and indexer rules
@@ -320,8 +318,9 @@ public class HarvestClient {
             // Send harvest end message to event log
             Map<String, String> endMsgs = new LinkedHashMap<String, String>();
             endMsgs.put("harvestId", harvestId);
-            endMsgs.put("repoType", repoType);
-            endMsgs.put("repoName", repoName);
+            endMsgs.put("repository_type", repoType);
+            endMsgs.put("repository_name", repoName);
+            // endMsgs.put("totalInStorage", getTotal(repoType, repoName));
             sentMessage("-1", "harvestEnd", endMsgs);
         }
 
@@ -463,45 +462,47 @@ public class HarvestClient {
     /**
      * Log harvest results.
      */
-    private void logHarvest(String repoType, String repoName) {
+    private String getTotal(String repoType, String repoName) {
 
-        try {
+        // try {
 
-            DigitalObject object;
-            Properties props;
+        DigitalObject object;
+        Properties props;
+        long totalRecordCount = 0;
 
-            Set<String> set = storage.getObjectIdList();
-            set.size();
-            for (String oid : set) {
-                try {
-                    object = storage.getObject(oid);
-                    props = object.getMetadata();
+        Set<String> set = storage.getObjectIdList();
+        set.size();
+        for (String oid : set) {
+            try {
+                object = storage.getObject(oid);
+                props = object.getMetadata();
 
-                    if (repoType.equals(props.getProperty("repository.type"))
-                            && repoName.equals(props
-                                    .getProperty("repository.name"))) {
-                        totalRecordCount++;
-                    }
-
-                } catch (StorageException e) {
-                    log.error("Could not retrieve the object: '{}'", oid, e);
+                if (repoType.equals(props.getProperty("repository.type"))
+                        && repoName
+                                .equals(props.getProperty("repository.name"))) {
+                    totalRecordCount++;
                 }
+
+            } catch (StorageException e) {
+                log.error("Could not retrieve the object: '{}'", oid, e);
             }
-
-            String logStr = "\nTotal records harvested : " + rowCount
-                    + "\nNew records created : " + newRecordCount
-                    + "\nNumber of modified records : " + modifiedCount
-                    + "\nNumber of not modified records : " + unModifiedCount
-                    + "\nTotal number of records in " + repoType + " "
-                    + repoName + " : " + totalRecordCount;
-
-            BufferedWriter out = new BufferedWriter(new FileWriter(
-                    config.getString(null, "logFile"), true));
-            out.write(logStr);
-            out.close();
-        } catch (IOException e) {
-            log.error("Failed to write log file", e);
         }
+
+        return Long.toString(totalRecordCount);
+        /*String logStr = "\nTotal records harvested : " + rowCount
+                + "\nNew records created : " + newRecordCount
+                + "\nNumber of modified records : " + modifiedCount
+                + "\nNumber of not modified records : " + unModifiedCount
+                + "\nTotal number of records in " + repoType + " "
+                + repoName + " : " + totalRecordCount;
+
+        BufferedWriter out = new BufferedWriter(new FileWriter(
+                config.getString(null, "logFile"), true));
+        out.write(logStr);
+        out.close();
+        } catch (IOException e) {
+        log.error("Failed to write log file", e);
+        }*/
     }
 
     /**
@@ -582,6 +583,8 @@ public class HarvestClient {
         msgs.put("harvestId", harvestId);
         msgs.put("isNew", isNew);
         msgs.put("isModified", isModified);
+        msgs.put("repository_type", repoType);
+        msgs.put("repository_name", repoName);
         sentMessage(oid, "modify", msgs);
 
         // queue the object for indexing

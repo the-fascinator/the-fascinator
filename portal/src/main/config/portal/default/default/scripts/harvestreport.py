@@ -21,7 +21,7 @@ class HarvestreportData:
         self.services = self.vc("Services")
         self.request = self.vc("request")
         self.log = context["log"]
-        self.__records = None
+        self.__harvestedRecords = None
         
         uri = URLDecoder.decode(self.request.getAttribute("RequestURI"))
         self.__harvestId = os.path.basename(uri)
@@ -53,7 +53,7 @@ class HarvestreportData:
             print traceback.format_exc();
             print repr(traceback.print_exc())
             traceback.print_stack(file=sys.stdout)
-        self.__records = SolrResult(ByteArrayInputStream(out.toByteArray()))
+        self.__harvestedRecords = SolrResult(ByteArrayInputStream(out.toByteArray()))
         
         req = SearchRequest('harvestId:"' + self.__harvestId + '"')
         req.setParam("fq", 'eventType:modify')
@@ -64,16 +64,13 @@ class HarvestreportData:
         
         req = SearchRequest('harvestId:"' + self.__harvestId + '"')
         req.setParam("fq", 'eventType:modify')
-        req.setParam("fq", 'isNew:false')
         req.setParam("fq", 'isModified:true')
         out = ByteArrayOutputStream()
         indexer.searchByIndex(req, out, "eventLog")
         self.__modified = SolrResult(ByteArrayInputStream(out.toByteArray()))
         
-        req = SearchRequest('harvestId:"' + self.__harvestId + '"')
-        req.setParam("fq", 'eventType:modify')
+        req = SearchRequest('harvestId:"' + self.__harvestId + '" AND eventType:"modify" AND isModified:false')
         req.setParam("fq", 'isNew:false')
-        req.setParam("fq", 'isModified:false')
         out = ByteArrayOutputStream()
         indexer.searchByIndex(req, out, "eventLog")
         self.__unmodified = SolrResult(ByteArrayInputStream(out.toByteArray()))
@@ -92,23 +89,24 @@ class HarvestreportData:
         if(endTimeList.size() > 0):
             date = endTimeList.get(0)
         
-        repoTypeList = endItem.getFieldList('repoType')
+        repoTypeList = endItem.getFieldList('repository_type')
         if(repoTypeList.size() > 0):
             repoType = repoTypeList.get(0)
             
-        repoNameList = endItem.getFieldList('repoName')
+        repoNameList = endItem.getFieldList('repository_name')
         if(repoTypeList.size() > 0):
             repoName = repoNameList.get(0)
         
-        req = SearchRequest("last_modified:[* TO " + date + "]")
-        req.setParam("fq", 'item_type:"object"')
-        req.setParam("fq", 'repository_type:"' + repoType + '"')
-        req.setParam("fq", 'repository_name:"' + repoName + '"')
+        req = SearchRequest('repository_type:"' + repoType + '" AND repository_name:"' + repoName + '" AND eventType:"modify" AND isNew:true')  
+        req.setParam("fq", "eventTime:[* TO " + date + "]")
         out = ByteArrayOutputStream()
-        indexer.search(req, out)
+        indexer.searchByIndex(req, out, "eventLog")
         self.__allRecords = SolrResult(ByteArrayInputStream(out.toByteArray()))
         
 
+    def getItemcount(self):
+        return self.__harvestedRecords.getNumFound()
+    
     def getNewcount(self):
         return self.__latest.getNumFound()
     
@@ -117,9 +115,6 @@ class HarvestreportData:
     
     def getUnmodifiedcount(self):
         return self.__unmodified.getNumFound()
-    
-    def getItemcount(self):
-        return self.__records.getNumFound()
     
     def getTotalcount(self):
         return self.__allRecords.getNumFound()
