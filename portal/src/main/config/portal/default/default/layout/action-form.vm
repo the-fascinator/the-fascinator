@@ -16,8 +16,7 @@
     }
 -->
 </script>
-#set($portalFormPath = $portalPath.replaceAll("verNum[0-9A-Za-z_.\\-]+/",""))
-<form action="$portalFormPath/$pageName" id="action-form" method="post">
+<form action="$portalPath/${pageName}.ajax" id="action-form" method="post">
   <input id="verb" name="verb" type="hidden" />
   <input id="value" name="value" type="hidden" />
 </form>
