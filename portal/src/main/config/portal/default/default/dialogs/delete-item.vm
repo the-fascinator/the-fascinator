@@ -58,6 +58,7 @@
                     function (data, status) {
                         me.parent().parent().hide();
                         $("#delete-dialog").dialog('close');
+                        window.location.reload();
                     },
                 error:
                     function (req, status, e) {
