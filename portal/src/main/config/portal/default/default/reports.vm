@@ -3,27 +3,8 @@
 <script type="text/javascript" src="$portalPath/js/jquery.tablesorter.min.js"></script> 
 <script type="text/javascript">
 <!--
-	$(".tablesorter").addParser({
-		id: 'lloyd',
-		is: function(s) {
-			return false;
-		},
-		format: function(s) {
-			var d=s.substring(0,10);
-			var t=s.substring(11,19);
-			return new Date(d+t);
-		},
-		type: 'numeric'
-	});
-
 	$(document).ready(function() {
-		$("#harvestTable").tablesorter({
-			headers: {
-				1: {
-					sorter:'lloyd'
-				}
-			}
-		});
+		$("#harvestTable").tablesorter();
 	});
 -->
 </script>
@@ -45,11 +26,13 @@
       <tbody>
       #foreach($item in $self.latest)
         #set($harvestId = $item.getFirst('harvestId'))
+        #set($date = $harvestId.substring(0,10))
+        #set($time = $harvestId.substring(11,19))
         #set($repoType = $item.getFirst('repository_type'))
         #set($repoName = $item.getFirst('repository_name'))
         <tr>
           <td><a href="$portalPath/harvestreport/$harvestId">$repoType $repoName</a></td>
-          <td><a href="$portalPath/harvestreport/$harvestId">$harvestId</a></td>
+          <td><a href="$portalPath/harvestreport/$harvestId">$date $time</a></td>
         </tr>
       #end
       </tbody>
