@@ -18,7 +18,6 @@
  */
 package com.googlecode.fascinator;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,9 +39,6 @@ import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
 import com.googlecode.fascinator.api.harvester.Harvester;
 import com.googlecode.fascinator.api.harvester.HarvesterException;
-import com.googlecode.fascinator.api.indexer.Indexer;
-import com.googlecode.fascinator.api.indexer.IndexerException;
-import com.googlecode.fascinator.api.indexer.SearchRequest;
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Payload;
 import com.googlecode.fascinator.api.storage.Storage;
@@ -53,7 +49,6 @@ import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
-import com.googlecode.fascinator.common.solr.SolrResult;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 
@@ -104,9 +99,6 @@ public class HarvestClient {
     /** Json configuration */
     private JsonSimpleConfig config;
 
-    /** JSON configuration */
-    private JsonSimpleConfig globalConfig;
-
     /** Storage to store the digital object */
     private Storage storage;
 
@@ -115,18 +107,6 @@ public class HarvestClient {
 
     /** Tool Chain entry queue */
     private String toolChainEntry;
-
-    /** Row count */
-    private long rowCount;
-
-    /** Modified count */
-    private long modifiedCount;
-
-    /** Un modified count */
-    private long unModifiedCount;
-
-    /** New record count */
-    private long newRecordCount;
 
     /** Harvest id for reports */
     private String harvestId;
@@ -169,7 +149,6 @@ public class HarvestClient {
         fileOwner = owner;
 
         try {
-            globalConfig = new JsonSimpleConfig();
             if (configFile == null) {
                 config = new JsonSimpleConfig();
             } else {
@@ -421,90 +400,6 @@ public class HarvestClient {
     }
 
     /**
-     * Get total records count of a particular type
-     */
-
-    private int getTotalRecordCount(String repoType, String repoName) {
-
-        try {
-
-            Indexer indexer = PluginManager.getIndexer(globalConfig.getString(
-                    "solr", "indexer", "type"));
-
-            File sysFile = JsonSimpleConfig.getSystemFile();
-            indexer.init(sysFile);
-
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            String query = "repository_type:" + repoType
-                    + "AND repository_name:" + repoName;
-
-            SearchRequest searchRequest = new SearchRequest(query);
-
-            // int start = 0;
-            // int pageSize = 10;
-            // searchRequest.setParam("start", "" + start);
-            // searchRequest.setParam("rows", "" + pageSize);
-
-            indexer.search(searchRequest, result);
-            SolrResult resultObject = new SolrResult(result.toString());
-            return resultObject.getNumFound();
-        } catch (IndexerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (PluginException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /**
-     * Log harvest results.
-     */
-    private String getTotal(String repoType, String repoName) {
-
-        // try {
-
-        DigitalObject object;
-        Properties props;
-        long totalRecordCount = 0;
-
-        Set<String> set = storage.getObjectIdList();
-        set.size();
-        for (String oid : set) {
-            try {
-                object = storage.getObject(oid);
-                props = object.getMetadata();
-
-                if (repoType.equals(props.getProperty("repository.type"))
-                        && repoName
-                                .equals(props.getProperty("repository.name"))) {
-                    totalRecordCount++;
-                }
-
-            } catch (StorageException e) {
-                log.error("Could not retrieve the object: '{}'", oid, e);
-            }
-        }
-
-        return Long.toString(totalRecordCount);
-        /*String logStr = "\nTotal records harvested : " + rowCount
-                + "\nNew records created : " + newRecordCount
-                + "\nNumber of modified records : " + modifiedCount
-                + "\nNumber of not modified records : " + unModifiedCount
-                + "\nTotal number of records in " + repoType + " "
-                + repoName + " : " + totalRecordCount;
-
-        BufferedWriter out = new BufferedWriter(new FileWriter(
-                config.getString(null, "logFile"), true));
-        out.write(logStr);
-        out.close();
-        } catch (IOException e) {
-        log.error("Failed to write log file", e);
-        }*/
-    }
-
-    /**
      * Process each objects
      * 
      * @param oid Object Id
@@ -557,22 +452,16 @@ public class HarvestClient {
         // check this object's status (i.e. new or modified) and count
         if (props.containsKey("isNew")
                 && Boolean.parseBoolean(props.getProperty("isNew"))) {
-            newRecordCount++;
             isNew = "true";
         } else if (props.containsKey("isModified")) {
             if (Boolean.parseBoolean(props.getProperty("isModified"))) {
-                modifiedCount++;
                 isModified = "true";
-            } else {
-                unModifiedCount++;
             }
         }
 
         // now remove these properties. We don't need them anymore
         props.remove("isNew");
         props.remove("isModified");
-
-        rowCount++;
 
         // done with the object
         object.close();
