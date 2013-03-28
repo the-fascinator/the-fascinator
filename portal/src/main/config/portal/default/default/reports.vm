@@ -1,22 +1,35 @@
-#set($pageTitle = "Harvest Log")
+#set($pageTitle = "List Of Harvests")
+
+<h2 id="page-heading">
+  <span>$pageTitle</span>
+</h2>
+
+#if (!$page.authentication.is_admin())
+  <div class="box">
+    <div class="block">
+      <div class="login-error">
+        Sorry, but you need to be logged in as an administrator to use this screen.
+      </div>
+    </div>
+  </div>
+
+#else
 <script type="text/javascript" src="$portalPath/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="$portalPath/js/jquery.tablesorter.min.js"></script> 
 <script type="text/javascript">
 <!--
 	$(document).ready(function() {
-		$("#harvestTable").tablesorter();
+		$("#harvestTable").tablesorter({cssAsc: "headerSortUp"});
 	});
 -->
 </script>
-
-<div class="grid_6">
-  <div><h3> List of harvests </h3></div>
-  #set($menuTitle = "Harvest logs")
+<div class="grid_16">
+ #if ($self.itemcount != 0)
+#set($contentTitle = "Harvest list")
+#parse($page.getTemplate('wrapping/content-block-open.vm'))
+#set($contentTitle = $nullValue)
   <div class="block">
-    #if(!$self.latest)
-      &nbsp;
-    #else
-      <table id="harvestTable" class="tablesorter" border="1">
+      <table id="harvestTable" class="harvest-rpt" border="1">
       <thead>
       <tr>
       	<th>Source</th>
@@ -24,7 +37,7 @@
       </tr>
       </thead>
       <tbody>
-      #foreach($item in $self.latest)
+      #foreach($item in $self.harvestlist)
         #set($harvestId = $item.getFirst('harvestId'))
         #set($date = $harvestId.substring(0,10))
         #set($time = $harvestId.substring(11,19))
@@ -37,6 +50,15 @@
       #end
       </tbody>
       </table>
-    #end
   </div>
+#parse($page.getTemplate('wrapping/content-block-close.vm'))
+ #else
+    <div class="block">
+      <div class="login-error">
+        There are no any harvest reports.
+      </div>
+    </div>
+ #end
 </div>
+<div class="clear"></div>
+#end

@@ -17,7 +17,7 @@ class ReportsData:
         self.vc("sessionState").remove("fq")
         self.services = self.vc("Services")
         self.log = context["log"]
-        self.__latest = None
+        self.__harvestList = None
         self.__search()
 
     # Get from velocity context
@@ -41,11 +41,11 @@ class ReportsData:
         req.setParam("rows", "100")
         out = ByteArrayOutputStream()
         indexer.searchByIndex(req, out, "eventLog")
-        self.__latest = SolrResult(ByteArrayInputStream(out.toByteArray()))
+        self.__harvestList = SolrResult(ByteArrayInputStream(out.toByteArray()))
 
     
-    def getLatest(self):
-        return self.__latest.getResults()
+    def getHarvestlist(self):
+        return self.__harvestList.getResults()
 
     def getItemCount(self):
-        return self.__latest.getNumFound()
+        return self.__harvestList.getNumFound()

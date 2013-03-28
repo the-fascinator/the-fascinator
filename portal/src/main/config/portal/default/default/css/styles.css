@@ -721,6 +721,39 @@ li img.workflow, .mime-icon {
     display: none;
     width: auto;
 }
+.harvest-rpt td, .harvest-rpt th {
+    text-align: center;
+    border: 1px solid #999999;
+}
+.harvest-rpt tr td:first-child,
+.harvest-rpt tr th:first-child {
+    text-align: left;
+    font-size: 110%;
+}
+.harvest-rpt tr.group th {
+    background-color: #CCCCCC;
+}
+.harvest-rpt td {
+    width: 5em;
+}
+.harvest-rpt td.description {
+    font-size: 1em !important;
+    padding-left: 3em;
+    display: none;
+    width: auto;
+}
+.harvest-rpt.tablesorter .headerSortUp {
+	background-image: url(../../images/icons/asc.png);
+	background-repeat: no-repeat;
+}
+.harvest-rpt.tablesorter .headerSortDown {
+	background-image: url(../../images/icons/desc.png);
+	background-repeat: no-repeat;
+}
+.harvest-rpt.tablesorter .header {
+	background-image: url(../../images/icons/bg.png);
+	background-repeat: no-repeat;
+}
 ul.global-topic {
     font-family: monospace;
     border: 1px dashed #999999;
