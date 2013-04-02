@@ -15,11 +15,11 @@
 
 #else
 <script type="text/javascript" src="$portalPath/js/jquery-1.4.2.min.js"></script>
-<script type="text/javascript" src="$portalPath/js/jquery.tablesorter.min.js"></script> 
+<script type="text/javascript" src="$portalPath/js/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 <!--
 	$(document).ready(function() {
-		$("#harvestTable").tablesorter({cssAsc: "headerSortUp"});
+		$(".tablesorter").tablesorter({cssAsc: "headerSortUp"});
 	});
 -->
 </script>
@@ -29,7 +29,7 @@
 #parse($page.getTemplate('wrapping/content-block-open.vm'))
 #set($contentTitle = $nullValue)
   <div class="block">
-      <table id="harvestTable" class="harvest-rpt" border="1">
+      <table class="tablesorter" border="1">
       <thead>
       <tr>
       	<th>Source</th>
