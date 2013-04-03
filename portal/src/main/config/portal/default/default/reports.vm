@@ -1,4 +1,4 @@
-#set($pageTitle = "List Of Harvests")
+#set($pageTitle = "Ingest Reports")
 
 <h2 id="page-heading">
   <span>$pageTitle</span>
@@ -25,7 +25,7 @@
 </script>
 <div class="grid_16">
  #if ($self.itemcount != 0)
-#set($contentTitle = "Harvest list")
+#set($contentTitle = "Ingest list")
 #parse($page.getTemplate('wrapping/content-block-open.vm'))
 #set($contentTitle = $nullValue)
   <div class="block">
