@@ -1,8 +1,31 @@
-#set($pageTitle = "Harvest report")
-<div class="grid_6">
-  <br>Total records harvested : $self.itemcount</br>
-  <br>New records created : $self.newcount</br>
-  <br>Number of modified records : $self.modifiedcount</br>
-  <br>Number of not modified records : $self.unmodifiedcount</br>
-  <br>Number of total records after harvest : $self.totalcount</br>
+#set($pageTitle = "Ingest report")
+
+<h2 id="page-heading">
+  <span></span>
+</h2>
+
+#if (!$page.authentication.is_admin())
+  <div class="box">
+    <div class="block">
+      <div class="login-error">
+        Sorry, but you need to be logged in as an administrator to use this screen.
+      </div>
+    </div>
+  </div>
+
+#else
+<div class="grid_16">
+ #set($contentTitle = "Ingest report")
+ #parse($page.getTemplate('wrapping/content-block-open.vm'))
+ #set($contentTitle = $nullValue)
+ <div class="block" style="font-weight:bold">
+   <br>Total records harvested : $self.itemcount</br>
+   <br>New records created : $self.newcount</br>
+   <br>Number of modified records : $self.modifiedcount</br>
+   <br>Number of not modified records : $self.unmodifiedcount</br>
+   <br>Number of total records after harvest : $self.totalcount</br><br>
+ </div>
+ #parse($page.getTemplate('wrapping/content-block-close.vm'))
+ <div class="clear"></div>
 </div>
+#end
