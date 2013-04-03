@@ -469,14 +469,12 @@ public class Dispatch {
         // Strip special extensions whilst checking on disk
         if (isSpecial) {
             searchable = resource.substring(0, resource.lastIndexOf(ext));
-            log.debug("Location of ext {} = {}", ext, resource.lastIndexOf(ext));
-            log.debug("As it is special resource {} now is {}", resource,
-                    searchable);
+            // log.debug("Location of ext {} = {}", ext, resource.lastIndexOf(ext));
+            // log.debug("As it is special resource {} now is {}", resource, searchable);
         }
         // Return if found
         if (velocityService.resourceExists(portalId, searchable) != null) {
-            log.debug("{} has been found and return it for rendering",
-                    searchable);
+            // log.debug("{} has been found and return it for rendering", searchable);
             return searchable;
         }
         // Keep checking

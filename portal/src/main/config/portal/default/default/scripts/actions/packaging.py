@@ -43,7 +43,7 @@ class PackagingData:
         if self.velocityContext[index] is not None:
             return self.velocityContext[index]
         else:
-            log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
+            self.vc("log").error("ERROR: Requested context entry '" + index + "' doesn't exist")
             return None
 
     def __createNew(self):
@@ -89,7 +89,7 @@ class PackagingData:
             harvester.shutdown()
         except Exception, ex:
             error = "Packager workflow failed: %s" % str(ex)
-            log.error(error, ex)
+            self.vc("log").error(error, ex)
             if harvester is not None:
                 harvester.shutdown()
             return '{ "status": "failed" }'
@@ -154,7 +154,7 @@ class PackagingData:
                 object.close()
         except Exception, ex:
             error = "Packager workflow failed: %s" % str(ex)
-            log.error(error, ex)
+            self.vc("log").error(error, ex)
             if harvester is not None:
                 harvester.shutdown()
             return '{ "status": "failed" }'
