@@ -46,8 +46,9 @@ function transition_click(e)  {
 		var stateName = $('[id="'+wizardTabIdentifier+'"] > li.ui-state-active').text();
 		var transitionName = $(e).attr('transition-name');
 		var targetState = wizard_def["steps"][stateName][transitionName];
-		// Mimic the click on one of ui-tab-nav tab
-		$('a:contains('+targetState+')').click();
+		// Mimic the click on one of ui-tab-nav tab, 
+		// jQuery always returns an array but we only one to be clicked on no matter it is we wanted or not
+		$('a:contains('+targetState+')')[0].click();
 	}
 	}
 	return false;
