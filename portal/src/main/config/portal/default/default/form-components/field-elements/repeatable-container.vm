@@ -20,6 +20,7 @@
 		"child-config":{
 			"label":"${label}",
 			"field":"",
+      		"portalPath":"$portalPath",
 			"sub-elements": $sub-elements.settings	
 		},
 		"class-list":"widgetListBranding"

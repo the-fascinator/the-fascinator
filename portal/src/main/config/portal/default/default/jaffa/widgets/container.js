@@ -65,17 +65,20 @@ var ContainerWidgetBuilder = function($, jaffa) {
             input.attr('id',this.field);
             
             //read all the sub elements and add div placeholders to the dom
-            var inputDivs = {};
+            var inputDivs = {};                        
             for(var i=0; i<this.getConfig("sub-elements").length; i++) {
             
             	for( key in this.getConfig("sub-elements")[i]) {
              		var subDiv = $("<div id=\""+this.field+"."+i+"\">"+"to be replaced"+"</div>");
              		var options = this.getConfig("sub-elements")[i][key];
+                if (options["json-data-url"] != null) {
+                  options["json-data-url"] = options["json-data-url"].replace("$portalPath", this.getConfig("portalPath"));
+                }
              		options["field"]=this.field+options["suffix"];
  			 		inputDivs[this.field+"."+i] = [key,options];
  			 		input.append(subDiv);
 				}
-			}
+			}               
             ui.append(input);
             
             // Now make function call to turn placeholders to jaffa elements. 
@@ -88,7 +91,7 @@ var ContainerWidgetBuilder = function($, jaffa) {
 
             // Add help content
             this._super();
-
+                                                    
             // Activating a change trigger will synch
             //  all fields and the managed data
             input.trigger("change");
