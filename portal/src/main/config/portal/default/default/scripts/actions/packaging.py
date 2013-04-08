@@ -71,7 +71,10 @@ class PackagingData:
 
         outWriter.write(manifest.toString(True))
         outWriter.close()
-
+        # adding ability to set access plugin
+        accessPlugin = self.vc("formData").get("access_plugin", "derby")
+        if accessPlugin is not None:
+            self.vc("page").authentication.set_access_plugin(accessPlugin)
         try:
             # harvest the package as an object
             username = self.vc("sessionState").get("username")
