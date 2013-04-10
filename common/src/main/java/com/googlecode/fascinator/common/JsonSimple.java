@@ -64,6 +64,10 @@ public class JsonSimple {
 
     /** Holds this object's JSON */
     private JsonObject jsonObject;
+    
+    /** Hold the unmodified json object as parse(String) essentially throws away the JSONArray */
+    
+    private JSONArray jsonArray;
 
     /** Flag for system property substitution */
     private boolean substitueProperties;
@@ -174,6 +178,8 @@ public class JsonSimple {
             jsonObject = (JsonObject) object;
         } else {
             if (object instanceof JSONArray) {
+                // @TODO: the reasons as to why the original JSONArray is discarded has been lost in time - will need to determine this is by design
+                jsonArray = (JSONArray) object;
                 jsonObject = getFromArray((JSONArray) object);
             } else {
                 log.error("Expected JsonObject or at least JSONArray, but" +
@@ -927,5 +933,9 @@ public class JsonSimple {
             }
         }
         return response;
+    }
+    
+    public JSONArray getJsonArray() {
+        return jsonArray;
     }
 }
