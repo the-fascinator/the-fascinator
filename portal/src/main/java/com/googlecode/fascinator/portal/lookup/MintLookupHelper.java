@@ -5,6 +5,9 @@ import java.util.Map;
 
 import com.googlecode.fascinator.common.BasicHttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.googlecode.fascinator.common.JsonSimple;
 
 /**
@@ -15,14 +18,15 @@ import com.googlecode.fascinator.common.JsonSimple;
  * 
  */
 public class MintLookupHelper {
-
+    private static Logger log = LoggerFactory
+            .getLogger(MintLookupHelper.class);
     public static JsonSimple get(JsonSimple systemConfig, String urlName,
             Map<String, String> reqData) throws Exception {
         String url = systemConfig.getString("http://localhost:9001/mint",
                 "proxy-urls", urlName);
         StringBuilder reqStr = new StringBuilder();
         reqStr.append(url);
-        if (!urlName.endsWith("Detail") && !reqData.containsKey("id")) {
+        if (urlName.endsWith("Detail") && !reqData.containsKey("id")) {
             throw new Exception(
                     "Invalid request - please provide ID(s) to lookup.");
         }
@@ -38,6 +42,7 @@ public class MintLookupHelper {
             reqStr.append(URLEncoder.encode(data, "utf-8"));
         }
         url = reqStr.toString();
+        log.debug("Hitting URL: " + url);
         BasicHttpClient client = new BasicHttpClient(url);
         GetMethod get = new GetMethod(url);
         client.executeMethod(get);
