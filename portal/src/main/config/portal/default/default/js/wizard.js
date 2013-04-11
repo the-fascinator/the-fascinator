@@ -34,7 +34,7 @@ function setFirstWizardStep() {
    	 targetState = step;
    	 break;
 	}
-		$('a:contains('+targetState+')').click();
+	$('a:contains('+targetState+')')[0].click();
 }
 
 function transition_click(e)  {
@@ -48,7 +48,8 @@ function transition_click(e)  {
 		var targetState = wizard_def["steps"][stateName][transitionName];
 		// Mimic the click on one of ui-tab-nav tab, 
 		// jQuery always returns an array but we only one to be clicked on no matter it is we wanted or not
-		$('a:contains('+targetState+')')[0].click();
+		// with save like buttons, targetState is null
+		if (targetState) { $('a:contains('+targetState+')')[0].click(); }
 	}
 	}
 	return false;
