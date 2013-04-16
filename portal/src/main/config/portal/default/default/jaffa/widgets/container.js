@@ -22,6 +22,8 @@ var ContainerWidgetBuilder = function($, jaffa) {
             jaffa.form.ignoreField(this.oldField);
             //Tell Jaffa to update it's childWidgets
             for(var i =0; i < this.childWidgets.length; i++) {
+               var childContainer = this.childWidgets[i].getContainer();
+               childContainer.attr("id", childContainer.attr("id").replace(from, to));
  			   this.childWidgets[i].domUpdate(from, to, depth);
 			}
             // TODO: Testing
