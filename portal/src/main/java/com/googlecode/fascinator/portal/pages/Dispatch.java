@@ -169,8 +169,6 @@ public class Dispatch {
         // Do all our parsing
         resourceName = resourceProcessing();
 
-        // log.debug("Final processed resource is {}", resourceName);
-
         // Make sure it's valid
         if (resourceName == null) {
             if (response.isCommitted()) {
@@ -301,8 +299,7 @@ public class Dispatch {
         if (uploadContext == null || "".equals(uploadContext)) {
             file_path = file_path + "/" + uploadedFile.getFileName();
         } else {
-            file_path = file_path + "/" + uploadContext + "/"
-                    + uploadedFile.getFileName();
+            file_path = file_path + "/" + uploadContext + "/" + uploadedFile.getFileName();
         }
         File file = new File(file_path);
         if (!file.exists()) {
@@ -384,17 +381,9 @@ public class Dispatch {
 
     private void renderProcessing() {
         // render the page or retrieve the resource
-        // log.debug("resourceName in rendering: {}", resourceName);
-        int dotPosition = resourceName.indexOf(".");
-        if (dotPosition == -1 || isSpecial) {
-            String cleanedResourceName = resourceName; // In case some code
-                                                       // needs it later (Li)
-            if (dotPosition > 0) {
-                cleanedResourceName = cleanedResourceName.substring(0,
-                        dotPosition);
-            }
+        if ((resourceName.indexOf(".") == -1) || isSpecial) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            mimeType = pageService.render(portalId, cleanedResourceName, out,
+            mimeType = pageService.render(portalId, resourceName, out,
                     formData, sessionState);
             stream = new ByteArrayInputStream(out.toByteArray());
         } else {
@@ -457,25 +446,23 @@ public class Dispatch {
     public String getBestMatchResource(String resource) {
         String searchable = resource;
         String ext = "";
-        if (resource.endsWith(AJAX_EXT) == true) {
-            // Look for AJAX
+        // Look for AJAX
+        if (resource.endsWith(AJAX_EXT)) {
             isSpecial = true;
             ext = AJAX_EXT;
-        } else if (resource.endsWith(SCRIPT_EXT) == true) {
-            // Look for scripts
+        }
+        // Look for scripts
+        if (resource.endsWith(SCRIPT_EXT)) {
             isSpecial = true;
             ext = SCRIPT_EXT;
         }
         // Strip special extensions whilst checking on disk
         if (isSpecial) {
             searchable = resource.substring(0, resource.lastIndexOf(ext));
-            // log.debug("Location of ext {} = {}", ext, resource.lastIndexOf(ext));
-            // log.debug("As it is special resource {} now is {}", resource, searchable);
         }
         // Return if found
         if (velocityService.resourceExists(portalId, searchable) != null) {
-            // log.debug("{} has been found and return it for rendering", searchable);
-            return searchable;
+            return resource;
         }
         // Keep checking
         int slash = resource.lastIndexOf('/');
