@@ -72,7 +72,7 @@ var ContainerWidgetBuilder = function($, jaffa) {
             
             	for( key in this.getConfig("sub-elements")[i]) {
              		var subDiv = $("<div id=\""+this.field+"."+i+"\">"+"to be replaced"+"</div>");
-             		var options = this.getConfig("sub-elements")[i][key];
+             		var options = $.extend({}, this.getConfig("sub-elements")[i][key]);
                 if (options["json-data-url"] != null) {
                   options["json-data-url"] = options["json-data-url"].replace("$portalPath", this.getConfig("portalPath"));
                 }
