@@ -3,6 +3,6 @@
     <label><input name="$field-name" class="jaffa-field"
     #if( $button.action ) onclick="$button.action" #end
     #if( $button.checked ) checked="checked" #end 
-    type="radio">$button.label</label>
+    type="radio" value="$button.value">$button.label</label>
     #if( $multiline ) <br> #end
 #end
