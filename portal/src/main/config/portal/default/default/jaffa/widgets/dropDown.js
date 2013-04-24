@@ -102,13 +102,30 @@ var DropDownWidgetBuilder = function($, jaffa) {
             if  (dataListKey != null){
                 this.dropDownData = this.dropDownData[dataListKey];
             }
-            var len = this.dropDownData.length;
+
+            //sorting dropDownData...
+            if  (dataIdKey != null){
+                this.dropDownData.sort(function (a, b){
+                    var a1= a[dataIdKey], b1= b[dataIdKey];
+                    if(a1== b1) return 0;
+                    return a1> b1? 1: -1;
+                });
+            }
+            else {
+                this.dropDownData.sort(function (a, b){
+                    var a1= a.id, b1=b.id;
+                    if(a1== b1) return 0;
+                    return a1> b1? 1: -1;
+                });
+            }
+
+            var len = this.dropDownData.length;            
             
             if ((dataListKey != null) && (dataIdKey != null) && (dataLabelKey != null)){ 
 	            for (var i = 0; i < len; i++) {
-	             if(typeof this.dropDownData[i][dataIdKey] === 'object') {
-                	this.dropDownData[i][dataIdKey] = JSON.stringify(this.dropDownData[i][dataIdKey]);
-                } 
+		            if(typeof this.dropDownData[i][dataIdKey] === 'object') {
+	                	this.dropDownData[i][dataIdKey] = JSON.stringify(this.dropDownData[i][dataIdKey]);
+	                } 
 	                if (defaultValue == this.dropDownData[i][dataIdKey]) {
 	                	var option = $("<option selected=\"selected\">"+this.dropDownData[i][dataLabelKey]+"</option>");
                 		option.attr('value', this.dropDownData[i][dataIdKey]);
