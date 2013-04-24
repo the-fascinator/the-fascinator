@@ -73,11 +73,15 @@ var ContainerWidgetBuilder = function($, jaffa) {
             	for( key in this.getConfig("sub-elements")[i]) {
              		var subDiv = $("<div id=\""+this.field+"."+i+"\">"+"to be replaced"+"</div>");
              		var options = $.extend({}, this.getConfig("sub-elements")[i][key]);
-                if (options["json-data-url"] != null) {
-                  options["json-data-url"] = options["json-data-url"].replace("$portalPath", this.getConfig("portalPath"));
-                }
+	                if (options["json-data-url"] != null) {
+	                  options["json-data-url"] = options["json-data-url"].replace("$portalPath", this.getConfig("portalPath"));
+	                }
              		options["field"]=this.field+options["suffix"];
- 			 		inputDivs[this.field+"."+i] = [key,options];
+             		//ensuring that the hidden label field is correctly indexed for combos. The 'label-field' is optional.
+             		if (options["label-field"] != null && options["label-field-suffix"] != null){
+             			options["label-field"]=this.field+options["label-field-suffix"];
+             		}
+             		inputDivs[this.field+"."+i] = [key,options];
  			 		input.append(subDiv);
 				}
 			}               
