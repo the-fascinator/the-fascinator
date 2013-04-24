@@ -53,3 +53,5 @@ plugins/transformer/ims/.classpath
 plugins/transformer/jython/.classpath
 
 portal/.classpath
+
+.gitignore
