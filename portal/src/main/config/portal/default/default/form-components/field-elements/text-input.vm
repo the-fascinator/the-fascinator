@@ -1,7 +1,7 @@
 #if( $additional-classes )
 ## may not be a simple text-input: date control	
 	<label for="$field-name" #if($label-classes)class="$label-classes"#end>#displayMessage($label)</label>
-	<input class="jaffa-field $additional-classes" type="text" id="$field-name" />
+	<input class="jaffa-field $additional-classes" type="text" id="$field-name" #if($disabled) disabled="disabled" #end/>
 	#if ($help)
 		<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 	#end
