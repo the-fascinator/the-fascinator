@@ -59,13 +59,18 @@ public class EmailNotifier implements Processor {
         for (String var : vars) {
             String varField = config.getString("", "mapping", var);
             log.debug("Replacing '" + var + "' using field '" + varField + "'");
-            String replacement = solrDoc.getString("", varField);
+            String replacement = solrDoc.getString(var, varField);
             if (replacement == null || "".equals(replacement)) {
                 JSONArray arr = solrDoc.getArray(varField);
-                replacement = (String) arr.get(0);
-                if (replacement == null) {
-                    // giving up, setting to empty so replace won't blow up.
-                    replacement = "";
+                if (arr != null) {
+                    replacement = (String) arr.get(0);
+                    if (replacement == null) {
+                        // giving up, setting back to source value so caller can evaluate
+                        replacement = var;
+                    }
+                } else {
+                    // giving up, setting back to source value so caller can evaluate
+                    replacement = var;
                 }
             }
             text = text.replace(var, replacement);
@@ -99,9 +104,17 @@ public class EmailNotifier implements Processor {
             SolrDoc solrDoc = results.get(0);
             String subject = replaceVars(solrDoc, subjectTemplate, vars, config);
             String body = replaceVars(solrDoc, bodyTemplate, vars, config);
-            log.debug("Subject is: " + subject);
-            log.debug("Body is: " + body);
-            if (!email(oid, to, subject, body)) {
+            String recipient = to;
+            if (to.startsWith("$")) {
+                recipient = replaceVars(solrDoc, to, vars, config);
+                if (recipient.startsWith("$")) {
+                    // exception encountered...
+                    log.error("Failed to build the email recipient:'" + recipient + "'. Please check the mapping field and verify that it exists and is populated in Solr.");
+                    failedOids.add(oid);
+                    continue;
+                }
+            }
+            if (!email(oid, recipient, subject, body)) {
                 failedOids.add(oid);
             }
         }
@@ -109,24 +122,33 @@ public class EmailNotifier implements Processor {
         return true;
     }
     
-    private boolean email(String oid, String receipient, String subject, String body) {
+    private boolean email(String oid, String recipient, String subject, String body) {
         try {
             Email email = new SimpleEmail();
             log.debug("Email host: " + host);
             log.debug("Email port: " + port);
             log.debug("Email username: " + username);
             log.debug("Email from: " + from);
-            log.debug("Email to: " + to);
+            log.debug("Email to: " + recipient);
+            log.debug("Email Subject is: " + subject);
+            log.debug("Email Body is: " + body);
             email.setHostName(host);
             email.setSmtpPort(Integer.parseInt(port));
             email.setAuthenticator(new DefaultAuthenticator(username, password));
-            // the method is deprecated on the newest version...
+            // the method setSSL is deprecated on the newer versions of commons email...
             email.setSSL("true".equalsIgnoreCase(ssl));
             email.setTLS("true".equalsIgnoreCase(tls));
             email.setFrom(from);
             email.setSubject(subject);
             email.setMsg(body);
-            email.addTo(receipient);
+            if (recipient.indexOf(",") >= 0) {
+                String[] recs= recipient.split(",");
+                for (String rec : recs) {
+                    email.addTo(rec);
+                }
+            } else {
+                email.addTo(recipient);
+            }
             email.send();
         } catch (Exception ex) {
             log.debug("Error sending notification mail for oid:" + oid, ex);

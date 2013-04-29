@@ -76,9 +76,9 @@ public class NewRecordProcessor implements Processor {
            resultObject = new SolrResult(result.toString());
        }
        // get the exception list..
-       JSONArray exceptionArr = config.getArray("exceptList");
-       if (exceptionArr != null && exceptionArr.size() > 0) {
-           newRecords.addAll(exceptionArr);
+       JSONArray includedArr = config.getArray("includeList");
+       if (includedArr != null && includedArr.size() > 0) {
+           newRecords.addAll(includedArr);
        }
        dataMap.put(outputKey, newRecords);
        return true;
@@ -91,14 +91,20 @@ public class NewRecordProcessor implements Processor {
         JsonSimple config = new JsonSimple(configFile);
         config.getJsonObject().put("lastrun", dtFormat.format(new Date()));
         List<String> oids = (List<String>) dataMap.get(inputKey);
-        JSONArray exceptionArr = config.getArray("exceptList");
+        JSONArray includedArr = config.getArray("includeList");
         if (oids != null && oids.size() > 0) {
-            if (exceptionArr == null) {
-                exceptionArr = config.writeArray("exceptList");
+            // some oids failed, writing it to inclusion list so it can be sent next time...
+            if (includedArr == null) {
+                includedArr = config.writeArray("includeList");
             }
-            exceptionArr.clear();
+            includedArr.clear();
             for (String oid:oids) {
-                exceptionArr.add(oid);
+                includedArr.add(oid);
+            }
+        } else {
+            // no oids failed, all good, clearing the list...
+            if (includedArr != null && includedArr.size() > 0) {
+                includedArr.clear();
             }
         }
         FileWriter writer = new FileWriter(configFile);
