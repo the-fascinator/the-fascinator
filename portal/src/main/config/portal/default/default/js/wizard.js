@@ -25,7 +25,7 @@ function wizard_init(content_selector, tab_heading_selector, json_url, tabIdenti
 	jaffa.ui.changeToTabLayout($(content_selector), tab_heading_selector, "h1.heading-selector", tabIdentifier);
 	$('[id="'+tabIdentifier+'"]').hide();
 	wizardTabIdentifier = tabIdentifier;
-	jQuery.getJSON(json_url, function(data) {	wizard_def = data; setFirstWizardStep()});
+	jQuery.getJSON(json_url, function(data) {	wizard_def = data; setFirstWizardStep()}).fail(function() { alert("Wizard definition could not be found");  });
 }
 
 function setFirstWizardStep() {
