@@ -19,12 +19,10 @@ class NavigationData:
     def hasWorkflowAccess(self):
         # role-based security check
         userRoles = self.page.authentication.get_roles_list()
-        allowedUsers = self.metadata.getList("security_exception")
         workflowSecurity = self.metadata.getList("workflow_security")
         if workflowSecurity is not None:
             for userRole in userRoles:
-                # only allow access if security_exception is not populated (for DMPT plan view-only sharing)
-                if userRole in workflowSecurity and allowedUsers is None:
+                if userRole in workflowSecurity:
                     return True
         
         # is the record owner allowed to edit their own record (in this workflow stage)?   
