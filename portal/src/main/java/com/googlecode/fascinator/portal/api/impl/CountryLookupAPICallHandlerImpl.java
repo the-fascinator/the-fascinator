@@ -2,7 +2,10 @@ package com.googlecode.fascinator.portal.api.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 import org.apache.tapestry5.services.Request;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
@@ -76,26 +79,14 @@ public class CountryLookupAPICallHandlerImpl implements APICallHandler {
         int numFound = res.getNumFound();
         int start = 0;
         int pageSize = MAX_PAGE_COUNT;
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("[");
-        strBuilder.append(System.getProperty("line.separator"));
-        int numCount = 0;
+        HashMap<String, String> countryMap = new HashMap<String, String>();
         while (true) {
             List<SolrDoc> results = res.getResults();
             for (SolrDoc docObject : results) {
             	String dc_title = docObject.getString(null, "dc_title");
             	JSONArray dc_identifier = docObject.getArray("dc_identifier");
             	if (dc_identifier != null && dc_identifier.get(0) !=null) {
-	            	if (numCount > 0) {
-	            		strBuilder.append(",");
-	            		strBuilder.append(System.getProperty("line.separator"));
-	            	}
-	            	strBuilder.append("{\"label\":\"");
-	            	strBuilder.append(dc_title);
-	            	strBuilder.append("\",\"value\":\"");            	            	
-	            	strBuilder.append((String)dc_identifier.get(0));            	             		
-	            	strBuilder.append("\"}");
-	            	numCount++;
+	            	countryMap.put(dc_title, (String)dc_identifier.get(0));
             	} else {
             		log.error("Null dc_identfier:" + dc_title);
             	}
@@ -108,6 +99,28 @@ public class CountryLookupAPICallHandlerImpl implements APICallHandler {
             out = new ByteArrayOutputStream();
             indexer.search(req, out);
             res = new SolrResult(new ByteArrayInputStream(out.toByteArray()));
+        }
+        // sorting the title manually as Solr sort does not work on values with whitespace in between words
+        ArrayList<String> nameList = new ArrayList<String>();
+        nameList.addAll(countryMap.keySet());
+        Collections.sort(nameList);
+        int numCount = 0;
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("[");
+        strBuilder.append(System.getProperty("line.separator"));
+        for (String name:nameList) {
+            String dc_title = name;
+            String dc_id = countryMap.get(dc_title);
+            if (numCount > 0) {
+                strBuilder.append(",");
+                strBuilder.append(System.getProperty("line.separator"));
+            }
+            strBuilder.append("{\"label\":\"");
+            strBuilder.append(dc_title);
+            strBuilder.append("\",\"value\":\"");                               
+            strBuilder.append(dc_id);                                    
+            strBuilder.append("\"}");
+            numCount++;
         }
         strBuilder.append(System.getProperty("line.separator"));
         strBuilder.append("]");
