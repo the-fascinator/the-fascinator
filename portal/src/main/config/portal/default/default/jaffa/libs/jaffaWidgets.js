@@ -322,7 +322,9 @@ function jaffaWidgets(jaffaObject) {
                 jaffa.util.getJsonUrl(jsonDataUrl, jsonDataUrl,
                     function(data) {thisWidget.dataCallback(data);},
                     function(xhr, status, err) {thisWidget.dataFailure(xhr, status, err);},
-                    jsonDataType);
+                    jsonDataType,
+                    null,
+                    this.getConfig("field"));
 
             // Otherwise just get on with it.
             } else {

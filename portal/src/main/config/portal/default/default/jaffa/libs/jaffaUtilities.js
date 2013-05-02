@@ -164,6 +164,7 @@ function jaffaUtilies(jaffaObject) {
 
     // Tracking loading data
     var pendingWork = {};
+    var pendingWorkByField = {};
     var firstLoad = false;
     var pendingWorkAllDoneFunc = function() {alert("TODO");};
     util.setFirstLoadCallback = function(callback) {
@@ -189,12 +190,13 @@ function jaffaUtilies(jaffaObject) {
     }
 
     // Start the tracking of a job and arrange for followup
-    function pendingWorkStart(url) {
+    function pendingWorkStart(url, field) {
         var workId, pendingWorkDone;
         // Get the next ID available
         workId = util.getIdNum();
         // Store a reference to this URL against the workId
         pendingWork[workId] = url;
+        pendingWorkByField[field] = url;
         jaffa.logDebug("Starting Job Tracking URL='"+url+"', ID='"+workId+"'");
 
         // The tracking function will know how to
@@ -202,6 +204,7 @@ function jaffaUtilies(jaffaObject) {
         pendingWorkDone = function() {
             jaffa.logDebug("Job Tracking Complete URL='"+pendingWork[workId]+"', ID='"+workId+"'");
             // Delete the reference to this work
+            delete pendingWorkByField[field];
             delete pendingWork[workId];
             // If there is nothing else loading
             if ($.isEmptyObject(pendingWork)) {
@@ -238,7 +241,7 @@ function jaffaUtilies(jaffaObject) {
     }
 
     // Testing TODO
-    util.getJsonUrl = function(cacheIndex, jsonUrl, success, error, dataType, skipCache) {
+    util.getJsonUrl = function(cacheIndex, jsonUrl, success, error, dataType, skipCache, fieldId) {
         // Prefer the cache... unless we've been told not to
         if (skipCache == null) {
             skipCache = false;
@@ -250,7 +253,11 @@ function jaffaUtilies(jaffaObject) {
         if (dataType == null) {
             dataType = "json";
         }
-        var pendingWorkDone = pendingWorkStart(jsonUrl);
+        if (pendingWorkByField[fieldId] == jsonUrl) {
+            console.log("THERE IS A PENDING REQUEST FOR " + fieldId + ", USING URL: " + jsonUrl + ", DOING NOTHING");
+            return;
+        }
+        var pendingWorkDone = pendingWorkStart(jsonUrl, fieldId);
         // Go and get the data
         $.ajax({
             url: jsonUrl,
