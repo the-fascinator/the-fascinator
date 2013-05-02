@@ -2,12 +2,26 @@ $elementHtml
 
 <script type="text/javascript">
 $(document).ready(function() {
-	jaffa.valid.setSaveRules("$validation.get("validation-id")",  [
+  
+ 
+        var intervalId = window.setInterval(function() {
+             if($("[id='$validation.get("validation-id")']").length > 0) {
+                jaffa.valid.setSaveRules("$validation.get("validation-id")",  [
 		#set($validationTypes = $validation.get("save-rules"))
  			#foreach($validationType in $validationTypes)
    				"$validationType",
  			#end
-	 ], null, validationFail);});
+     
+	 ], null, validationFail);
+  
+   window.clearInterval(intervalId); }
+       },500);    
+      
+    }
+   
+    
+   
+   );
 	 
 	 var validationMessages = jQuery.parseJSON('$validation.get("validation-messages")');
 	 var focusId = '$validation.get("focus-id")';
