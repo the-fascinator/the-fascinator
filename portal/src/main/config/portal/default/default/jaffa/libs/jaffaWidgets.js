@@ -247,13 +247,19 @@ function jaffaWidgets(jaffaObject) {
                     var target = jaffa.form.field(field);
                     if (target != null) {
                         jaffa.form.value(field, value);
+                        $("[id='"+field+"']").change();
                         found = true;
                     }
 
                     // Second, is it in our document as a selector?
                     target = $(field);
-                    if (target != null) {
-                        target.html(value);
+                    if (found == false && target != null) {
+                    	if(target.is("input")) {
+                    		target.val(value);
+                    	} else {
+                        	target.html(value);
+                        }
+                        target.change();
                         found = true;
                     }
 

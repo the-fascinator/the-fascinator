@@ -13,6 +13,8 @@
 <script type="text/javascript" src="$portalPath/jaffa/widgets/dropDown.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/container.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/people.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/funding-body.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/grants.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/libs/nameLookup2.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/libs/jquery/jquery.blockUI.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrc-Selection.js"></script>
