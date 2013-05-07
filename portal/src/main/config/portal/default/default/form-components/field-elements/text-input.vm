@@ -16,10 +16,13 @@
 		$("[id='${field-name}-container']").jaffaText({
 			"label": "#displayMessage($label)",
 			"field": "$field-name"
-				#if($help)
-					,"help-content": "${field-name}-container-help"
-				#end		
-		});
+			#if($help)
+				,"help-content": "${field-name}-container-help"
+			#end		
+            #if($placeholder)
+                ,"placeholder": "$placeholder"
+            #end        
+        });
 	});
 	</script>
 #end

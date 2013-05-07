@@ -20,7 +20,7 @@ $(function() {
 #else
 ## may not be a simple textarea: date control	
 	<label for="$field-name">#displayMessage($label)</label>
-	<textarea class="jaffa-field $!additional-classes" cols="80" rows="4" id="$field-name">$content</textarea>
+	<textarea class="jaffa-field $!additional-classes" cols="80" rows="4" id="$field-name" #if($placeholder)placeholder="$placeholder"#end>$content</textarea>
 	#if ($help)
 		<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 	#end	
