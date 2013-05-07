@@ -82,6 +82,13 @@ var TextWidgetBuilder = function($, jaffa) {
                 if  (classList != null){
                 	input.attr("class", classList)
                 }
+
+                if (type == "checkbox"){
+                    var checked = this.getConfig("checked");
+                    if  (checked != null){
+                    	input.attr("checked", "checked")
+                    }
+                }
             }
             ui.append(input);
             // Are we tying any data lookups to the control?
