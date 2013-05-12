@@ -142,6 +142,11 @@
 		for(var i=0; i < inputs.length; i++) {
     		ids.push($(inputs[i]).attr('id'));
 		}
+		//get all textarea ids
+		var textareas = $("[id='"+tabId+"']").find(".component-wrapper textarea");
+		for(var i=0; i < textareas.length; i++) {
+    		ids.push($(textareas[i]).attr('id'));
+		}
 		
 		//get all select ids
 		var selects = $("[id='"+tabId+"']").find(".component-wrapper select");
