@@ -34,7 +34,8 @@ function setFirstWizardStep() {
    	 targetState = step;
    	 break;
 	}
-	$('a:contains('+targetState+')')[0].click();
+    // Safari 5.1 needs two $$ 
+    $($('a:contains('+targetState+')')[0]).click();
 }
 
 function transition_click(e)  {
@@ -49,7 +50,7 @@ function transition_click(e)  {
 		// Mimic the click on one of ui-tab-nav tab, 
 		// jQuery always returns an array but we only one to be clicked on no matter it is we wanted or not
 		// with save like buttons, targetState is null
-		if (targetState) { $('a:contains('+targetState+')')[0].click(); }
+		if (targetState) { $($('a:contains('+targetState+')')[0]).click(); }
 	}
 	}
 	return false;
