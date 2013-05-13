@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.tapestry5.internal.KeyValue;
 import org.apache.velocity.VelocityContext;
@@ -133,17 +135,50 @@ public class SimpleWorkflowHelper {
                 .getArray("stages", workflowMetadata.getString(null, "step"),
                         "divs").toArray());
 
+        Map<String, Integer> repeatableFormFields = new HashMap<String, Integer>();
+        Pattern p = Pattern
+                .compile("([A-Za-z0-9\\.\\:]+\\.)([0-9]+)(\\.[A-Za-z0-9\\.\\:]*)");
+
         Set<String> fields = formData.getFormFields();
         for (String field : fields) {
             String fieldValue = formData.get(field);
             if (fieldValue != null) {
                 tfPackage.getJsonObject().put(field, fieldValue);
             }
+
+            Matcher m = p.matcher(field);
+            m.find();
+            if (m.matches()) {
+                String fieldId = m.group(1) + "0" + m.group(3);
+                int fieldIndex = new Integer(m.group(2));
+                Integer count = repeatableFormFields.get(fieldId);
+                if (count == null || count < fieldIndex) {
+                    repeatableFormFields.put(fieldId, fieldIndex);
+                }
+            }
+        }
+
+        // search through the tfPackage and remove anything greater than the
+        // highest index in the form
+        for (String repeatableFormField : repeatableFormFields.keySet()) {
+            int count = repeatableFormFields.get(repeatableFormField);
+            count++;
+            Matcher m = p.matcher(repeatableFormField);
+            m.find();
+            while (existsInTFPackage(tfPackage, m.group(1) + count + m.group(3))) {
+                tfPackage.getJsonObject().remove(
+                        m.group(1) + count + m.group(3));
+                count++;
+            }
         }
 
         digitalObject.updatePayload(pid, new ByteArrayInputStream(tfPackage
                 .toString().getBytes()));
 
+    }
+
+    private boolean existsInTFPackage(JsonSimple tfPackage, String path) {
+        return tfPackage.getJsonObject().get(path) != null;
     }
 
     private List<JsonObject> getFormFieldArray(Object[] divs) {
