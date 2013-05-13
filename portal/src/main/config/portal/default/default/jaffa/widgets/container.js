@@ -5,6 +5,9 @@ var ContainerWidgetBuilder = function($, jaffa) {
         v2rules: {},
         deleteWidget: function() {
             jaffa.form.ignoreField(this.field);
+             for(var i =0; i < this.childWidgets.length; i++) {
+ 			   this.childWidgets[i].deleteWidget();
+			}
             this.getContainer().remove();
         },
         // Identity has been altered, adjust the DOM for all fields
