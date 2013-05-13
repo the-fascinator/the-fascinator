@@ -46,7 +46,7 @@
                     $("#render-list").prev("img").hide();
                     $("#render-list").before('<img src="$portalPath/images/icons/information.png" /><span>&nbsp;The render process has completed!</span>');
                     clearTimeout(pollTimerId);
-                    window.location = "$portalPath/workflow/$oid";
+                    window.location = "$portalPath/workflow/$oid"+document.location.search;
                 }
             }
           },
@@ -128,7 +128,7 @@
         #else
           #if ($self.redirectNeeded())
         <script type="text/javascript">
-            window.location = "$portalPath/detail/$oid";
+            window.location = "$portalPath/detail/$oid"+document.location.search;
         </script>
           #else
             #if($self.prepareTemplate())
