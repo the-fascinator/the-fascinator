@@ -103,6 +103,9 @@
     							$(this).find('.jaffaDeleteItem button').click();
 							}
 					});
+					if($("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaList').length == 0) {
+ 						$("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaAddItem button').click();
+					}
 					$('#simpleworkflow-form').unblock();
 				} else {
 				//unblock form for editing
