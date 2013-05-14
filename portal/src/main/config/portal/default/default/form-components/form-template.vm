@@ -95,8 +95,19 @@
 				
 				//final population of data
 				jaffa.form.synch(true);
+				//populate map if it exists
+				if(window["openLayersMap"] != null) {
+					window["openLayersMap"].loadData();
+					$("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaList').each(function () {
+							if($(this).attr('class').indexOf("redboxGeoDataRow") == -1) {
+    							$(this).find('.jaffaDeleteItem button').click();
+							}
+					});
+					$('#simpleworkflow-form').unblock();
+				} else {
 				//unblock form for editing
-				$('#simpleworkflow-form').unblock();
+					$('#simpleworkflow-form').unblock();
+				}
 			});
 		}
 		
@@ -108,6 +119,7 @@
     	for(var i =0; i < testsFailed.length; i++) {
     		var message = validation["validationMessages"][testsFailed[i]];
     		$("#errorbox-list").append('<li>'+message+'<button id="'+fieldId+'-errorButton" class="jaffaHelpToggle ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" role="button" aria-disabled="false"><span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span><span class="ui-button-text"></span></button></li>');
+    		
         	$("[id='"+fieldId+"-errorButton']").click(function() { $("[id='"+validation["focusId"]+"']").focus();});
         }
     	

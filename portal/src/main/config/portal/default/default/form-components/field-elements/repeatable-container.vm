@@ -16,7 +16,8 @@
         #if("$!add-item-text"!="")"add-item-text":"$!add-item-text",
         #else"add-item-text":"Add",#end
 		"delete-item-html":"<button>Remove</button>",
-		"min-size":1,
+		#if("$!{min-size}"!="")"min-size":$(min-size},#end
+		#if("$!{max-size}"!="")"max-size":$(max-size},#end
 		"child-config":{
 			"label":"${label}",
 			"field":"",
