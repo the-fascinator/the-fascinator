@@ -68,21 +68,29 @@ var TextWidgetBuilder = function($, jaffa) {
                 var type = this.getConfig("type") || "text";
                 input = $("<input type=\""+type+"\" id=\""+this.field+"\" />");
 
-                var placeHolder = this.getConfig("placeholder");
-                if  (placeHolder != null) {
-                	input.attr("placeholder", placeHolder);
-                }
-
                 var size = this.getConfig("size");
                 if  (size != null){
                 	input.attr("size", size);
                 }
 
-                var classList = this.getConfig("class-list");
-                if  (classList != null){
-                	input.attr("class", classList)
+                if (type == "checkbox"){
+                    var checked = this.getConfig("checked");
+                    if  (checked != null){
+                    	input.attr("checked", "checked")
+                    }
                 }
             }
+
+            var placeHolder = this.getConfig("placeholder");
+            if  (placeHolder != null) {
+            	input.attr("placeholder", placeHolder);
+            }
+
+            var classList = this.getConfig("class-list");
+            if  (classList != null){
+            	input.attr("class", classList)
+            }
+            
             ui.append(input);
             // Are we tying any data lookups to the control?
             var lookupData = this.getConfig("lookup-data");

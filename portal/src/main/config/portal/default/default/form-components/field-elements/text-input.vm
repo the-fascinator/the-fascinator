@@ -1,7 +1,7 @@
 #if( $additional-classes )
 ## may not be a simple text-input: date control	
 	<label for="$field-name" #if($label-classes)class="$label-classes"#end>#displayMessage($label)</label>
-	<input class="jaffa-field $additional-classes" type="text" id="$field-name" #if($disabled) disabled="disabled" #end/>
+	<input class="jaffa-field $additional-classes" type="text" id="$field-name" #if($disabled) disabled="disabled" #end #if($!size != "")size="$!size"#end #if($!placeholder != "")placeholder="$!placeholder"#end/>
 	#if ($help)
 		<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 	#end
@@ -19,8 +19,11 @@
 			#if($help)
 				,"help-content": "${field-name}-container-help"
 			#end		
-            #if($placeholder)
-                ,"placeholder": "$placeholder"
+            #if($!placeholder != "")
+                ,"placeholder": "$!placeholder"
+            #end        
+            #if($!size != "")
+                ,"size": "$!size"
             #end        
         });
 	});

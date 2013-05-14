@@ -24,6 +24,7 @@ $(document).ready(function() {
         #if("$!listKey"!="")"data-list-key":"$!listKey",#end
         #if("$!childrenKey"!="")"data-children-key":"$!childrenKey",#end
         #if("$!defaultValue"!="")"default-value":"$!defaultValue",#end
+        #if("$!lookup-parser"!="")"lookup-parser":$!lookup-parser,#end
         #if ($help)
 			"help-content": "[id='${field-name}-help']",
 		#end        
