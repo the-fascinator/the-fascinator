@@ -16,12 +16,13 @@
         #if("$!add-item-text"!="")"add-item-text":"$!add-item-text",
         #else"add-item-text":"Add",#end
 		"delete-item-html":"<button>Remove</button>",
-		#if("$!{min-size}"!="")"min-size":$(min-size},#end
-		#if("$!{max-size}"!="")"max-size":$(max-size},#end
+		#if("$!{min-size}"!="")"min-size":$min-size,#end
+		#if("$!{max-size}"!="")"max-size":$max-size,#end
 		"child-config":{
 			"label":"${label}",
 			"field":"",
       		"portalPath":"$portalPath",
+            #if("$!{suffix}"!="")"suffix":"$suffix",#end
 			"sub-elements": $sub-elements.settings	
 		},
 		"class-list":"widgetListBranding"

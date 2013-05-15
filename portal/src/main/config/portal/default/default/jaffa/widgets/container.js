@@ -14,7 +14,7 @@ var ContainerWidgetBuilder = function($, jaffa) {
         domUpdate: function(from, to, depth) {
             this._super(from, to, depth);
             // Store, we'll need them to notify Jaffa later
-            this.oldField = this.field;
+            this.oldField = this.field + (this.getConfig("suffix") == null ? "" : this.getConfig("suffix"));
             // Replace the portion of the ID that changed
             this.field = this.oldField.domUpdate(from, to, depth);
             // Update DOM but constrain searches to container, since there may
@@ -38,7 +38,7 @@ var ContainerWidgetBuilder = function($, jaffa) {
             // Only synch if an update has effected this widget
             if (this.oldField != null) {
                 this._super();
-                //jaffa.form.addField(this.field, this.id());
+                jaffa.form.addField(this.field, this.id());
                 this.oldField = null;
             }
             // TODO: Validation alterations ?? Doesn't seem to matter
