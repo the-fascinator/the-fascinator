@@ -39,7 +39,7 @@
 <script type="text/javascript">
   var jaffa = jaffaFactory({
         debuggingEnabled: true,
-        urlDataSource: "$portalPath/workflows/simpleworkflow.ajax?func=get-tfpackage&oid=$oid",
+        urlDataSource: "$portalPath/workflows/simpleworkflow.ajax?func=get-tfpackage&oid=$oid&dateStamp="+new Date().getTime(),
         formSelector: "#simpleworkflow-form",
         functionSaveData: saveData,
         callbackPreSave: preSave,
