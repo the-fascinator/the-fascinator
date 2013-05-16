@@ -18,6 +18,7 @@
 		"delete-item-html":"<button>Remove</button>",
 		#if("$!{min-size}"!="")"min-size":$min-size,#end
 		#if("$!{max-size}"!="")"max-size":$max-size,#end
+		#if("$!{additional-container-classes}"!="")"additional-container-classes":"${additional-container-classes}",#end
 		"child-config":{
 			"label":"${label}",
 			"field":"",

@@ -98,15 +98,17 @@
 				//populate map if it exists
 				if(window["openLayersMap"] != null) {
 					window["openLayersMap"].loadData();
-					$("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaList').each(function () {
-							if($(this).attr('class').indexOf("redboxGeoDataRow") == -1) {
-    							$(this).find('.jaffaDeleteItem button').click();
-							}
-					});
-					if($("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaList').length == 0) {
- 						$("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaAddItem button').click();
-					}
-					
+
+					$('.redboxGeoData .jaffaDeleteItem').each(function (index, value) {
+       						 var currentItem = $(value);
+        					 var originalClickEvent = currentItem.data("events")['click'][0].handler;
+       						 currentItem.unbind('click');
+        					 currentItem.click(function (event) {
+        					   window["openLayersMap"].deleteFeature(event.target);   
+                			 	jQuery.proxy(originalClickEvent, currentItem)(event); 
+           					 });
+       					 });
+				
 				} 
 				
 					var loadingCheckId = window.setInterval(function() {

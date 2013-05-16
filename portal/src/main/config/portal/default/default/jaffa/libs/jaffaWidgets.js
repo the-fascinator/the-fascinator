@@ -507,7 +507,12 @@ function jaffaWidgets(jaffaObject) {
             var thisWidget = this;
 
             // Setup a container for the child and surrounding UI elements (item)
-            var itemContainer = $("<div id=\""+subField+"ContainerItem\" class=\"jaffaList\"></div>");
+            var additionalContainerClasses = this.getConfig("additional-container-classes");
+            if(additionalContainerClasses != null) {
+            	var itemContainer = $("<div id=\""+subField+"ContainerItem\" class=\"jaffaList " + additionalContainerClasses+"\"></div>");
+            } else {
+            	var itemContainer = $("<div id=\""+subField+"ContainerItem\" class=\"jaffaList\"></div>");
+            }
 
             // Sorting & Numbering
             var disableSorting = this.getConfig("disable-sorting");
