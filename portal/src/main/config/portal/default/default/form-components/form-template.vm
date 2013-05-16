@@ -106,11 +106,16 @@
 					if($("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaList').length == 0) {
  						$("[id='dc:coverage.vivo:GeographicLocation']").find('.jaffaAddItem button').click();
 					}
-					$('#simpleworkflow-form').unblock();
-				} else {
-				//unblock form for editing
-					$('#simpleworkflow-form').unblock();
-				}
+					
+				} 
+				
+					var loadingCheckId = window.setInterval(function() {
+             		if($('.jaffa2Loading').length == 0) {
+				   		$('#simpleworkflow-form').unblock();
+				   		window.clearInterval(loadingCheckId);
+				   }
+       		  },500); 
+				
 			});
 		}
 		

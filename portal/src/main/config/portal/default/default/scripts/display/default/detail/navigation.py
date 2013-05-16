@@ -33,6 +33,9 @@ class NavigationData:
         if currentStage is not None:  
             if currentStage.getBoolean(False, "owner_edit_allowed"):
                 current_user = self.page.authentication.get_username()
+                if current_user == "guest":
+                    if currentStage.getBoolean(False, "guest_owner_edit_allowed") == False:
+                        return False
                 owner = self.metadata.getFirst("owner")
                 if current_user == owner:
                     return True

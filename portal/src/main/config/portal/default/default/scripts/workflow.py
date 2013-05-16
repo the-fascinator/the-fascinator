@@ -258,6 +258,9 @@ class WorkflowData:
                 self.getTfObjMetaProperties()    
                 owner = self.tfObjMeta.getProperty("owner") 
                 current_user = self.vc("page").authentication.get_username()
+                if current_user == "guest":
+                    if currentStage.getBoolean(False, "guest_owner_edit_allowed") == False:
+                        return False
                 if current_user == owner:    
                     valid = True 
         if not valid:

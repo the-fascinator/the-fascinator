@@ -317,7 +317,7 @@ function jaffaWidgets(jaffaObject) {
             // We have data to load
             if (jsonDataUrl != null) {
                 var ui = this.getContainer();
-                this.jsonLoader = $("<span style='color:green;'> [loading&nbsp;please&nbsp;wait...] </span>");
+                this.jsonLoader = $("<span class=\"jaffa2Loading\"> [loading&nbsp;please&nbsp;wait...] </span>");
                 ui.append(this.jsonLoader);
 
                 // Check if something like 'jsonp' was requested
