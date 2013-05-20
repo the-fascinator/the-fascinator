@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.tapestry5.internal.KeyValue;
 import org.apache.velocity.VelocityContext;
 import org.json.simple.JSONArray;
@@ -144,8 +143,7 @@ public class SimpleWorkflowHelper {
         for (String field : fields) {
             String fieldValue = formData.get(field);
             if (fieldValue != null) {
-                tfPackage.getJsonObject().put(field,
-                        StringEscapeUtils.escapeHtml(fieldValue));
+                tfPackage.getJsonObject().put(field, fieldValue);
             }
 
             Matcher m = p.matcher(field);
