@@ -30,15 +30,15 @@
       <legend>User Data</legend>
       <p>
         <label for="udUsername">User ID</label>
-        <input type="text" id="udUsername" readonly="readonly" value="$page.authentication.get_username()" />
+        <input type="text" id="udUsername" readonly="readonly" value="$page.escapeHtml($page.authentication.get_username())" />
       </p>
       <p>
         <label for="name">Name</label>
-        <input type="text" id="name" readonly="readonly" value="$page.authentication.get_name()" />
+        <input type="text" id="name" readonly="readonly" value="$page.escapeHtml($page.authentication.get_name())" />
       </p>
       <p>
         <label for="origin">Origin</label>
-        <input type="text" id="origin" readonly="readonly" value="$page.authentication.get_user_source()" />
+        <input type="text" id="origin" readonly="readonly" value="$page.escapeHtml($page.authentication.get_user_source())" />
       </p>
       <p>
         <label>Roles</label>
@@ -46,7 +46,7 @@
         #set ($roles_list = $page.authentication.get_roles_list())
         <ul>
           #foreach($role in $roles_list)
-          <li>$role</li>
+          <li>$page.escapeHtml($role)</li>
           #end
         </ul>
         #parseTemplate("dialogs/user-data-message.vm")

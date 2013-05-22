@@ -209,7 +209,7 @@
 
         function addRow(pluginId, value) {
             var data = $("#security-rows-" + pluginId).html();
-            data += "<tr><td>" + value;
+            data += "<tr><td>" + value.escapeHTML();
             data += " <a class='remove-role-link' rel='" + pluginId + "' value='" + value + "' href='#'>";
             data += "<img src='$portalPath/images/icons/cross.png'/></a>";
             data += "</td></tr>";

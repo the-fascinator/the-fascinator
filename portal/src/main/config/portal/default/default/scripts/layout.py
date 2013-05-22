@@ -1,6 +1,6 @@
 import md5
 from authentication import AuthenticationData
-from java.net import URLDecoder
+from java.net import URLDecoder,URLEncoder
 from org.apache.commons.lang import StringEscapeUtils
 from java.lang import String
 
@@ -61,6 +61,9 @@ class LayoutData:
 
     def escapeXml(self, text):
         return StringEscapeUtils.escapeXml(text)
+    
+    def escapeUrl(self, text):
+        return URLEncoder.encode(text,"utf-8")
     
     def escapeHtml(self, text):
         return StringEscapeUtils.escapeHtml(text)

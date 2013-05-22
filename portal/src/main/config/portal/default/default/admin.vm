@@ -13,7 +13,7 @@
           <strong>List of users:</strong><br/>
           <select id="users-$data.getId()-list" name="users-list" size="10">
             #foreach ($user in $page.authentication.search_users("", $data.getId()))
-              <option>$user.getUsername()</option>
+              <option>$page.escapeHtml($user.getUsername())</option>
             #end
           </select>
         </td>
@@ -44,7 +44,7 @@
           <strong>List of roles:</strong><br/>
           <select id="roles-$data.getId()-list" name="roles-list" size="10">
             #foreach ($role in $page.authentication.search_roles("", $data.getId()))
-              <option>$role</option>
+              <option>$page.escapeHtml($role)</option>
             #end
           </select>
         </td>
@@ -294,6 +294,7 @@
             $("#create-user-form").dialog('close');
             return false;
         });
+  
         $("#create-user-submit").click(function() {
             $("#create-user-message").empty();
             $("#create-user-loading").show();
@@ -305,9 +306,9 @@
                         $("#create-user-loading").hide();
                         $("#create-user-form").dialog('close');
                         var source = $("#create-user-source").val();
-                        $("<option>" + jQuery.trim(data) + "</option>").appendTo("#users-" + source + "-list");
+                        $("<option>" + jQuery.trim(data.escapeHTML()) + "</option>").appendTo("#users-" + source + "-list");
                         $("#users-" + source + "-alert").show();
-                        $("#users-" + source + "-message").html("User '" + jQuery.trim(data) + "' created successfully");
+                        $("#users-" + source + "-message").html("User '" + jQuery.trim(data.escapeHTML()) + "' created successfully");
                     },
                 error:
                     function (req, status, e) {
@@ -351,7 +352,7 @@
                             $("#users-" + last_plugin + "-loading").hide();
                             $("#users-" + last_plugin + "-list option:selected").remove();
                             $("#users-" + last_plugin + "-alert").show();
-                            $("#users-" + last_plugin + "-message").html("User '" + jQuery.trim(data) + "' deleted successfully");
+                            $("#users-" + last_plugin + "-message").html("User '" + jQuery.trim(data.escapeHTML()) + "' deleted successfully");
                         },
                     error:
                         function (req, status, e) {
@@ -386,7 +387,7 @@
                 $("#change-password-message").empty();
                 $("#change-password-error").hide();
                 $("#change-password-username").val(username);
-                $("#change-password-userlabel").html(username);
+                $("#change-password-userlabel").text(username).html();
                 $("#newpassword").val("");
                 $("#password-confirm").val("");
                 $("#change-password-source").val(plugin);
@@ -413,7 +414,7 @@
                         var source = $("#change-password-source").val();
                         $("#users-" + source + "-alert").show();
                         $("#users-" + source + "-error").hide();
-                        $("#users-" + source + "-message").html("Password for '" + jQuery.trim(data) + "' changed successfully");
+                        $("#users-" + source + "-message").html("Password for '" + jQuery.trim(data.escapeHTML()) + "' changed successfully");
                     },
                 error:
                     function (req, status, e) {
@@ -457,7 +458,7 @@
             var source = $("#simple-form-source").val();
             $("<option>" + data + "</option>").appendTo("#roles-" + source + "-list");
             $("#roles-" + source + "-alert").show();
-            $("#roles-" + source + "-message").html("Role '" + jQuery.trim(data) + "' created successfully");
+            $("#roles-" + source + "-message").html("Role '" + jQuery.trim(data.escapeHTML()) + "' created successfully");
         }
 
         /******************************
@@ -485,7 +486,7 @@
                             $("#roles-" + last_plugin + "-loading").hide();
                             $("#roles-" + last_plugin + "-list option:selected").remove();
                             $("#roles-" + last_plugin + "-alert").show();
-                            $("#roles-" + last_plugin + "-message").html("Role '" + jQuery.trim(data) + "' deleted successfully");
+                            $("#roles-" + last_plugin + "-message").html("Role '" + jQuery.trim(data.escapeHTML()) + "' deleted successfully");
                         },
                     error:
                         function (req, status, e) {
@@ -537,7 +538,7 @@
                             $("#roles-" + last_plugin + "-loading").hide();
                             var user_list = eval(data);
                             for (i = 0; i < user_list.length; i++) {
-                                $("<option>" + user_list[i] + "</option>").appendTo("#roles-" + last_plugin + "-edit");
+                                $("<option>" + user_list[i].escapeHTML() + "</option>").appendTo("#roles-" + last_plugin + "-edit");
                             }
                         },
                     error:
@@ -584,7 +585,7 @@
             var source = $("#simple-form-source").val();
             $("<option>" + data + "</option>").appendTo("#roles-" + source + "-edit");
             $("#roles-" + source + "-alert").show();
-            $("#roles-" + source + "-message").html("User '" + data + "' successfully add to role '" + current_role + "'");
+            $("#roles-" + source + "-message").html("User '" + data.escapeHTML() + "' successfully add to role '" + current_role + "'");
         }
 
         /******************************
@@ -612,7 +613,7 @@
                             $("#roles-" + last_plugin + "-loading").hide();
                             $("#roles-" + last_plugin + "-edit option:selected").remove();
                             $("#roles-" + last_plugin + "-alert").show();
-                            $("#roles-" + last_plugin + "-message").html("User '" + jQuery.trim(data) + "' removed successfully");
+                            $("#roles-" + last_plugin + "-message").html("User '" + jQuery.trim(data.escapeHTML()) + "' removed successfully");
                         },
                     error:
                         function (req, status, e) {
@@ -665,7 +666,7 @@
                     function(data, status) {
                         $("#simple-form-loading").hide();
                         $("#simple-dialog").dialog('close');
-                        window[$("#simple-form-followup").val()](jQuery.trim(data));
+                        window[$("#simple-form-followup").val()](jQuery.trim(data.escapeHTML()));
                     },
                 error:
                     function (req, status, e) {

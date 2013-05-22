@@ -1,4 +1,4 @@
-#set($query = $page.getQuery())
+#set($query = $page.escapeHtml($page.getQuery()))
 <script type="text/javascript">
 <!--
     $(function() {

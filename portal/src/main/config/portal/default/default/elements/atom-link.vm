@@ -1,4 +1,4 @@
-#set($query = $page.getQuery())
+#set($query = $page.escapeUrl($page.getQuery()))
 #if("$!query" != "")
   #set($atomLink = "$portalPath/feed/atom?query=$query")
 #else
