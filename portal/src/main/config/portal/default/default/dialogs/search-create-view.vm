@@ -29,11 +29,21 @@
             return false;
         });
         $("#create-view-accept").click(function() {
+        	var id = String($("#create-view-id").val());
+         	if (/[\\/]/.test(id)) {
+        		alert("Invalid id value.");
+        		return false;
+        	}
+        	var description = String($("#create-view-description").val());
+        	if (/[<>]+/.test(description)) {
+            	alert("Invalid description: no HTML tag is allowed.");
+            	return false;
+            }	                    	
             jQuery.post("$portalPath/actions/view.ajax",
                 {
                     func: "create-view",
-                    id: $("#create-view-id").val(),
-                    description: $("#create-view-description").val()
+                    id: id,
+                    description: description
                 },
                 function(data, status) {
                     $("#create-view-box").toggle("blind");

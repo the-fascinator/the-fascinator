@@ -18,11 +18,6 @@
  */
 package com.googlecode.fascinator.portal.services.impl;
 
-import com.googlecode.fascinator.HarvestClient;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.portal.Portal;
-import com.googlecode.fascinator.portal.services.PortalManager;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
@@ -32,8 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.HarvestClient;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.portal.Portal;
+import com.googlecode.fascinator.portal.services.PortalManager;
 
 public class PortalManagerImpl implements PortalManager {
 
@@ -63,12 +64,12 @@ public class PortalManagerImpl implements PortalManager {
             JsonSimpleConfig config = new JsonSimpleConfig();
 
             // Default templates
-            defaultPortal = config.getString(DEFAULT_PORTAL_NAME,
-                    "portal", "defaultView");
-            defaultSkin = config.getString(DEFAULT_SKIN,
-                    "portal", "skins", "default");
-            defaultDisplay = config.getString(DEFAULT_DISPLAY,
-                    "portal", "displays", "default");
+            defaultPortal = config.getString(DEFAULT_PORTAL_NAME, "portal",
+                    "defaultView");
+            defaultSkin = config.getString(DEFAULT_SKIN, "portal", "skins",
+                    "default");
+            defaultDisplay = config.getString(DEFAULT_DISPLAY, "portal",
+                    "displays", "default");
 
             skinPriority = config.getStringList("portal", "skins", "order");
             if (!skinPriority.contains(defaultSkin)) {
@@ -76,8 +77,8 @@ public class PortalManagerImpl implements PortalManager {
             }
 
             // Path to the files on disk
-            String home = config.getString(DEFAULT_PORTAL_HOME,
-                    "portal", "home");
+            String home = config.getString(DEFAULT_PORTAL_HOME, "portal",
+                    "home");
             File homeDir = new File(home);
             if (!homeDir.exists()) {
                 home = DEFAULT_PORTAL_HOME_DEV;
@@ -122,7 +123,8 @@ public class PortalManagerImpl implements PortalManager {
         Portal portal = null;
         if (getPortals().containsKey(name)) {
             if (lastModified.containsKey(name)
-                    && lastModified.get(name) < portalFiles.get(name).lastModified()) {
+                    && lastModified.get(name) < portalFiles.get(name)
+                            .lastModified()) {
                 loadPortal(name);
             }
             portal = getPortals().get(name);
@@ -155,8 +157,9 @@ public class PortalManagerImpl implements PortalManager {
     @Override
     public void save(Portal portal) {
         String portalName = portal.getName();
-        File portalFile = new File(new File(portalsDir, portalName),
-                PORTAL_JSON);
+
+        File portalFile = new File(new File(portalsDir,
+                FilenameUtils.normalize(portalName)), PORTAL_JSON);
         portalFile.getParentFile().mkdirs();
         try {
             FileWriter writer = new FileWriter(portalFile);
