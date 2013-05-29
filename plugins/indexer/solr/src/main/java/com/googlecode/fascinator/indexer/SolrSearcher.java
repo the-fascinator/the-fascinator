@@ -18,8 +18,6 @@
  */
 package com.googlecode.fascinator.indexer;
 
-import com.googlecode.fascinator.common.BasicHttpClient;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -33,6 +31,8 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.common.BasicHttpClient;
 
 public class SolrSearcher {
 
@@ -76,6 +76,8 @@ public class SolrSearcher {
         NameValuePair[] postData = getPostData(query, extras);
         log.debug("URL:{}, POSTDATA:{}", selectUrl, postData);
         PostMethod method = new PostMethod(selectUrl);
+        method.addRequestHeader("Content-type",
+                "application/x-www-form-urlencoded; charset=UTF-8");
         method.setRequestBody(postData);
         int status = client.executeMethod(method, true);
         if (status == HttpStatus.SC_OK) {

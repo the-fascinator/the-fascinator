@@ -1,4 +1,3 @@
-import md5
 import os.path
 
 from com.googlecode.fascinator.api.indexer import SearchRequest
@@ -13,6 +12,7 @@ from java.lang import Boolean
 from java.net import URLDecoder
 from java.net import URLEncoder
 from java.util import ArrayList, LinkedHashMap, HashSet
+from org.apache.commons.codec.digest import DigestUtils
 
 class SearchData:
     def __activate__(self, context):
@@ -266,7 +266,7 @@ class SearchData:
         return fq in self.__selected
     
     def getSelectedFacetIds(self):
-        return [md5.new(fq).hexdigest() for fq in self.__selected]
+        return [ DigestUtils.md5Hex(fq) for fq in self.__selected]
     
     def getFileName(self, path):
         return os.path.splitext(os.path.basename(path))[0]
