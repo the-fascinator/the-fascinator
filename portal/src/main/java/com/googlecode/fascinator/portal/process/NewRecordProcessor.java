@@ -73,6 +73,7 @@ public class NewRecordProcessor implements Processor {
            }
            searchRequest.setParam("start", "" + start);
            result = new ByteArrayOutputStream();
+           indexer.search(searchRequest, result);
            resultObject = new SolrResult(result.toString());
        }
        // get the exception list..
