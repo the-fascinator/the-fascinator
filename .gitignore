@@ -2,6 +2,7 @@ target/
 .name
 /.idea
 *.iml
+.svn
 
 plugins/harvester/filesystem/derby.log
 
