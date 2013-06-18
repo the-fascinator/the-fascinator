@@ -18,23 +18,6 @@
  */
 package com.googlecode.fascinator;
 
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.harvester.Harvester;
-import com.googlecode.fascinator.api.harvester.HarvesterException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.common.messaging.MessagingServices;
-import com.googlecode.fascinator.common.storage.StorageUtils;
-import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,6 +34,23 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.harvester.Harvester;
+import com.googlecode.fascinator.api.harvester.HarvesterException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.api.transformer.TransformerException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.common.storage.StorageUtils;
+import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 
 /**
  * 
@@ -70,8 +70,7 @@ public class HarvestClient {
     private static final String DEFAULT_STORAGE_TYPE = "file-system";
 
     /** Default tool chain queue */
-    private static final String DEFAULT_TOOL_CHAIN_QUEUE =
-            HarvestQueueConsumer.HARVEST_QUEUE;
+    private static final String DEFAULT_TOOL_CHAIN_QUEUE = HarvestQueueConsumer.HARVEST_QUEUE;
 
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(HarvestClient.class);
@@ -108,6 +107,13 @@ public class HarvestClient {
 
     /** Tool Chain entry queue */
     private String toolChainEntry;
+
+    /** Harvest id for reports */
+    private String harvestId;
+
+    private String repoType;
+
+    private String repoName;
 
     /**
      * Harvest Client Constructor
@@ -147,8 +153,8 @@ public class HarvestClient {
                 config = new JsonSimpleConfig();
             } else {
                 config = new JsonSimpleConfig(configFile);
-                String rules = config.getString(null,
-                        "indexer", "script", "rules");
+                String rules = config.getString(null, "indexer", "script",
+                        "rules");
                 rulesFile = new File(configFile.getParent(), rules);
             }
         } catch (IOException ioe) {
@@ -157,8 +163,8 @@ public class HarvestClient {
         }
 
         // initialise storage system
-        String storageType = config.getString(DEFAULT_STORAGE_TYPE,
-                "storage", "type");
+        String storageType = config.getString(DEFAULT_STORAGE_TYPE, "storage",
+                "type");
         storage = PluginManager.getStorage(storageType);
         if (storage == null) {
             throw new HarvesterException("Storage plugin '" + storageType
@@ -191,7 +197,8 @@ public class HarvestClient {
     private DigitalObject updateHarvestFile(File file) throws StorageException {
         // Check the file in storage
         DigitalObject object = StorageUtils.checkHarvestFile(storage, file);
-        //log.info("=== Check harvest file: '{}'=> '{}'", file.getName(), object);
+        // log.info("=== Check harvest file: '{}'=> '{}'", file.getName(),
+        // object);
         if (object != null) {
             // If we got an object back its new or updated
             JsonObject message = new JsonObject();
@@ -206,7 +213,7 @@ public class HarvestClient {
             // Otherwise grab the existing object
             String oid = StorageUtils.generateOid(file);
             object = StorageUtils.getDigitalObject(storage, oid);
-            //log.info("=== Try again: '{}'=> '{}'", file.getName(), object);
+            // log.info("=== Try again: '{}'=> '{}'", file.getName(), object);
         }
         return object;
     }
@@ -221,6 +228,20 @@ public class HarvestClient {
         String now = df.format(new Date());
         long start = System.currentTimeMillis();
         log.info("Started at " + now);
+
+        // Generate harvest id. This is just a string representation of current
+        // date and time
+        harvestId = now;
+
+        repoType = config.getString("", "indexer", "params", "repository.type");
+        repoName = config.getString("", "indexer", "params", "repository.name");
+
+        // Put in event log
+        Map<String, String> startMsgs = new LinkedHashMap<String, String>();
+        startMsgs.put("harvestId", harvestId);
+        startMsgs.put("repository_type", repoType);
+        startMsgs.put("repository_name", repoName);
+        sentMessage("-1", "harvestStart", startMsgs);
 
         // cache harvester config and indexer rules
         configObject = updateHarvestFile(configFile);
@@ -271,6 +292,14 @@ public class HarvestClient {
                     }
                 }
             } while (harvester.hasMoreDeletedObjects());
+
+            // Send harvest end message to event log
+            Map<String, String> endMsgs = new LinkedHashMap<String, String>();
+            endMsgs.put("harvestId", harvestId);
+            endMsgs.put("repository_type", repoType);
+            endMsgs.put("repository_name", repoName);
+            // endMsgs.put("totalInStorage", getTotal(repoType, repoName));
+            sentMessage("-1", "harvestEnd", endMsgs);
         }
 
         // Shutdown the harvester
@@ -280,6 +309,7 @@ public class HarvestClient {
 
         log.info("Completed in "
                 + ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
+
     }
 
     /**
@@ -396,12 +426,15 @@ public class HarvestClient {
         // get the object
         DigitalObject object = storage.getObject(oid);
 
+        String isNew = "false";
+        String isModified = "false";
+
         // update object metadata
         Properties props = object.getMetadata();
         // TODO - objectId is redundant now?
         props.setProperty("objectId", object.getId());
-        props.setProperty("scriptType", config.getString(null,
-                "indexer", "script", "type"));
+        props.setProperty("scriptType",
+                config.getString(null, "indexer", "script", "type"));
         // Set our config and rules data as properties on the object
         props.setProperty("rulesOid", rulesObject.getId());
         props.setProperty("rulesPid", rulesObject.getSourceId());
@@ -416,11 +449,31 @@ public class HarvestClient {
             props.setProperty(key.toString(), params.get(key).toString());
         }
 
+        // check this object's status (i.e. new or modified) and count
+        if (props.containsKey("isNew")
+                && Boolean.parseBoolean(props.getProperty("isNew"))) {
+            isNew = "true";
+        } else if (props.containsKey("isModified")) {
+            if (Boolean.parseBoolean(props.getProperty("isModified"))) {
+                isModified = "true";
+            }
+        }
+
+        // now remove these properties. We don't need them anymore
+        props.remove("isNew");
+        props.remove("isModified");
+
         // done with the object
         object.close();
 
         // put in event log
-        sentMessage(oid, "modify");
+        Map<String, String> msgs = new LinkedHashMap<String, String>();
+        msgs.put("harvestId", harvestId);
+        msgs.put("isNew", isNew);
+        msgs.put("isModified", isModified);
+        msgs.put("repository_type", repoType);
+        msgs.put("repository_name", repoName);
+        sentMessage(oid, "modify", msgs);
 
         // queue the object for indexing
         queueHarvest(oid, configFile, commit);
@@ -476,8 +529,7 @@ public class HarvestClient {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
             json.put("deleted", "true");
-            messaging.queueMessage(toolChainEntry,
-                    json.toString());
+            messaging.queueMessage(toolChainEntry, json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
             throw new MessagingException(ioe);
@@ -505,12 +557,15 @@ public class HarvestClient {
      * @param context where the event happened
      * @param jsonFile Configuration file
      */
-    private void sentMessage(String oid, String eventType) {
+    private void sentMessage(String oid, String eventType,
+            Map<String, String> optionalParams) {
         Map<String, String> param = new LinkedHashMap<String, String>();
         param.put("oid", oid);
         param.put("eventType", eventType);
         param.put("username", "system");
         param.put("context", "HarvestClient");
+
+        param.putAll(optionalParams);
         try {
             messaging.onEvent(param);
         } catch (MessagingException ex) {

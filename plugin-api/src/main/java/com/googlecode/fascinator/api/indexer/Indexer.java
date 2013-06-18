@@ -140,6 +140,6 @@ public interface Indexer extends Plugin {
      * @param indexName the name of the index to search
      * @throws IndexerException if an error occurred performing the search
      */
-    void searchByIndex(SearchRequest request, OutputStream response,
+    public void searchByIndex(SearchRequest request, OutputStream response,
             String indexName) throws IndexerException;
 }
