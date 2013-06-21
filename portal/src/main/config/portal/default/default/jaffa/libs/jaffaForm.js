@@ -605,6 +605,13 @@ function jaffaForm(jaffaObject) {
     // Send data out via whatever context required. Logic is very similar to both
     function sendData(isValid, preCb, fn, postCb) {
         var unmanagedData = form.hasUnmanagedData();
+        if (unmanagedData) {
+            for (var key in form.unmanaged) {
+            	if (typeof jaffa.serverData[key] == "object") {
+					delete jaffa.serverData[key];
+				}
+            }
+        }
         var proceed = jaffa.cb(preCb, unmanagedData, isValid, jaffa.serverData);
 
         // In the absense of a callback (or decision)

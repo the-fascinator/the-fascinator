@@ -1,5 +1,9 @@
 #set($oid = $velocityContext.get('formData').get('oid'))
 <script type="text/javascript">
+	var action = null;
+	var objectMetadataParams = null;
+	var closeUrl = null; 
+    
     // Fix in case there are some unchecked logging statements
     if(!window.console) {
         var console = {
@@ -11,16 +15,7 @@
         }
     }
 </script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaRegexes.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaUtilities.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaValidation.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaWidgets.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaUI.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/jaffaForm.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/libs/validatious/validatious.2.0.min.0.9.1.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/jaffa.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/myJaffa.js"></script>
-<script type="text/javascript" src="$portalPath/jaffa/widgets-ini.js"></script>
+
 <script type="text/javascript" src="$portalPath/jaffa/widgets/text.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/dropDown.js"></script>
 <script type="text/javascript" src="$portalPath/jaffa/widgets/container.js"></script>
@@ -39,14 +34,12 @@
 		<ul id="errorbox-list">
 		</ul>
 </div>
-	
 
 <div id="simpleworkflow-form">
 	$fieldElementsHtml
 	$divElementsHtml
 	$buttonElementsHtml
 </div>	
-
 
 <script type="text/javascript">
   var jaffa = jaffaFactory({
@@ -67,8 +60,6 @@
                                 prefixes.push(multiVariablePrefix);
                                 }
         					 );
-    	
-    	
     	
 		var dataSource = jaffa.config("urlDataSource");
 		
@@ -97,14 +88,6 @@
 						$("[id='"+prefix+".1.ContainerItem']").parent().find('.jaffaAddItem button').click();
 					}
 				}
-				
-				$("#simpleworkflow-form").find("input.dateYMD, input.date").datepicker({
-																	dateFormat: "yy-mm-dd",
-																	changeMonth: true,
-																	changeYear: true,
-																	showButtonPanel: false
-																	}); 
-				
 				//final population of data
 				jaffa.form.synch(true);
 				//populate map if it exists
@@ -158,8 +141,16 @@
     	return null;
     }
     
+    //TODO: this is the default preSave function of Fascinator. Without it, seems tab has been checked.
+    //Called on line 14 of wizard.js before calling jaffa.save. Seems manually call preSave() ourselves instead of jaff.
+    /*
     function preSave() {
     	validateTab();
+    	return true;
+    }
+    */
+    
+    function preSave() { // overwrite defaut preSave funcition of fascinator
     	return true;
     }
 
@@ -205,18 +196,32 @@
     			ids.push(name);
     		}
 		}
-
 		
 		return jaffa.valid.test("save", ids);
 		}
 	
-	
+    function prepareHelps() {
+    	var help_contents = $('.pre-help-content');
+    	for (var i = 0; i < help_contents.length; i++ ) {
+    		$(help_contents[i]).hide().attr("class","help-content");
+    		var helpToggleHtml = "<button class=\"jaffaHelpToggle\"></button>";
+    	    helpToggle = $(helpToggleHtml);
+    	    helpToggle.button({icons: {primary:'ui-icon-help'}});
+
+    	    // Setup click logic
+    	    helpToggle.click(function(){$(this).next().toggle('fast');});
+
+    	    // And attach to our container
+    	    helpToggle.insertBefore(help_contents[i]);	
+    	}
+    }
 </script>
 
 $formFooterHtml
 
 <script type="text/javascript">
  $(document).ready(function() {
+	prepareHelps();
  	$('#ui-datepicker-div').hide();
  	$('#simpleworkflow-form').block();
  });

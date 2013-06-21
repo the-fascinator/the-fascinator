@@ -204,10 +204,14 @@ var DropDownWidgetBuilder = function($, jaffa) {
         change: function(fieldName, isValid) {
             // To avoid double handling, just pay attention to the actual value field
             if (fieldName == this.field) {
-                // Update our label field if we have one
-                if (this.labelField != null) {
-                    var label = jaffa.form.field(fieldName).find(":selected").text();
-                    jaffa.form.value(this.labelField, label);
+                // Update our label field if we have one and only when there is an associated value
+				if (this.labelField != null) {
+					var selected = jaffa.form.field(fieldName).find(":selected");
+					if (selected.val()) {
+						jaffa.form.value(this.labelField, selected.text());
+					} else {
+						jaffa.form.value(this.labelField, "");
+					}
                 }
                 // Complex relations, we want to look like a jQuery automcomplete
                 //  to leverage the same methods on the base widget
