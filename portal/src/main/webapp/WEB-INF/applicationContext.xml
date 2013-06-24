@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!--
+		This will automatically locate any and all property files you have
+		within your classpath, provided they fall under the META-INF
+		directory. The located property files are parsed and their values can
+		then be used within application context files in the form of
+		${propertyKey}.
+	-->
+	<context:property-placeholder location="classpath*:*.properties" />
+	
+    	
+	<bean id="applicationContextProvider" class="com.googlecode.fascinator.spring.ApplicationContextProvider"></bean>
+	
+	<bean id="authenticationFilter"
+		class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter"
+		p:authenticationManager-ref="fascinatorAuthenticationManager"
+		p:authenticationFailureHandler-ref="customAuthenticationFailureHandler"
+		p:authenticationSuccessHandler-ref="customAuthenticationSuccessHandler">
+
+	</bean>
+
+	<bean id="fascinatorAuthInterceptor"
+		class="com.googlecode.fascinator.portal.security.filter.FascinatorAuthenticationInterceptorFilter">
+		<property name="authManager" ref="fascinatorAuthenticationManager" />
+	</bean>
+
+	<bean id="fascinatorAuthenticationManager"
+		class="com.googlecode.fascinator.portal.security.FascinatorSpringSecurityAuthenticationManager" >
+		<property name="roleManager" ref="fascinatorRoleManager" />
+	</bean>
+	
+		<bean id="authenticationEntryPoint"
+		class="com.googlecode.fascinator.portal.security.handler.FascinatorLoginUrlAuthenticationEntryPoint"
+		p:loginFormUrl="/default/login"/>
+
+	
+
+	<bean id="customAuthenticationFailureHandler"
+		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"
+		p:defaultFailureUrl="/default/login?error=true" />
+
+	<bean id="customAuthenticationSuccessHandler"
+		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler"
+		p:defaultTargetUrl="/default/home" />
+	
+	<bean id="accessDeniedHandler" class="com.googlecode.fascinator.portal.security.handler.FascinatorAccessDeniedHandler" />
+	
+	
+	<import resource="file:${FASCINATOR_HOME}/applicationContext-*.xml" />
+	
+	<context:component-scan base-package="com.googlecode.fascinator" />
+	
+</beans>

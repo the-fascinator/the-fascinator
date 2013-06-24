@@ -28,6 +28,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.googlecode.fascinator.api.PluginDescription;
 import com.googlecode.fascinator.api.PluginException;
@@ -39,6 +42,7 @@ import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.User;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * Authentication and management of users.
@@ -62,6 +66,8 @@ public class AuthenticationManager implements AuthManager {
     /** User */
     @SuppressWarnings("unused")
     private GenericUser user_object;
+
+    private org.springframework.security.authentication.AuthenticationManager authenticationManager;
 
     /** List of plugins */
     private Map<String, Authentication> plugins;
@@ -158,6 +164,10 @@ public class AuthenticationManager implements AuthManager {
         if (active == null) {
             active = INTERNAL_AUTH_PLUGIN;
         }
+
+        authenticationManager = (org.springframework.security.authentication.AuthenticationManager) ApplicationContextProvider
+                .getApplicationContext().getBean(
+                        "fascinatorAuthenticationManager");
     }
 
     @Override
@@ -190,6 +200,22 @@ public class AuthenticationManager implements AuthManager {
             try {
                 User user = p.logIn(username, password);
                 user.setSource(p.getId());
+
+                // Now authenticate user using Spring Securit
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        username, password);
+                token.setDetails(user);
+
+                try {
+                    org.springframework.security.core.Authentication auth = authenticationManager
+                            .authenticate(token);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                } catch (BadCredentialsException e) {
+                    // TODO: When we move completely to Spring Security we'll
+                    // need to handle this.
+                    // Our custom AuthManager will never throw this exception
+                    // for the time being
+                }
                 return user;
             } catch (AuthenticationException e) {
                 // Don't need to do anything here
@@ -213,6 +239,8 @@ public class AuthenticationManager implements AuthManager {
     public void logOut(User user) throws AuthenticationException {
         String source = user.getSource();
         plugins.get(source).logOut(user);
+        // Log user out of Spring Security
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     /**

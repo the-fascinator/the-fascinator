@@ -19,14 +19,6 @@
 
 package com.googlecode.fascinator;
 
-import com.googlecode.fascinator.api.PluginDescription;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.roles.Roles;
-import com.googlecode.fascinator.api.roles.RolesException;
-import com.googlecode.fascinator.api.roles.RolesManager;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,8 +27,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import com.googlecode.fascinator.api.PluginDescription;
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.roles.Roles;
+import com.googlecode.fascinator.api.roles.RolesException;
+import com.googlecode.fascinator.api.roles.RolesManager;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 /**
  * Search and management of roles.
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Greg Pendlebury
  */
+@Component(value = "fascinatorRoleManager")
 public class RoleManager implements RolesManager {
 
     /** The internal plugin is the default if none are specified */
@@ -75,7 +79,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Gets a PluginDescription object relating to this plugin.
-     *
+     * 
      * @return a PluginDescription
      */
     @Override
@@ -91,6 +95,17 @@ public class RoleManager implements RolesManager {
             throw new RolesException(e);
         } catch (IOException e) {
             throw new RolesException(e);
+        }
+    }
+
+    @PostConstruct
+    public void init() throws RolesException {
+        try {
+            setConfig(new JsonSimpleConfig(JsonSimpleConfig.getSystemFile()));
+        } catch (RolesException e) {
+            throw new RolesException(e);
+        } catch (IOException ioe) {
+            throw new RolesException(ioe);
         }
     }
 
@@ -115,8 +130,8 @@ public class RoleManager implements RolesManager {
         // Initialise our local properties
         plugins = new LinkedHashMap<String, Roles>();
         // Get and parse the config
-        String plugin_string = config.getString(INTERNAL_ROLES_PLUGIN,
-                "roles", "type");
+        String plugin_string = config.getString(INTERNAL_ROLES_PLUGIN, "roles",
+                "type");
         String[] plugin_list = plugin_string.split(",");
         // Now start each required plugin
         for (String element : plugin_list) {
@@ -143,7 +158,7 @@ public class RoleManager implements RolesManager {
     public void shutdown() throws RolesException {
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             try {
                 p.shutdown();
             } catch (PluginException e) {
@@ -166,7 +181,7 @@ public class RoleManager implements RolesManager {
         // Loop through each plugin
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             result = p.getRoles(username);
             for (int j = 0; j < result.length; j++) {
                 if (!found.contains(result[j])) {
@@ -192,7 +207,7 @@ public class RoleManager implements RolesManager {
         // Loop through each plugin
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             result = p.getUsersInRole(role);
             for (int j = 0; j < result.length; j++) {
                 if (!found.contains(result[j])) {
@@ -215,7 +230,7 @@ public class RoleManager implements RolesManager {
     public boolean supportsRoleManagement() {
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             // Return true as soon as we
             // find one plugin
             if (p.supportsRoleManagement()) {
@@ -247,7 +262,7 @@ public class RoleManager implements RolesManager {
         Boolean success = false;
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext() && !success) {
-            p = (Roles) i.next();
+            p = i.next();
             try {
                 // Make we don't try the active plugin again
                 if (!active.equals(p.getId())) {
@@ -288,7 +303,7 @@ public class RoleManager implements RolesManager {
         Boolean success = false;
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             try {
                 // Make we don't try the active plugin again
                 if (!active.equals(p.getId())) {
@@ -362,7 +377,7 @@ public class RoleManager implements RolesManager {
         Boolean success = false;
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             try {
                 // Make we don't try the active plugin again
                 if (!active.equals(p.getId())) {
@@ -406,7 +421,7 @@ public class RoleManager implements RolesManager {
         // Loop through each plugin
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             result = p.searchRoles(search);
             for (int j = 0; j < result.length; j++) {
                 if (!found.contains(result[j])) {
@@ -429,7 +444,7 @@ public class RoleManager implements RolesManager {
         // Make sure it exists
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             if (pluginId.equals(p.getId())) {
                 active = pluginId;
             }
@@ -459,7 +474,7 @@ public class RoleManager implements RolesManager {
         // Loop through each plugin
         Iterator<Roles> i = plugins.values().iterator();
         while (i.hasNext()) {
-            p = (Roles) i.next();
+            p = i.next();
             result = new PluginDescription(p);
             found.add(result);
         }
