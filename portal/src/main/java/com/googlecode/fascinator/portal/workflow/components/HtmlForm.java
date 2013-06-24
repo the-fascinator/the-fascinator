@@ -9,6 +9,7 @@ public class HtmlForm {
     private List<HtmlButton> htmlButtons = new ArrayList<HtmlButton>();
     private List<HtmlDiv> htmlDivs = new ArrayList<HtmlDiv>();
     private String htmlFooter = null;
+    private String validationFunction = "standard";
 
     public void addHtmlFieldElement(HtmlFieldElement htmlFieldElement) {
         htmlFieldElements.add(htmlFieldElement);
@@ -41,6 +42,14 @@ public class HtmlForm {
 
     public void setHtmlFooter(String htmlFooter) {
         this.htmlFooter = htmlFooter;
+    }
+
+    public String getValidationFunction() {
+        return validationFunction;
+    }
+
+    public void setValidationFunction(String validationFunction) {
+        this.validationFunction = validationFunction;
     }
 
 }
