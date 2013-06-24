@@ -33,6 +33,7 @@
             $("#login-form").dialog('close');
             return false;
         });
+        
         $("#login-submit").click(function() {
             $("#login-message").empty();
             $("#login-loading").show();
@@ -41,7 +42,11 @@
                 url : "$portalPath/actions/login.ajax",
                 success:
                     function(data, status) {
-                        window.location.reload();
+                    	if(typeof redirectUrl == 'undefined') {
+                        	window.location.reload();
+                        } else {
+                        	window.location = "$portalPath/" + redirectUrl;
+                        }
                     },
                 error:
                     function (req, status, e) {
