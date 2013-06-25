@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.internal.KeyValue;
 import org.apache.velocity.VelocityContext;
 import org.json.simple.JSONArray;
@@ -37,6 +38,8 @@ import com.googlecode.fascinator.portal.workflow.components.HtmlComponent;
 import com.googlecode.fascinator.portal.workflow.components.HtmlDiv;
 import com.googlecode.fascinator.portal.workflow.components.HtmlFieldElement;
 import com.googlecode.fascinator.portal.workflow.components.HtmlForm;
+import com.googlecode.fascinator.portal.workflow.components.HtmlFormLayout;
+import com.googlecode.fascinator.portal.workflow.components.HtmlValidationFunction;
 
 public class SimpleWorkflowHelper {
 
@@ -275,17 +278,55 @@ public class SimpleWorkflowHelper {
             form.setHtmlFooter(htmlFooter);
         }
 
-        String validationFunction = (String) ((JsonObject) ((JsonObject) formConfiguration
+        JsonObject validationFunction = (JsonObject) ((JsonObject) ((JsonObject) formConfiguration
                 .getJsonObject().get("stages")).get(workflowMetadata.getString(
                 null, "step"))).get("validation-function");
 
         if (validationFunction != null) {
-            form.setValidationFunction(validationFunction);
+            form.setValidationFunction(getValidationFunction(validationFunction));
         }
 
+        JsonObject formLayout = (JsonObject) ((JsonObject) ((JsonObject) formConfiguration
+                .getJsonObject().get("stages")).get(workflowMetadata.getString(
+                null, "step"))).get("form-layout");
+
+        if (formLayout != null) {
+            form.setHtmlFormLayout(getFormLayout(formLayout));
+        }
         String output = renderFormHtml(form);
 
         return output;
+    }
+
+    private HtmlValidationFunction getValidationFunction(JsonObject jsonObject) {
+        HtmlValidationFunction htmlValidationFunction = new HtmlValidationFunction();
+        htmlValidationFunction.setComponentTemplateName((String) jsonObject
+                .get("component-type"));
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        Set<Object> keys = jsonObject.keySet();
+        for (Object key : keys) {
+            parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        htmlValidationFunction.setParameterMap(parameterMap);
+        return htmlValidationFunction;
+    }
+
+    private HtmlFormLayout getFormLayout(JsonObject jsonObject) {
+        HtmlFormLayout htmlFormLayout = new HtmlFormLayout();
+        htmlFormLayout.setComponentTemplateName((String) jsonObject
+                .get("component-type"));
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        Set<Object> keys = jsonObject.keySet();
+        for (Object key : keys) {
+            parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        htmlFormLayout.setParameterMap(parameterMap);
+
+        return htmlFormLayout;
     }
 
     private String renderFormHtml(HtmlForm form) throws Exception {
@@ -299,6 +340,11 @@ public class SimpleWorkflowHelper {
 
         String validationFunction = renderValidationFunction(form
                 .getValidationFunction());
+        String formLayout = StringUtils.EMPTY;
+        if (form.getHtmlFormLayout() != null) {
+            formLayout = renderFormLayoutCode(form.getHtmlFormLayout());
+        }
+
         String formFooterHtml = renderFormFooterHtml(form.getHtmlFooter());
 
         // Now that we have generated the elements we need for the html form.
@@ -308,6 +354,7 @@ public class SimpleWorkflowHelper {
         vc.put("buttonElementsHtml", buttonElementsHtml);
         vc.put("divElementsHtml", divElementsHtml);
         vc.put("formFooterHtml", formFooterHtml);
+        vc.put("formLayoutCode", formLayout);
         vc.put("validationFunction", validationFunction);
 
         StringWriter pageContentWriter = new StringWriter();
@@ -317,12 +364,48 @@ public class SimpleWorkflowHelper {
         return pageContentWriter.toString();
     }
 
-    private String renderValidationFunction(String validationFunctionTemplate)
+    private String renderFormLayoutCode(HtmlFormLayout htmlFormLayout)
             throws Exception {
         VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+
+        if (velocityService.resourceExists(
+                portalId,
+                "form-components/form-layouts/"
+                        + htmlFormLayout.getComponentTemplateName() + ".vm") != null) {
+            Map<String, Object> parameterMap = htmlFormLayout.getParameterMap();
+            Set<String> keySet = parameterMap.keySet();
+            for (String key : keySet) {
+                vc.put(key, parameterMap.get(key));
+            }
+            // Render the component's velocity template as a String
+            StringWriter pageContentWriter = new StringWriter();
+            velocityService.renderTemplate(
+                    portalId,
+                    "form-components/form-layouts/"
+                            + htmlFormLayout.getComponentTemplateName(), vc,
+                    pageContentWriter);
+            return pageContentWriter.toString();
+        }
+        // no layout
+        String formLayoutCode = "";
+        return formLayoutCode;
+    }
+
+    private String renderValidationFunction(
+            HtmlValidationFunction validationFunction) throws Exception {
+        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        String validationFunctionTemplate = validationFunction
+                .getComponentTemplateName();
         if (velocityService.resourceExists(portalId,
                 "form-components/validation-functions/"
                         + validationFunctionTemplate + ".vm") != null) {
+
+            Map<String, Object> parameterMap = validationFunction
+                    .getParameterMap();
+            Set<String> keySet = parameterMap.keySet();
+            for (String key : keySet) {
+                vc.put(key, parameterMap.get(key));
+            }
             // Render the component's velocity template as a String
             StringWriter pageContentWriter = new StringWriter();
             velocityService
@@ -333,8 +416,8 @@ public class SimpleWorkflowHelper {
             return pageContentWriter.toString();
         }
         // no validation
-        String validationFunction = "function doValidation() { return null;}";
-        return validationFunction;
+        String validationFunctionString = "function doValidation() { return true;}";
+        return validationFunctionString;
     }
 
     private String renderFormFooterHtml(String htmlFooterTemplate)

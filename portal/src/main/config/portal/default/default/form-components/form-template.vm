@@ -39,6 +39,7 @@
 	$fieldElementsHtml
 	$divElementsHtml
 	$buttonElementsHtml
+	$formLayoutCode
 </div>	
 
 <script type="text/javascript">
@@ -143,8 +144,7 @@
     
     
     function preSave() {
-    	doValidation();
-    	return true;
+    	return doValidation();
     }
 
 

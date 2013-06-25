@@ -1,0 +1,5 @@
+<script src="$portalPath/js/wizard.js"></script>
+<script type='text/javascript'>
+$(document).ready(function() {
+	wizard_init('#simpleworkflow-form','h1.tab-heading', "$portalPath/$wizardConfigPath", "$tabHeaderIdentifier");});
+</script>
