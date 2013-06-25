@@ -1,0 +1,3 @@
+function doValidation() {
+		return jaffa.valid.okToSave();
+}
