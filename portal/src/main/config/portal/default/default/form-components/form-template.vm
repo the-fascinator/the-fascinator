@@ -144,9 +144,23 @@
     
     
     function preSave() {
-    	return doValidation();
+    	return validateSave();
     }
 
+	function validateSubmit() {
+		clearAndHideErrorBox();
+    	return jaffa.valid.test("submit");
+	}
+	
+	function validateSave() {
+		clearAndHideErrorBox();
+    	return doValidation();
+	}
+	
+	function clearAndHideErrorBox() {
+		$(".errorbox").hide();
+    	$("#errorbox-list").html(''); 
+	}
 
 	$validationFunction
 	

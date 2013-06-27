@@ -13,7 +13,13 @@ $(document).ready(function() {
  			#end
      
 	 ], null, validationFail);
-  
+  				jaffa.valid.setSubmitRules("$validation.get("validation-id")",  [
+		#set($validationTypes = $validation.get("save-rules"))
+ 			#foreach($validationType in $validationTypes)
+   				"$validationType",
+ 			#end
+     
+	 ], null, validationFail);
    window.clearInterval(intervalId); }
        },500);    
       

@@ -1,0 +1,17 @@
+<label><input name="$field-name" id="${field-name}" class="jaffa-field" type="checkbox" value= #if( $box-value ) "$box-value" #else "$box-label" #end >#displayMessage($box-label)</label>
+#set($oid = $formData.get("oid"))
+<button id="$button-name" value="$action" >$label</button>
+<script type="text/javascript">
+$('#$button-name').click(function () { action= $(this).val();
+#if($closeUrl) closeUrl="$portalPath/$closeUrl"; #end
+										 if(validateSubmit()) {
+								   	    jaffa.form.save(true);
+								   	    }});
+								   	    
+$(document).ready(function() {
+		$("[id='$button-name']").hide();
+		$("[id='$field-name']").change(function() {
+			$("[id='$button-name']").toggle();
+		});		
+	});
+</script>
