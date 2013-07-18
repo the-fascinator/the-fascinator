@@ -22,6 +22,7 @@ $("[id='repeat-textbox-of-$field-name']").jaffaTextRepeatable({
 	"delete-item-html":"<button>Remove</button>",
 	"min-size":1,
 	"child-config":{
+		#if($!textarea)"textarea":"textarea",#end
 		"label":"${label}",
 		"field":""
 	},
