@@ -49,7 +49,8 @@
         formSelector: "#simpleworkflow-form",
         functionSaveData: saveData,
         callbackPreSave: preSave,
-        callbackStartupComplete: startupComplete
+        callbackStartupComplete: startupComplete,
+        validateOnChange: false
     });
     
     function startupComplete(jaffa) {
