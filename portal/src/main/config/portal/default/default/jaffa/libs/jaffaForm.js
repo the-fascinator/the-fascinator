@@ -423,7 +423,7 @@ function jaffaForm(jaffaObject) {
             if (form.isChecked(fieldId)) {
                 return form.checkbox[fieldId].val();
             } else {
-                return null;
+                return "null";
             }
         }
 
@@ -622,15 +622,7 @@ function jaffaForm(jaffaObject) {
             // and post-process (if requested)
             jaffa.cb(postCb, unmanagedData, isValid, jaffa.serverData);
             return true;
-
-        // We aren't sending... log something
-        } else {
-            if ((!unmanagedData && isValid) && !proceed) {
-                jaffa.logWarning("Send was aborted on request");
-            } else {
-                jaffa.logError("Send was aborted due to invalid/unmanaged data");
-            }
-        }
+        } 
 
         return false;
     }
