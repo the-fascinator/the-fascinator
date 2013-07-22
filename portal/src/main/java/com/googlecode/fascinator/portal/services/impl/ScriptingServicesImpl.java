@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.googlecode.fascinator.api.indexer.Indexer;
 import com.googlecode.fascinator.api.storage.Storage;
@@ -40,6 +41,7 @@ import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.ScriptingServices;
 import com.googlecode.fascinator.portal.services.VelocityService;
 
+@Component(value = "scriptingServices")
 public class ScriptingServicesImpl implements ScriptingServices {
 
     @Inject
