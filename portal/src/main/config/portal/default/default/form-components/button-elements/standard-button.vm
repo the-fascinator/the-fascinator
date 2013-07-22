@@ -7,4 +7,5 @@ $('#$button-name').click(function () { action= $(this).val();
 								   	    jaffa.form.save(true);
 								  }
 								  });
+}
 </script>

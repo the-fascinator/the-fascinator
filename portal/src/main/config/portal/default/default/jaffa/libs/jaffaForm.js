@@ -423,7 +423,7 @@ function jaffaForm(jaffaObject) {
             if (form.isChecked(fieldId)) {
                 return form.checkbox[fieldId].val();
             } else {
-                return null;
+                return "null";
             }
         }
 
