@@ -9,9 +9,16 @@ $('#$button-name').click(function () { action= $(this).val();
 								   	    }});
 								   	    
 $(document).ready(function() {
-		$("[id='$button-name']").hide();
-		$("[id='$field-name']").change(function() {
-			$("[id='$button-name']").toggle();
-		});		
-	});
+	function toggleSubmitButton() {
+		if($("[id='$field-name']").is(':checked')) {
+			$("[id='$button-name']").show();
+		} else {
+			$("[id='$button-name']").hide();
+		}
+	}
+	toggleSubmitButton();
+	$("[id='$field-name']").change(function() {
+		toggleSubmitButton();	
+	});		
+});
 </script>
