@@ -36,7 +36,7 @@
 #set($languageService = $Services.getService("languageService"))#if($languageService && $message)#set($message = $languageService.displayMessage($message))#end$message#end
 
 ##
-## Display an arrary of strings in an unorder list
+## Display an arrary of strings in an un-ordered list
 ##
 ## $vals : an array of strings for display
 ##
@@ -57,4 +57,25 @@
 	<li>$page.escapeHtml($v)</li> #end
 	#end
 </$listType>
+#end
+
+##
+## Display an arrary of repeatables, e.g. ANZSRC-FOR in an un-ordered list
+##
+## $baseKey : main key, e.g. "dc:subject.anzsrc:for" 
+## $subKey : sub key, e.g. "skos:prefLabel"
+##
+#macro(displayRepeatablesUL $baseKey $subKey)
+	#set($repeats = $util.getJavaList($item, "$baseKey"))
+	#set( $valStr = '' )
+	#foreach($v in $repeats)
+		#set($v = $v.get("$subKey").trim())
+		#if($v && $!v != '')
+			#set( $valStr = "${valStr},${v}" )
+		#end
+	#end
+	#if( $valStr != '')
+	  #set($vals = $valStr.split(","))
+	  #displayUL($vals)
+	#end
 #end
