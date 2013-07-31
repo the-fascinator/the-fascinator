@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -268,6 +270,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         Set<String> messages = new HashSet<String>();
         bindings.put("page",
                 evalScript(portalId, layoutName, bindings, messages));
+        bindings.put("StringUtils", StringUtils.class);
+        bindings.put("StringEscapeUtils", StringEscapeUtils.class);
         bindings.put("self", evalScript(portalId, pageName, bindings, messages));
 
         // try to return the proper MIME type
