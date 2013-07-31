@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.StorageDataUtil;
 import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.JsonSessionState;
@@ -261,7 +262,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         bindings.put("log", log);
         bindings.put("notifications", houseKeeping.getUserMessages());
         bindings.put("bindings", bindings);
-
+        StorageDataUtil dataUtil = new StorageDataUtil();
+        bindings.put("jsonUtil", dataUtil);
         // run page and template scripts
         Set<String> messages = new HashSet<String>();
         bindings.put("page",

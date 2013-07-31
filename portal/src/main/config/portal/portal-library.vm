@@ -66,7 +66,7 @@
 ## $subKey : sub key, e.g. "skos:prefLabel"
 ##
 #macro(displayRepeatablesUL $baseKey $subKey)
-	#set($repeats = $util.getJavaList($item, "$baseKey"))
+	#set($repeats = $jsonUtil.getJavaList($item, "$baseKey"))
 	#set( $valStr = '' )
 	#foreach($v in $repeats)
 		#set($v = $v.get("$subKey").trim())
