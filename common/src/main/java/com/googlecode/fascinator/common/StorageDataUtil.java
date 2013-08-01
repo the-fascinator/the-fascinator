@@ -288,8 +288,22 @@ public class StorageDataUtil {
      * @return String: The data in the field, possibly NULL
      */
     public String getEmptyIfNull(JsonSimple json, Object... field) {
+        return getDefaultValueIfNull(json, "", field);
+    }
+
+    /**
+     * Similar to get Method but return a string supplied by caller if cannot
+     * get the field
+     * 
+     * @param json: The JSON object to get from
+     * @param defaultValue: The default value of the field
+     * @param field: The field in the JSON object to get
+     * @return String: The data in the field, possibly NULL
+     */
+    public String getDefaultValueIfNull(JsonSimple json, String defaultValue,
+            Object... field) {
         String value = get(json, field);
-        return value == null ? "" : value;
+        return value == null ? defaultValue : value;
     }
 
     /**
