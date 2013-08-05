@@ -151,9 +151,12 @@ public class GenericDigitalObject implements DigitalObject {
             try {
                 Payload metaPayload = man.get(METADATA_PAYLOAD);
                 metadata = new Properties();
-                metadata.load(metaPayload.open());
+                InputStream is = metaPayload.open();
+                metadata.load(is);
                 metadata.setProperty("metaPid", METADATA_PAYLOAD);
                 metaPayload.close();
+                is.close();
+                log.debug("Closed init metadata input Stream");
             } catch (IOException ex) {
                 throw new StorageException(ex);
             }
@@ -312,8 +315,10 @@ public class GenericDigitalObject implements DigitalObject {
             try {
                 ByteArrayOutputStream metaOut = new ByteArrayOutputStream();
                 metadata.store(metaOut, METADATA_LABEL);
-                updatePayload(METADATA_PAYLOAD, new ByteArrayInputStream(
-                        metaOut.toByteArray()));
+                InputStream in = new ByteArrayInputStream(metaOut.toByteArray());
+                updatePayload(METADATA_PAYLOAD, in);
+                in.close();
+                log.info("Closed metadata inputstream");
             } catch (IOException ex) {
                 throw new StorageException(ex);
             }
