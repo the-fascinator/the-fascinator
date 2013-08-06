@@ -194,8 +194,7 @@ public class PortalManagerImpl implements PortalManager {
                 add(portal);
                 // log.info("Loaded portal: " + portal);
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.warn("Portal: " + name + " failed to load", e);
             }
         }
         return portal;
