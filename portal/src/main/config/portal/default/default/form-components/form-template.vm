@@ -1,0 +1,211 @@
+#set($oid = $velocityContext.get('formData').get('oid'))
+<script type="text/javascript">
+	var action = null;
+	var objectMetadataParams = null;
+	var closeUrl = null; 
+	    
+    // Fix in case there are some unchecked logging statements
+    if(!window.console) {
+        var console = {
+            log : function(){},
+            warn : function(){},
+            error : function(){},
+            time : function(){},
+            timeEnd : function(){}
+        }
+    }
+    
+    function s4() {
+ 		 return Math.floor((1 + Math.random()) * 0x10000)
+             .toString(16)
+             .substring(1);
+	}
+
+	function guid() {
+  		return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        	 s4() + '-' + s4() + s4() + s4();
+	}
+</script>
+
+<script type="text/javascript" src="$portalPath/jaffa/widgets/text.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/dropDown.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/container.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/people.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/funding-body.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/grants.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/libs/nameLookup2.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/libs/jquery/jquery.blockUI.js"></script>
+<script type="text/javascript" src="$portalPath/jaffa/widgets/anzsrc-Selection.js"></script>
+
+<script type="text/javascript">
+	var validationFieldMap = {};
+	 var startupCompleteListeners= [];
+</script>
+<div class="errorbox">
+		#displayMessage("reports.create.report.validation.message")
+		<ul id="errorbox-list">
+		</ul>
+</div>
+
+<div id="simpleworkflow-form">
+	$fieldElementsHtml
+	$divElementsHtml
+	$buttonElementsHtml
+	$formLayoutCode
+</div>	
+
+<script type="text/javascript">
+  var jaffa = jaffaFactory({
+        debuggingEnabled: true,
+        urlDataSource: "$portalPath/workflows/simpleworkflow.ajax?func=get-tfpackage&oid=$oid&dateStamp="+new Date().getTime(),
+        formSelector: "#simpleworkflow-form",
+        functionSaveData: saveData,
+        callbackPreSave: preSave,
+        callbackStartupComplete: startupComplete,
+        validateOnChange: false
+    });
+    
+   
+    
+    function startupComplete(jaffa) {
+    	//discover the prefixes for all the multivalued fields
+    	var prefixes = [];
+		$(".jaffaList").each(function() {
+                                var listId= $(this).attr('id');
+                                var multiVariablePrefix = listId.substring(0, listId.length - 16);
+                                prefixes.push(multiVariablePrefix);
+                                }
+        					 );
+    	
+		var dataSource = jaffa.config("urlDataSource");
+		
+		if (dataSource != null && dataSource != "") {
+			// Get the JSON Data and run this callback
+			jaffa.util.loadJsonUrl(dataSource, function(data) {
+				var prefixCounts = {};		
+				for (var field in data) {
+					jaffa.serverData[field] = data[field];
+					var prefix = matchesPrefix(field,prefixes);
+					if(prefix != null) {
+						var index = field.substring(prefix.length+1,prefix.length+2);
+						var count = prefixCounts[prefix];
+						if (count == null) {
+							count = 0;
+						}
+						if(count < index) {
+							prefixCounts[prefix] = index;
+						}
+					}
+				}
+				
+				//Click the add button to initialise the correct number of repeatable elements to populate
+				for(prefix in prefixCounts) {
+					for(var i=1; i<prefixCounts[prefix];i++) {
+						$("[id='"+prefix+".1.ContainerItem']").parent().find('.jaffaAddItem button').click();
+					}
+				}
+				//final population of data
+				jaffa.form.synch(true);
+				//populate map if it exists
+				if(window["openLayersMap"] != null) {
+					window["openLayersMap"].loadData();
+
+					$('.redboxGeoData .jaffaDeleteItem').each(function (index, value) {
+       						 var currentItem = $(value);
+        					 var originalClickEvent = currentItem.data("events")['click'][0].handler;
+       						 currentItem.unbind('click');
+        					 currentItem.click(function (event) {
+        					   window["openLayersMap"].deleteFeature(event.target);   
+                			 	jQuery.proxy(originalClickEvent, currentItem)(event); 
+           					 });
+       					 });
+				
+				} 
+				
+				for(var i=0; i<startupCompleteListeners.length; i++) {
+						parent[startupCompleteListeners[i]]();
+					}
+				
+					var loadingCheckId = window.setInterval(function() {
+             		if($('.jaffa2Loading').length == 0) {
+				   		$('#simpleworkflow-form').unblock();
+				   		window.clearInterval(loadingCheckId);
+				   }
+       		  },500); 
+				
+			});
+		}
+		
+	}
+	
+	function validationFail(fieldId, testsFailed) {
+    	$(".errorbox").show();
+    	var validation = validationFieldMap[fieldId];
+    	for(var i =0; i < testsFailed.length; i++) {
+    		var message = validation["validationMessages"][testsFailed[i]];
+    		$("#errorbox-list").append('<li>'+message+'<button id="'+fieldId+'-errorButton" class="jaffaHelpToggle ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" role="button" aria-disabled="false"><span class="ui-button-icon-primary ui-icon ui-icon-circle-arrow-e"></span><span class="ui-button-text"></span></button></li>');
+    		
+        	$("[id='"+fieldId+"-errorButton']").click(function() { $("[id='"+validation["focusId"]+"']").focus();});
+        }
+    	
+	}
+    
+    function matchesPrefix(field,prefixes) {
+    	for(var i=0;i<prefixes.length; i++) {
+    		var prefix = prefixes[i];
+    		if(field.indexOf(prefix) ==0) {
+    			return prefix;
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    
+    function preSave() {
+    	return validateSave();
+    }
+
+	function validateSubmit() {
+		clearAndHideErrorBox();
+    	return jaffa.valid.test("submit");
+	}
+	
+	function validateSave() {
+		clearAndHideErrorBox();
+    	return doValidation();
+	}
+	
+	function clearAndHideErrorBox() {
+		$(".errorbox").hide();
+    	$("#errorbox-list").html(''); 
+	}
+
+	$validationFunction
+	
+    function prepareHelps() {
+    	var help_contents = $('.pre-help-content');
+    	for (var i = 0; i < help_contents.length; i++ ) {
+    		$(help_contents[i]).hide().attr("class","help-content");
+    		var helpToggleHtml = "<button class=\"jaffaHelpToggle\"></button>";
+    	    helpToggle = $(helpToggleHtml);
+    	    helpToggle.button({icons: {primary:'ui-icon-help'}});
+
+    	    // Setup click logic
+    	    helpToggle.click(function(){$(this).next().toggle('fast');});
+
+    	    // And attach to our container
+    	    helpToggle.insertBefore(help_contents[i]);	
+    	}
+    }
+</script>
+
+$formFooterHtml
+
+<script type="text/javascript">
+ $(document).ready(function() {
+	prepareHelps();
+ 	$('#ui-datepicker-div').hide();
+ 	$('#simpleworkflow-form').block();
+ });
+</script>
