@@ -1,0 +1,88 @@
+<div id="$element-id" style="display:none" #if($additional-class)class="$additional-class"#end>
+<fieldset>
+    <legend></legend>
+$fieldElementsHtml
+<button class="addButton">Add</button>
+<button class="updateButton">Update</button>
+<button class="cancelButton">Cancel</button>
+</fieldset>
+</div>
+
+<script>
+function $modelName.substring(0,1).toUpperCase()$modelName.substring(1)() {
+    var self = this;
+    
+ 
+}
+function $addFunction() {
+	${modelName}.modelIdentifier = guid();
+	$("[id='$element-id']").find("legend").text("#displayMessage("$addFormTitle")");
+	$("[id='$element-id']").find('.addButton').show();
+	$("[id='$element-id']").find('.updateButton').hide();
+	$("[id='$element-id']").show();
+}
+
+function $editFunction(model) {
+	#foreach ($field in $fields)
+		$modelName.$field.get("table-json-propertyName")(model['$field.get("table-json-propertyName")']);
+	#end
+		${modelName}.modelIdentifier = model.modelIdentifier;
+	$("[id='$element-id']").find("legend").text("#displayMessage("$editFormTitle")");
+	$("[id='$element-id']").find('.addButton').hide();
+	$("[id='$element-id']").find('.updateButton').show();
+	$("[id='$element-id']").show();
+}
+
+
+
+var $modelName;
+$(document).ready(
+function() {
+
+
+
+function clear$modelName.substring(0,1).toUpperCase()$modelName.substring(1)(model) {
+	#foreach ($field in $fields)
+		$modelName.$field.get("table-json-propertyName")(null);
+	#end
+	${modelName}.modelIdentifier = "";
+}
+
+
+        
+$modelName =  new $modelName.substring(0,1).toUpperCase()$modelName.substring(1)();
+#foreach ($field in $fields)
+jaffa.form.ignoreField('$field.get("field-name")');
+$modelName['$field.get("table-json-propertyName")']= ko.observable();
+#end
+
+#foreach ($field in $fields)
+ko.applyBindingsToNode($("[id='$field.get("field-name")']")[0], { value: $modelName.$field.get("table-json-propertyName") }, $modelName );
+#end
+
+ko.applyBindingsToNode($("[id='$element-id']").find($("[class='addButton']"))[0], 
+	{ click: function () { 	
+						  add${tableModelName}Row(ko.toJS($modelName));
+						  clear$modelName.substring(0,1).toUpperCase()$modelName.substring(1)($modelName);
+						  $("[id='$element-id']").hide();
+						  }
+						   
+						 }, $modelName );
+						 
+ko.applyBindingsToNode($("[id='$element-id']").find($("[class='updateButton']"))[0], 
+	{ click: function () { 	
+						  edit${tableModelName}Row(ko.toJS($modelName));
+						  clear$modelName.substring(0,1).toUpperCase()$modelName.substring(1)($modelName);
+						  $("[id='$element-id']").hide();}
+						 }, $modelName );
+
+ko.applyBindingsToNode($("[id='$element-id']").find($("[class='cancelButton']"))[0], 
+	{ click: function () { 	
+						  clear$modelName.substring(0,1).toUpperCase()$modelName.substring(1)($modelName);
+						  $("[id='$element-id']").hide();
+						  cancel$modelName.substring(0,1).toUpperCase()$modelName.substring(1)();
+						  } 
+						 }, $modelName );
+						 
+});
+</script>
