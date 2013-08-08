@@ -1,34 +1,26 @@
 /* start of button def */
 .fileinput-button {
     position: relative;
-    overflow: hidden;
+    
 	-moz-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-	box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ccd8e0), color-stop(1, #0092b6) );
-	background:-moz-linear-gradient( center top, #ccd8e0 5%, #0092b6 100% );
+
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ccd8e0', endColorstr='#0092b6');
-	background-color:#ccd8e0;
 	-moz-border-radius:6px;
 	-webkit-border-radius:6px;
 	border-radius:6px;
 	border:1px solid #918f91;
 	display:inline-block;
-	color:#ffffff;
-	font-family:arial;
 	font-size:15px;
 	font-weight:bold;
-	padding:6px 24px;
+	padding:4px 13px;
 	text-decoration:none;
-	text-shadow:1px 1px 0px #528ecc;
+
 }.fileinput-button:hover {
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #0092b6), color-stop(1, #ccd8e0) );
-	background:-moz-linear-gradient( center top, #0092b6 5%, #ccd8e0 100% );
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0092b6', endColorstr='#ccd8e0');
-	background-color:#0092b6;
+	
 }.fileinput-button:active {
 	position:relative;
-	top:1px;
 }
 /* end of button def */
 .fileinput-button input {
