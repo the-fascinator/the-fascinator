@@ -537,7 +537,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
             StringBuffer submission = new StringBuffer();
             for (String doc : docBuffer.keySet()) {
                 // submission += docBuffer.get(doc);
-                submission.append(doc);
+                submission.append(docBuffer.get(doc));
                 // log.debug("DOC: {}", doc);
             }
 
