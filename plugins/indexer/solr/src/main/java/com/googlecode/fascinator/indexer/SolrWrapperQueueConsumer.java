@@ -533,23 +533,20 @@ public class SolrWrapperQueueConsumer implements GenericListener {
             log.debug("=== Submitting buffer: " + size + " documents");
 
             // Concatenate all documents in the buffer
-            // String submission = "";
-            StringBuffer submission = new StringBuffer();
+            StringBuffer submissionBuffer = new StringBuffer();
             for (String doc : docBuffer.keySet()) {
-                // submission += docBuffer.get(doc);
-                submission.append(docBuffer.get(doc));
+                submissionBuffer.append(docBuffer.get(doc));
                 // log.debug("DOC: {}", doc);
             }
 
             // Submit if the result is valid
-            if (submission.length() > 0) {
+            if (submissionBuffer.length() > 0) {
                 // Wrap in the basic Solr 'add' node
-                String submissionString = "<add>" + submission.toString()
+                String submission = "<add>" + submissionBuffer.toString()
                         + "</add>";
                 // And submit
                 try {
-                    solr.request(new DirectXmlRequest("/update",
-                            submissionString));
+                    solr.request(new DirectXmlRequest("/update", submission));
                 } catch (Exception ex) {
                     log.error("Error submitting documents to Solr!", ex);
                 }
