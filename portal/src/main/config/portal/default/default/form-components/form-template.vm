@@ -122,6 +122,13 @@
 				
 				} 
 				
+				
+				ko.bindingHandlers.stopBindings = {
+				    init: function() {
+					    return { 'controlsDescendantBindings': true };
+				    }        
+				};
+				ko.applyBindings(jaffa.serverData);
 				for(var i=0; i<startupCompleteListeners.length; i++) {
 						parent[startupCompleteListeners[i]]();
 					}
