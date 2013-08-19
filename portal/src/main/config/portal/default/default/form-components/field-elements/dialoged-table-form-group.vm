@@ -1,4 +1,4 @@
-<div id="$element-id" #if($additional-class)class="$additional-class"#end>
+<div id="$element-id" data-bind="stopBindings: true" #if($additional-class)class="$additional-class"#end>
 
 $fieldElementsHtml
 <button class="addButton">Add</button>

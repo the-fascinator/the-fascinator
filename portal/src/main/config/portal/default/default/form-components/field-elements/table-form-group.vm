@@ -1,4 +1,4 @@
-<div id="$element-id" style="display:none" #if($additional-class)class="$additional-class"#end>
+<div id="$element-id" style="display:none" data-bind="stopBindings: true" #if($additional-class)class="$additional-class"#end>
 <fieldset>
     <legend></legend>
 $fieldElementsHtml

@@ -4,9 +4,11 @@ from com.googlecode.fascinator import HarvestClient
 from com.googlecode.fascinator.api.storage import StorageException
 from com.googlecode.fascinator.common import FascinatorHome, JsonSimpleConfig, Manifest
 from com.googlecode.fascinator.common.storage import StorageUtils
+from com.googlecode.fascinator.spring import ApplicationContextProvider
+from com.googlecode.fascinator.common import JsonSimple
 
 from java.io import File, FileOutputStream, OutputStreamWriter
-from java.lang import Exception
+from java.lang import Exception,String
 
 from org.apache.commons.io import FileUtils, IOUtils
 
@@ -68,7 +70,14 @@ class PackagingData:
         for metaName in metaList:
             value = self.vc("formData").get(metaName)
             jsonObj.put(metaName, value)
-
+        if self.vc("formData").getValues("sequencesMetaList") != None:    
+            sequenceService = ApplicationContextProvider.getApplicationContext().getBean("sequenceService")
+            sequencesMetaList = list(self.vc("formData").getValues("sequencesMetaList"))
+            for sequenceInfo in sequencesMetaList:   
+                sequenceInfoJson = JsonSimple(sequenceInfo)
+                sequenceIndex = sequenceService.getSequence(sequenceInfoJson.getString(None,"sequenceName"))
+                jsonObj.put(sequenceInfoJson.getString(None,"metadataName"), String.format(sequenceInfoJson.getString(None,"stringFormat"),sequenceIndex))
+            
         outWriter.write(manifest.toString(True))
         outWriter.close()
         # adding ability to set access plugin
