@@ -18,13 +18,11 @@
  */
 package com.googlecode.fascinator.indexer.rules;
 
-import com.googlecode.fascinator.api.indexer.rule.Rule;
-import com.googlecode.fascinator.api.indexer.rule.RuleException;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -35,6 +33,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import com.googlecode.fascinator.api.indexer.rule.Rule;
+import com.googlecode.fascinator.api.indexer.rule.RuleException;
 
 public class XslTransform extends Rule {
 
@@ -52,8 +53,8 @@ public class XslTransform extends Rule {
             Templates t = tf.newTemplates(new StreamSource(xsl));
             transformer = t.newTransformer();
             if (params != null) {
-                for (String key : params.keySet()) {
-                    transformer.setParameter(key, params.get(key));
+                for (Entry<String, String> entry : params.entrySet()) {
+                    transformer.setParameter(entry.getKey(), entry.getValue());
                 }
             }
         } catch (TransformerConfigurationException tce) {

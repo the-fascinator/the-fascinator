@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.jms.Connection;
@@ -632,14 +633,23 @@ public class PythonUtils {
      * @return String : The generated XML snippet
      */
     public String solrDocument(Map<String, List<String>> fields) {
-        String result = "<doc>";
+        StringBuffer resultBuffer = new StringBuffer("<doc>");
+        for (Entry<String, List<String>> entry : fields.entrySet()) {
+            for (String value : entry.getValue()) {
+                resultBuffer.append(solrField(entry.getKey(), value));
+            }
+        }
+        resultBuffer.append("</doc>");
+        return resultBuffer.toString();
+
+        /*String result = "<doc>";
         for (String field : fields.keySet()) {
             for (String value : fields.get(field)) {
                 result += solrField(field, value);
             }
         }
         result += "</doc>";
-        return result;
+        return result; */
     }
 
     /*****

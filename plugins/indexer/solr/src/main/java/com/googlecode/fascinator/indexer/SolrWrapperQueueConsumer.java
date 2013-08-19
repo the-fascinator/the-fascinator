@@ -542,8 +542,8 @@ public class SolrWrapperQueueConsumer implements GenericListener {
             // Submit if the result is valid
             if (submissionBuffer.length() > 0) {
                 // Wrap in the basic Solr 'add' node
-                String submission = "<add>" + submissionBuffer.toString()
-                        + "</add>";
+                String submission = submissionBuffer.insert(0, "<add>")
+                        .append("</add>").toString();
                 // And submit
                 try {
                     solr.request(new DirectXmlRequest("/update", submission));

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -357,16 +358,16 @@ public class SolrEventLogSubscriber implements Subscriber {
             log.debug("=== Submitting buffer: " + size + " documents");
 
             // Concatenate all documents in the buffer
-            String submission = "";
+            StringBuffer submissionBuffer = new StringBuffer();
             for (String doc : docBuffer) {
-                submission += doc;
+            	submissionBuffer.append(doc);
                 //log.debug("DOC: {}", doc);
             }
 
             // Submit if the result is valid
-            if (!submission.equals("")) {
+            if (submissionBuffer.length() > 0) {
                 // Wrap in the basic Solr 'add' node
-                submission = "<add>" + submission + "</add>";
+            	String submission = submissionBuffer.insert(0, "<add>").append("</add>").toString();
                 // And submit
                 try {
                     core.request(new DirectXmlRequest("/update", submission));
@@ -427,13 +428,22 @@ public class SolrEventLogSubscriber implements Subscriber {
      * @param param : Map of key/value pairs to add to the index
      */
     private String writeUpdateString(Map<String, String> param) {
-        String fieldStr = "";
+        StringBuffer fieldStringBuffer = new StringBuffer();
+        for(Entry<String, String> entry : param.entrySet()){
+        	fieldStringBuffer.append("<field name=\"").append(entry.getKey()).append("\">")
+        			.append(StringEscapeUtils.escapeXml(entry.getValue())).append("</field>");
+        }
+        fieldStringBuffer.insert(0,"<add><doc>").append("</doc></add>");
+        
+        return fieldStringBuffer.toString();
+        
+        /*String fieldStr = "";
         for (String paramName : param.keySet()) {
             fieldStr += "<field name=\"" + paramName + "\">" +
                     StringEscapeUtils.escapeXml(param.get(paramName)) +
                     "</field>";
         }
-        return "<add><doc>" + fieldStr + "</doc></add>";
+        return "<add><doc>" + fieldStr + "</doc></add>";*/
     }
 
     /**

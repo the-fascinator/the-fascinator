@@ -18,13 +18,6 @@
  */
 package com.googlecode.fascinator.harvester.filesystem;
 
-import com.googlecode.fascinator.api.harvester.HarvesterException;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.harvester.impl.GenericHarvester;
-import com.googlecode.fascinator.common.storage.StorageUtils;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
@@ -34,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
@@ -42,6 +36,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.harvester.HarvesterException;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.harvester.impl.GenericHarvester;
+import com.googlecode.fascinator.common.storage.StorageUtils;
 
 /**
  * <p>
@@ -115,14 +116,14 @@ import org.slf4j.LoggerFactory;
  * <td>No</td>
  * <td>null</td>
  * </tr>
- *
+ * 
  * <tr>
  * <td>cacheId</td>
  * <td>The cache ID to use in the database if caching is in use.</td>
  * <td>Yes (if valid 'caching' value is provided)</td>
  * <td>null</td>
  * </tr>
- *
+ * 
  * <tr>
  * <td>derbyHome</td>
  * <td>Path to use for the file store of the database. Should match other Derby
@@ -132,27 +133,27 @@ import org.slf4j.LoggerFactory;
  * </tr>
  * </table>
  * 
- * <h3>Caching</h3>
- * With regards to the underlying cache you have three options for configuration:
+ * <h3>Caching</h3> With regards to the underlying cache you have three options
+ * for configuration:
  * <ol>
- *   <li>No caching: All files will always be be harvested. Be aware that
- * without caching there is no support for deletion.</li>
- *   <li><b>Basic</b> caching: The file is considered 'cached' if the last
+ * <li>No caching: All files will always be be harvested. Be aware that without
+ * caching there is no support for deletion.</li>
+ * <li><b>Basic</b> caching: The file is considered 'cached' if the last
  * modified date matches the database entry. On some operating systems (like
  * linux) this can provide a minimum of around 2 seconds of granularity. For
  * most purposes this is sufficient, and this cache is the most efficient.</li>
- *   <li><b>Hashed</b> caching: The entire contents of the file are SHA hashed
- * and the hash is stored in the database. The file is considered cached if the
- * old hash matches the new hash. This approach will only trigger a harvest if
- * the contents of the file really change, but it is quite slow across large
- * data sets and large files.</li>
+ * <li><b>Hashed</b> caching: The entire contents of the file are SHA hashed and
+ * the hash is stored in the database. The file is considered cached if the old
+ * hash matches the new hash. This approach will only trigger a harvest if the
+ * contents of the file really change, but it is quite slow across large data
+ * sets and large files.</li>
  * </ol>
  * Deletion support is provided by any configured cache. After the standard
- * harvest is performed any 'stale' cache entries are considered to targets
- * for deletion. This is why the 'cacheId' is particularly important, because
- * you don't want cache entries from a different harvest configuration getting
+ * harvest is performed any 'stale' cache entries are considered to targets for
+ * deletion. This is why the 'cacheId' is particularly important, because you
+ * don't want cache entries from a different harvest configuration getting
  * deleted.
- *
+ * 
  * <h3>Examples</h3>
  * <ol>
  * <li>
@@ -285,8 +286,8 @@ public class FileSystemHarvester extends GenericHarvester {
     @Override
     public void init() throws HarvesterException {
         // Check for valid targests
-        targets = getJsonConfig().getJsonSimpleList(
-                "harvester", "file-system", "targets");
+        targets = getJsonConfig().getJsonSimpleList("harvester", "file-system",
+                "targets");
         if (targets.isEmpty()) {
             throw new HarvesterException("No targets specified");
         }
@@ -312,20 +313,20 @@ public class FileSystemHarvester extends GenericHarvester {
 
         // Rendering: Order is significant
         renderChains = new LinkedHashMap<String, Map<String, List<String>>>();
-        Map<String, JsonSimple> renderTypes = getJsonConfig()
-                .getJsonSimpleMap("renderTypes");
+        Map<String, JsonSimple> renderTypes = getJsonConfig().getJsonSimpleMap(
+                "renderTypes");
         if (renderTypes != null) {
-            for (String name : renderTypes.keySet()) {
+            for (Entry<String, JsonSimple> entry : renderTypes.entrySet()) {
                 Map<String, List<String>> details = new HashMap<String, List<String>>();
                 details.put("fileTypes",
-                        renderTypes.get(name).getStringList("fileTypes"));
+                        entry.getValue().getStringList("fileTypes"));
                 details.put("harvestQueue",
-                        renderTypes.get(name).getStringList("harvestQueue"));
+                        entry.getValue().getStringList("harvestQueue"));
                 details.put("indexOnHarvest",
-                        renderTypes.get(name).getStringList("indexOnHarvest"));
+                        entry.getValue().getStringList("indexOnHarvest"));
                 details.put("renderQueue",
-                        renderTypes.get(name).getStringList("renderQueue"));
-                renderChains.put(name, details);
+                        entry.getValue().getStringList("renderQueue"));
+                renderChains.put(entry.getKey(), details);
             }
         }
 
@@ -359,7 +360,7 @@ public class FileSystemHarvester extends GenericHarvester {
     private File getNextTarget() {
         // First execution
         if (targetIndex == null) {
-            targetIndex = new Integer(0);
+            targetIndex = Integer.valueOf(0);
         } else {
             targetIndex++;
         }
@@ -491,7 +492,7 @@ public class FileSystemHarvester extends GenericHarvester {
     public boolean hasMoreObjects() {
         if (!hasMore) {
             // 'Add' harvesting must be run through to completeion before we
-            //  support deletes.
+            // support deletes.
             supportDeletes = true;
         }
         return hasMore;
@@ -507,11 +508,11 @@ public class FileSystemHarvester extends GenericHarvester {
     @Override
     public Set<String> getDeletedObjectIdList() throws HarvesterException {
         if (!supportDeletes) {
-            String msg = "This plugin only supports deletion if caching is" +
-                    " enabled and all 'add' and 'update' harvesting has been" +
-                    " processed first. Please ensure caching is configured" +
-                    " correctly and that harvesting has continued until" +
-                    " hasMoreObjects() returns false. ";
+            String msg = "This plugin only supports deletion if caching is"
+                    + " enabled and all 'add' and 'update' harvesting has been"
+                    + " processed first. Please ensure caching is configured"
+                    + " correctly and that harvesting has continued until"
+                    + " hasMoreObjects() returns false. ";
             throw new HarvesterException(msg);
         }
 
