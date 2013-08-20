@@ -233,7 +233,7 @@
 			<artifactId>jfreechart</artifactId>
 			<version>1.0.14</version>
 		</dependency>
-		
+
 	</dependencies>
 	<profiles>
 		<profile>
@@ -495,6 +495,34 @@
 				</executions>
 			</plugin>
 			<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack-config-db-conf</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/target/portal</outputDirectory>
+									<artifactItems>
+								
+										<artifactItem>
+											<groupId>com.googlecode.the-fascinator.plugins</groupId>
+											<artifactId>fascinator-config-db</artifactId>
+											<version>0.1-SNAPSHOT</version>
+											<classifier>fascinator-config</classifier>
+											<type>zip</type>
+										</artifactItem>
+							
+							</artifactItems>
+								</configuration>
+						</execution>
+						</executions>
+						
+					</plugin>
+			
+			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1.1</version>
 				<executions>
@@ -543,6 +571,7 @@
 										</versionRange>
 										<goals>
 											<goal>copy</goal>
+											<goal>unpack</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
