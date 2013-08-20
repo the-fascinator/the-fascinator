@@ -496,32 +496,29 @@
 			</plugin>
 			<plugin>
 						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.1</version>
 						<executions>
 							<execution>
-								<id>unpack-config-db-conf</id>
+								<id>unpack-configdb-conf</id>
 								<phase>process-resources</phase>
 								<goals>
 									<goal>unpack</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${basedir}/target/portal</outputDirectory>
+									<outputDirectory>${basedir}/target/portal/</outputDirectory>
 									<artifactItems>
-								
 										<artifactItem>
-											<groupId>com.googlecode.the-fascinator.plugins</groupId>
+											<groupId>com.googlecode.the-fascinator</groupId>
 											<artifactId>fascinator-config-db</artifactId>
-											<version>0.1-SNAPSHOT</version>
 											<classifier>fascinator-config</classifier>
 											<type>zip</type>
+											<version>0.1-SNAPSHOT</version>
 										</artifactItem>
-							
-							</artifactItems>
+									</artifactItems>
 								</configuration>
-						</execution>
+							</execution>
 						</executions>
-						
 					</plugin>
-			
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1.1</version>
@@ -571,7 +568,6 @@
 										</versionRange>
 										<goals>
 											<goal>copy</goal>
-											<goal>unpack</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

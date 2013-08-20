@@ -35,6 +35,11 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
  * Allows the use of configuration in the Fascinator system-config.json file in
  * the Spring application-context.
  * 
+ * Nested attributes are mapped in dot notation.
+ * 
+ * e.g. { "config": { "configItem": "sample config" } } becomes
+ * config.configItem=sample config in the properties configuration
+ * 
  * @author andrewqcif
  * 
  */
