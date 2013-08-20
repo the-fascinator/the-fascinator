@@ -14,6 +14,17 @@
 		${propertyKey}.
 	-->
 	<context:property-placeholder location="classpath*:*.properties" />
+		<bean
+        class="com.googlecode.fascinator.common.FascinatorPropertyPlaceHolderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:*.properties</value>
+                <value>file:${FASCINATOR_HOME}/*.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+	
 	
     	
 	<bean id="applicationContextProvider" class="com.googlecode.fascinator.spring.ApplicationContextProvider"></bean>
