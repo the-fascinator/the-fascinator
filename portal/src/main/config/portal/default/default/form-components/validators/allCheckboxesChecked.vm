@@ -1,0 +1,13 @@
+v2.Validator.add({
+    name: "allCheckboxesChecked",
+    acceptEmpty: true,
+    fn: function(field, value, params) {
+        if (params[0] == null || params[1] == null) {
+            return true;
+        }
+        if($("input[name='"+params[0]+"']:checked").length == params[1]) {
+            return true;
+        }
+        return false;
+    }
+});

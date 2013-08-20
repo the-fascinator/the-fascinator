@@ -1,0 +1,14 @@
+v2.Validator.add({
+    name: "atLeastOneRequired",
+    acceptEmpty: false,
+    fn: function(field, value, params) {
+        if (params[0] == null) {
+            return true;
+        }
+	if ($("[id='"+params[0]+"']").val() == "" && value == "") {
+	    return false;
+	} else {
+	    return true;
+	}
+    }
+});

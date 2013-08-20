@@ -11,6 +11,7 @@ public class HtmlForm {
     private String htmlFooter = null;
     private HtmlFormLayout htmlFormLayout = null;
     private HtmlValidationFunction validationFunction = new HtmlValidationFunction();
+    private List<String> customValidators = new ArrayList<String>();
 
     public void addHtmlFieldElement(HtmlFieldElement htmlFieldElement) {
         htmlFieldElements.add(htmlFieldElement);
@@ -59,6 +60,14 @@ public class HtmlForm {
 
     public void setHtmlFormLayout(HtmlFormLayout htmlFormLayout) {
         this.htmlFormLayout = htmlFormLayout;
+    }
+
+    public void setCustomValidators(List<String> validatorList) {
+        customValidators = validatorList;
+    }
+
+    public List<String> getCustomValidators() {
+        return customValidators;
     }
 
 }

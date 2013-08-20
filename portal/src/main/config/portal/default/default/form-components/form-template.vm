@@ -214,5 +214,6 @@ $formFooterHtml
 	prepareHelps();
  	$('#ui-datepicker-div').hide();
  	$('#simpleworkflow-form').block();
+ 	$validatorFunctions
  });
 </script>
