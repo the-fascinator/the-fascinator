@@ -33,6 +33,11 @@ public class FascinatorAccessDeniedHandler implements AccessDeniedHandler {
             ServletException {
         String path = request.getServletPath();
         path = path.substring(1, path.length());
+        // If we have our verNum string at the beginning, we need to filter it
+        // out before redirect.
+        if (path.startsWith("verNum")) {
+            path = path.substring(path.indexOf("/") + 1, path.length());
+        }
         String portal = path.substring(0, path.indexOf("/"));
         response.sendRedirect(urlBase + portal + "/accessDenied");
 
