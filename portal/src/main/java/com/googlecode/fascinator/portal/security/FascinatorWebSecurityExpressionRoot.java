@@ -21,6 +21,7 @@ package com.googlecode.fascinator.portal.security;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,8 +35,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
 
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.access.AccessControl;
+import com.googlecode.fascinator.api.access.AccessControlException;
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
@@ -44,10 +45,9 @@ import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.storage.StorageUtils;
-import com.googlecode.fascinator.common.storage.impl.SpringStorageWrapper;
 
 /**
- * Spring security methods for Fascinator.
+ * Spring security check methods for Fascinator portal.
  * 
  * @author Andrew Brazzatti
  * @author Jianfeng Li
@@ -57,9 +57,10 @@ public class FascinatorWebSecurityExpressionRoot extends
         WebSecurityExpressionRoot {
     private Logger log = LoggerFactory
             .getLogger(FascinatorWebSecurityExpressionRoot.class);
-    private Storage storageService;
+    private Storage storage;
     private JsonSimpleConfig systemConfiguration;
-    private static final String DEFAULT_STORAGE_TYPE = "file-system";
+    private AccessControl accessControl;
+    private JsonSimple workflowConfigJson;
 
     private static final String OID_PATTERN = ".+([0-9a-f]{32}).*";
 
@@ -71,28 +72,57 @@ public class FascinatorWebSecurityExpressionRoot extends
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        // initialiseStorage();
-        SpringStorageWrapper storageServiceWrapper = new SpringStorageWrapper();
-        storageService = storageServiceWrapper.getService();
     }
 
-    /**
-     * initialise storage system
-     */
-    private void initialiseStorage() {
-        String storageType = systemConfiguration.getString(
-                DEFAULT_STORAGE_TYPE, "storage", "type");
-        storageService = PluginManager.getStorage(storageType);
-        if (storageService == null) {
-            throw new RuntimeException("Storage plugin '" + storageType
-                    + "'. Ensure it is in the classpath.");
+    public FascinatorWebSecurityExpressionRoot(Authentication authentication,
+            FilterInvocation fi, Storage storage, AccessControl accessControl) {
+        this(authentication, fi);
+        this.storage = storage;
+        this.accessControl = accessControl;
+    }
+
+    public boolean hasDownloadAccess() {
+        return hasDownloadAccess(OID_PATTERN);
+    }
+
+    private boolean hasDownloadAccess(String oidPattern) {
+        if (isAdmin()) {
+            return true;
         }
+        String oid = getOid(oidPattern);
+        DigitalObject digitalObject = getDigitalObject(oid);
+        Properties tfObjMeta;
         try {
-            storageService.init(systemConfiguration.toString());
-            log.debug("Loaded {}", storageService.getName());
-        } catch (PluginException pe) {
-            throw new RuntimeException("Failed to initialise storage", pe);
+            tfObjMeta = digitalObject.getMetadata();
+
+            if (isPublished(tfObjMeta)) {
+                return true;
+            }
+
+            if (isOwner(tfObjMeta)) {
+                return true;
+            }
+
+            if (isInAllowedRoles(oid)) {
+                return true;
+            }
+
+            if (isInAllowedUsers(oid)) {
+                return true;
+            }
+            // TODO: Check whether attachment is set to public or not
+        } catch (Exception e) {
+            log.error("hasDownloadAccess check failed", e);
+
         }
+        return false;
+    }
+
+    private boolean isAdmin() {
+        if (authentication.getAuthorities().contains("admin")) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -103,21 +133,132 @@ public class FascinatorWebSecurityExpressionRoot extends
      * @return boolean
      */
     public boolean hasViewAccess() {
-        try {
-            DigitalObject digitalObject = getDigitalObject();
-            if (digitalObject != null) {
-                String userName = (String) authentication.getPrincipal();
-                Properties tfObjMeta = digitalObject.getMetadata();
-                // check if the current user is the record owner
-                String owner = tfObjMeta.getProperty("owner");
-                if (userName.equals(owner)) {
-                    return true;
+        return hasViewAccess(OID_PATTERN);
+    }
+
+    public boolean hasViewAccess(String oidPattern) {
+        String oid = getOid(oidPattern);
+        if (oid != null) {
+            try {
+                DigitalObject digitalObject = getDigitalObject(oid);
+                if (digitalObject != null) {
+
+                    Properties tfObjMeta = digitalObject.getMetadata();
+
+                    if (isPublished(tfObjMeta)) {
+                        return true;
+                    }
+
+                    if (isOwner(tfObjMeta)) {
+                        return true;
+                    }
+
+                    if (isInAllowedRoles(oid)) {
+                        return true;
+                    }
+
+                    if (isInAllowedUsers(oid)) {
+                        return true;
+                    }
+
+                } else {
+                    return false;
                 }
-                // check using role-based security
-                JsonObject workflowStageConfiguration = getWorkflowConfig(digitalObject);
-                // Check whether user has the correct role to edit
-                JSONArray allowedRoles = (JSONArray) workflowStageConfiguration
-                        .get("visibility");
+
+            } catch (Exception e) {
+                log.error("Failed to check view access: ", e);
+            }
+        }
+        return false;
+    }
+
+    public boolean isInAllowedUsers() {
+        return isInAllowedUsers(OID_PATTERN);
+    }
+
+    private boolean isInAllowedUsers(String oid) {
+        String userName = (String) authentication.getPrincipal();
+        try {
+            List<String> allowedUsers = accessControl.getUsers(oid);
+            if (allowedUsers != null) {
+                for (String allowedUserName : allowedUsers) {
+                    if (allowedUserName.equals(userName)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (AccessControlException e) {
+            return false;
+        }
+        return false;
+    }
+
+    public boolean isPublished() {
+        String oid = getOid(OID_PATTERN);
+        if (oid != null) {
+            try {
+                DigitalObject digitalObject = getDigitalObject(oid);
+                if (digitalObject != null) {
+                    Properties tfObjMeta = digitalObject.getMetadata();
+                    return isPublished(tfObjMeta);
+                }
+            } catch (Exception e) {
+                log.error("Failed to check property of isPublished.", e);
+            }
+        }
+        return false;
+    }
+
+    private boolean isPublished(Properties tfObjMeta) {
+        if ("true".equals(tfObjMeta.get("published"))) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOwner() {
+        return isOwner(OID_PATTERN);
+    }
+
+    public boolean isOwner(String oidPattern) {
+        String oid = getOid(oidPattern);
+        if (oid != null) {
+            try {
+                DigitalObject digitalObject = getDigitalObject(oid);
+                if (digitalObject != null) {
+                    Properties tfObjMeta = digitalObject.getMetadata();
+                    return isOwner(tfObjMeta);
+                }
+            } catch (Exception e) {
+                log.error("Failed to check ownership", e);
+            }
+        }
+        return false;
+    }
+
+    private boolean isOwner(Properties tfObjMeta) {
+        String userName = (String) authentication.getPrincipal();
+        // check if the current user is the record owner
+        String owner = tfObjMeta.getProperty("owner");
+        if (userName.equals(owner)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isInAllowedRoles() {
+        String oid = getOid(OID_PATTERN);
+        return isInAllowedRoles(oid);
+    }
+
+    /**
+     * Check whether user has the correct role to edit
+     */
+    private boolean isInAllowedRoles(String oid) {
+        List<String> allowedRoles;
+        try {
+            allowedRoles = accessControl.getRoles(oid);
+            if (allowedRoles != null) {
                 Collection<GrantedAuthority> userRoles = authentication
                         .getAuthorities();
                 for (GrantedAuthority grantedAuthority : userRoles) {
@@ -125,109 +266,136 @@ public class FascinatorWebSecurityExpressionRoot extends
                         return true;
                     }
                 }
-            } else {
-                return true; // not need to be guarded // TODO: check with
-                             // Andrew
             }
-
-        } catch (StorageException e) {
-            log.error("View access check failed - cannot get digital object: "
-                    + e.toString());
-        } catch (IOException e) {
-            log.error("View access check failed - cannot get digital object: "
-                    + e.toString());
+        } catch (Exception e) {
+            log.error("Failed to check allowed roles", e);
         }
         return false;
     }
 
     /**
-     * Default version of workflow access check for fascinator portal
-     * 
-     * @param String: uriPattern
-     * @return boolean
+     * Check editing access
      */
     public boolean hasWorkflowAccess() {
-        String defaultRegex = ".+([0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}).*";
-        return hasWorkflowAccess(defaultRegex);
+        return hasWorkflowAccess(OID_PATTERN);
     }
 
     /**
-     * Generic version of workflow access check
-     * 
-     * @param String: uriPattern
-     * @return boolean
+     * Check editing access
      */
-    public boolean hasWorkflowAccess(String uriPattern) {
+    private boolean hasWorkflowAccess(String oidPattern) {
         boolean hasAccess = false;
         try {
-            Pattern p = Pattern.compile(uriPattern);
-            String requestURI = request.getRequestURI();
-            if (!StringUtils.isEmpty(request.getQueryString())) {
-                requestURI = requestURI + "?" + request.getQueryString();
-            }
-            Matcher m = p.matcher(requestURI);
-
-            if (m.matches()) {
-                String oid = m.group(1);
-
+            String oid = getOid(oidPattern);
+            if (oid != null) {
                 DigitalObject digitalObject = getDigitalObject(oid);
-                JsonSimple workflowMetadata = getWorkflowMetadata(digitalObject);
-                String workflowId = workflowMetadata.getString(null, "id");
-                JsonSimple workflowConfiguration = getWorkflowConfiguration(workflowId);
+                JsonObject workflowStageConfiguration = getWorkflowStageConfig(digitalObject);
 
-                JSONArray workflowStages = workflowConfiguration
-                        .getArray("stages");
-                JsonObject workflowStageConfiguration = null;
-                for (int i = 0; i < workflowStages.size(); i++) {
-                    JsonObject workflowStage = (JsonObject) workflowStages
-                            .get(i);
-                    if (workflowMetadata.getJsonObject().get("step")
-                            .equals(workflowStage.get("name"))) {
-                        workflowStageConfiguration = workflowStage;
-                        break;
-                    }
-                }
-
-                String guestOwnerEditAllowed = (String) workflowStageConfiguration
-                        .get("guest_owner_edit_allowed");
-                if (guestOwnerEditAllowed != null
-                        && Boolean.parseBoolean(guestOwnerEditAllowed)) {
+                if (isGuestOwnerEditAllowed(workflowStageConfiguration)) {
                     return true;
                 }
 
-                // Check whether user has the correct role to edit
-                JSONArray allowedRoles = (JSONArray) workflowStageConfiguration
-                        .get("security");
-                Collection<GrantedAuthority> userRoles = authentication
-                        .getAuthorities();
-                for (GrantedAuthority grantedAuthority : userRoles) {
-                    if (allowedRoles.contains(grantedAuthority.getAuthority())) {
-                        return true;
-                    }
+                if (isOwnerEditAllowed(digitalObject,
+                        workflowStageConfiguration)) {
+                    return true;
                 }
 
-                String ownerEditAllowed = (String) workflowStageConfiguration
-                        .get("owner_edit_allowed");
-
-                if (ownerEditAllowed != null
-                        && Boolean.parseBoolean(ownerEditAllowed)) {
-                    // Check if user is owner of the object
-                    String userName = (String) authentication.getPrincipal();
-                    Properties tfObjMeta = digitalObject.getMetadata();
-                    String owner = tfObjMeta.getProperty("owner");
-                    if (userName.equals(owner)) {
-                        return true;
-                    }
+                if (isInAllowedRoles(oid)) {
+                    return true;
                 }
+
             } else {
                 hasAccess = false;
             }
         } catch (Exception e) {
-            log.error("Failed to check wrokflow access: " + e.toString());
+            log.error("Failed to check workflow access: ", e);
             hasAccess = false;
         }
-
         return hasAccess;
+    }
+
+    public boolean isOwnerEditAllowed() {
+        String oid = getOid(OID_PATTERN);
+        try {
+            if (oid != null) {
+                DigitalObject digitalObject = getDigitalObject(oid);
+                JsonObject workflowStageConfiguration = getWorkflowStageConfig(digitalObject);
+                return isOwnerEditAllowed(digitalObject,
+                        workflowStageConfiguration);
+            }
+        } catch (Exception e) {
+            log.error("Failed to check OwnerEditAllowed property", e);
+        }
+        return false;
+    }
+
+    private boolean isOwnerEditAllowed(DigitalObject digitalObject,
+            JsonObject workflowStageConfiguration) {
+        String ownerEditAllowed = (String) workflowStageConfiguration
+                .get("owner_edit_allowed");
+
+        if (ownerEditAllowed != null && Boolean.parseBoolean(ownerEditAllowed)) {
+            // Check if user is the owner of the object
+            Properties tfObjMeta;
+            try {
+                tfObjMeta = digitalObject.getMetadata();
+            } catch (StorageException e) {
+                log.error("Failed to read metadata from object", e);
+                return false;
+            }
+            if (isOwner(tfObjMeta)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isGuestOwnerEditAllowed() {
+        String oid = getOid(OID_PATTERN);
+        try {
+            if (oid != null) {
+                DigitalObject digitalObject = getDigitalObject(oid);
+                JsonObject workflowStageConfiguration = getWorkflowStageConfig(digitalObject);
+                return isGuestOwnerEditAllowed(workflowStageConfiguration);
+            }
+        } catch (Exception e) {
+            log.error("Failed to check GuestOwnerEditAllowed property", e);
+        }
+        return false;
+    }
+
+    private boolean isGuestOwnerEditAllowed(
+            JsonObject workflowStageConfiguration) {
+        String guestOwnerEditAllowed = (String) workflowStageConfiguration
+                .get("guest_owner_edit_allowed");
+        if (guestOwnerEditAllowed != null
+                && Boolean.parseBoolean(guestOwnerEditAllowed)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Extract object ID from requestURI using
+     * 
+     * @param oidPatthern
+     */
+    private String getOid(String oidPatthern) {
+        Pattern p = Pattern.compile(oidPatthern);
+        String requestURI = request.getRequestURI();
+        if (!StringUtils.isEmpty(request.getQueryString())) {
+            requestURI = requestURI + "?" + request.getQueryString();
+        }
+        Matcher m = p.matcher(requestURI);
+
+        if (m.matches()) {
+            return m.group(1);
+        }
+        return null;
     }
 
     /**
@@ -237,7 +405,7 @@ public class FascinatorWebSecurityExpressionRoot extends
      * @throws StorageException
      * @throws IOException
      */
-    private JsonObject getWorkflowConfig(DigitalObject digitalObject)
+    private JsonObject getWorkflowStageConfig(DigitalObject digitalObject)
             throws StorageException, IOException {
         JsonSimple workflowMetadata = getWorkflowMetadata(digitalObject);
         String workflowId = workflowMetadata.getString(null, "id");
@@ -265,42 +433,26 @@ public class FascinatorWebSecurityExpressionRoot extends
      */
     private JsonSimple getWorkflowConfiguration(String workflowId)
             throws IOException {
-        String workflowConfigFileLocation = (String) systemConfiguration
-                .getObject(
-                        new Object[] { "portal", "packageTypes", workflowId })
-                .get("jsonconfig");
-        File workflowConfigFile = FascinatorHome
-                .getPathFile("harvest/workflows/" + workflowConfigFileLocation);
-        return new JsonSimple(workflowConfigFile);
+        if (workflowConfigJson == null) {
+            String workflowConfigFileLocation = (String) systemConfiguration
+                    .getObject(
+                            new Object[] { "portal", "packageTypes", workflowId })
+                    .get("jsonconfig");
+            File workflowConfigFile = FascinatorHome
+                    .getPathFile("harvest/workflows/"
+                            + workflowConfigFileLocation);
+            workflowConfigJson = new JsonSimple(workflowConfigFile);
+        }
+        return workflowConfigJson;
     }
 
-    /*
-     * get digital from URI or query string
-     */
-    private DigitalObject getDigitalObject() {
-        Pattern p = Pattern.compile(OID_PATTERN);
-        String requestURI = request.getRequestURI();
-        if (!StringUtils.isEmpty(request.getQueryString())) {
-            requestURI = requestURI + "?" + request.getQueryString();
-        }
-        Matcher m = p.matcher(requestURI);
+    private DigitalObject getDigitalObject(String oid) {
         DigitalObject digitalObject = null;
         try {
-            if (m.matches()) {
-                String oid = m.group(1);
-                log.debug("Check permission of object {} ", oid);
-                digitalObject = StorageUtils.getDigitalObject(storageService,
-                        oid);
-            }
+            digitalObject = StorageUtils.getDigitalObject(storage, oid);
         } catch (StorageException e) {
-            log.error("Failed to check wrokflow access: " + e.toString());
+            log.error("When checking access, cannot get object {}", oid, e);
         }
-        return digitalObject;
-    }
-
-    private DigitalObject getDigitalObject(String oid) throws StorageException {
-        DigitalObject digitalObject = StorageUtils.getDigitalObject(
-                storageService, oid);
         return digitalObject;
     }
 

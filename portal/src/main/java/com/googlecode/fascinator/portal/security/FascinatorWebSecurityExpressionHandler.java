@@ -30,6 +30,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
+import com.googlecode.fascinator.api.access.AccessControl;
+import com.googlecode.fascinator.api.storage.Storage;
+
 /**
  * Spring security methods for Fascinator.
  * 
@@ -43,15 +46,19 @@ public class FascinatorWebSecurityExpressionHandler extends
     private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
     private ExpressionParser expressionParser = new SpelExpressionParser();
     private RoleHierarchy roleHierarchy;
+    private Storage storage;
+    private AccessControl accessControl;
 
     @Override
     public EvaluationContext createEvaluationContext(
             Authentication authentication, FilterInvocation fi) {
         StandardEvaluationContext ctx = new StandardEvaluationContext();
         SecurityExpressionRoot root;
-        root = new FascinatorWebSecurityExpressionRoot(authentication, fi);
+        root = new FascinatorWebSecurityExpressionRoot(authentication, fi,
+                storage, accessControl);
         root.setTrustResolver(trustResolver);
         root.setRoleHierarchy(roleHierarchy);
+
         ctx.setRootObject(root);
 
         return ctx;
@@ -65,5 +72,13 @@ public class FascinatorWebSecurityExpressionHandler extends
     @Override
     public void setRoleHierarchy(RoleHierarchy roleHierarchy) {
         this.roleHierarchy = roleHierarchy;
+    }
+
+    public void setAccessControl(AccessControl accessControl) {
+        this.accessControl = accessControl;
+    }
+
+    public void setStorage(Storage storage) {
+        this.storage = storage;
     }
 }
