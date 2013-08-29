@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 
 import com.googlecode.fascinator.RoleManager;
 import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.common.authentication.SpringUser;
 
 /**
  * Spring Security Authentication Manager This class assumes that the user has
@@ -33,17 +34,20 @@ public class FascinatorSpringSecurityAuthenticationManager implements
     @Override
     public Authentication authenticate(Authentication authToken)
             throws AuthenticationException {
-        GenericUser user = (GenericUser) authToken.getDetails();
-        List<GrantedAuthority> userRoles = buildRoleList(user.getUsername());
+        GenericUser genericUser = (GenericUser) authToken.getDetails();
+        SpringUser user = new SpringUser();
+        user.setUsername(genericUser.getUsername());
+        user.setSource(genericUser.getSource());
+        List<GrantedAuthority> userRoles = buildRoleList(user);
 
         return new PreAuthenticatedAuthenticationToken(user.getUsername(),
                 user, userRoles);
 
     }
 
-    private List<GrantedAuthority> buildRoleList(String username) {
+    private List<GrantedAuthority> buildRoleList(GenericUser user) {
         List<GrantedAuthority> userRoles = new ArrayList<GrantedAuthority>();
-        String[] roles = roleManager.getRoles(username);
+        String[] roles = roleManager.getRoles(user.getUsername());
         for (String role : roles) {
             GrantedAuthority authority = new GrantedAuthorityImpl(role);
             userRoles.add(authority);

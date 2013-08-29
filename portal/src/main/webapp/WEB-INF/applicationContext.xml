@@ -40,6 +40,7 @@
 	<bean id="fascinatorAuthInterceptor"
 		class="com.googlecode.fascinator.portal.security.filter.FascinatorAuthenticationInterceptorFilter">
 		<property name="authManager" ref="fascinatorAuthenticationManager" />
+		<property name="portalSecurityManager" ref="portalSecurityManager" />
 	</bean>
 
 	<bean id="fascinatorAuthenticationManager"

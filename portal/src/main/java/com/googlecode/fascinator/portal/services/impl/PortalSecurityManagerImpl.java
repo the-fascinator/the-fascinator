@@ -34,6 +34,7 @@ import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -44,6 +45,7 @@ import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.googlecode.fascinator.api.access.AccessControlManager;
 import com.googlecode.fascinator.api.authentication.AuthManager;
@@ -66,6 +68,7 @@ import com.googlecode.fascinator.portal.sso.SSOInterface;
  * 
  * @author Greg Pendlebury
  */
+@Component(value = "portalSecurityManager")
 public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /** Prefix for storing SSO parameters whilst round-tripping */
@@ -96,6 +99,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     private AuthManager authManager;
 
     /** Role Manager - user groups */
+    @Resource(name = "fascinatorRoleManager")
     @Inject
     private RolesManager roleManager;
 
