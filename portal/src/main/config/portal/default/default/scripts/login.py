@@ -4,4 +4,10 @@ class LoginData:
         pass
 
     def __activate__(self, context):
-		pass
+        request = context["request"]
+        if context["page"].authentication.is_logged_in():
+            if request.getParameter("fromUrl") is not None:
+                context["response"].sendRedirect(request.getParameter("fromUrl"))
+            else:
+                context["response"].sendRedirect("home")
+        pass

@@ -56,3 +56,6 @@ plugins/transformer/jython/.classpath
 portal/.classpath
 
 .gitignore
+/common/bin
+/core/bin
+/portal/bin

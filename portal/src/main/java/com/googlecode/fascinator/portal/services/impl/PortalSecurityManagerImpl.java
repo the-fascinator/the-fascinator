@@ -60,6 +60,7 @@ import com.googlecode.fascinator.portal.JsonSessionState;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.PortalSecurityManager;
 import com.googlecode.fascinator.portal.sso.SSOInterface;
+import com.googlecode.fascinator.portal.tapestry.TapestryRequestUtil;
 
 /**
  * The security manager coordinates access to various security plugins when
@@ -465,7 +466,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         // Find out what page we are on
         String path = request.getAttribute("RequestURI").toString();
         String currentAddress = serverUrlBase + path;
-
+        if (!StringUtils.isEmpty(TapestryRequestUtil.getQueryString(request))) {
+            currentAddress = currentAddress + "?"
+                    + TapestryRequestUtil.getQueryString(request);
+        }
         // Store the portal URL, might be required by implementers to build
         // an interface (images etc).
         session.set("ssoPortalUrl", serverUrlBase + portalId);
