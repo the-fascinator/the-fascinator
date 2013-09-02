@@ -37,6 +37,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.request.DirectXmlRequest;
 import org.slf4j.Logger;
@@ -45,11 +46,13 @@ import org.slf4j.MDC;
 
 /**
  * <p>
- * This plugin implements Event log subscriber using security solr 
- * core within the Fascinator.
+ * This plugin implements Event log subscriber using security solr core within
+ * the Fascinator.
  * 
- * <h3>Configuration</h3> 
- * <p>Standard configuration table:</p>
+ * <h3>Configuration</h3>
+ * <p>
+ * Standard configuration table:
+ * </p>
  * <table border="1">
  * <tr>
  * <th>Option</th>
@@ -113,343 +116,376 @@ import org.slf4j.MDC;
  * <p>
  * None
  * </p>
- *
+ * 
  * @author Linda Octalina
  */
 
 public class SolrEventLogSubscriber implements Subscriber {
 
-    /** Logging */
-    private final Logger log = LoggerFactory
-            .getLogger(SolrEventLogSubscriber.class);
+	/** Logging */
+	private final Logger log = LoggerFactory
+			.getLogger(SolrEventLogSubscriber.class);
 
-    /** Buffer Limit : Document count */
-    private static Integer BUFFER_LIMIT_DOCS = 200;
+	/** Buffer Limit : Document count */
+	private static Integer BUFFER_LIMIT_DOCS = 200;
 
-    /** Buffer Limit : Size */
-    private static Integer BUFFER_LIMIT_SIZE = 1024 * 200;
+	/** Buffer Limit : Size */
+	private static Integer BUFFER_LIMIT_SIZE = 1024 * 200;
 
-    /** Buffer Limit : Time */
-    private static Integer BUFFER_LIMIT_TIME = 30;
+	/** Buffer Limit : Time */
+	private static Integer BUFFER_LIMIT_TIME = 30;
 
-    /** Solr URI */
-    private URI uri;
+	/** Solr URI */
+	private URI uri;
 
-    /** Solr Core */
-    private CommonsHttpSolrServer core;
+	/** Solr Core */
+	private CommonsHttpSolrServer core;
 
-    /** Buffer of documents waiting submission */
-    private List<String> docBuffer;
+	/** Buffer of documents waiting submission */
+	private List<String> docBuffer;
 
-    /** Time the oldest document was written into the buffer */
-    private long bufferOldest;
+	/** Time the oldest document was written into the buffer */
+	private long bufferOldest;
 
-    /** Time the youngest document was written into the buffer */
-    private long bufferYoungest;
+	/** Time the youngest document was written into the buffer */
+	private long bufferYoungest;
 
-    /** Total size of documents currently in the buffer */
-    private int bufferSize;
+	/** Total size of documents currently in the buffer */
+	private int bufferSize;
 
-    /** Buffer Limit : Number of documents */
-    private int bufferDocLimit;
+	/** Buffer Limit : Number of documents */
+	private int bufferDocLimit;
 
-    /** Buffer Limit : Total data size */
-    private int bufferSizeLimit;
+	/** Buffer Limit : Total data size */
+	private int bufferSizeLimit;
 
-    /** Buffer Limit : Maximum age of oldest document */
-    private int bufferTimeLimit;
+	/** Buffer Limit : Maximum age of oldest document */
+	private int bufferTimeLimit;
 
-    /** Run a timer to check the buffer periodically */
-    private Timer timer;
+	/** Run a timer to check the buffer periodically */
+	private Timer timer;
 
-    /** Logging context for timer */
-    private String timerMDC;
+	/** Logging context for timer */
+	private String timerMDC;
 
-    /**
-     * Gets an identifier for this type of plugin. This should be a simple name
-     * such as "file-system" for a storage plugin, for example.
-     * 
-     * @return the plugin type id
-     */
-    @Override
-    public String getId() {
-        return "solr-event-log";
-    }
+	/**
+	 * Gets an identifier for this type of plugin. This should be a simple name
+	 * such as "file-system" for a storage plugin, for example.
+	 * 
+	 * @return the plugin type id
+	 */
+	@Override
+	public String getId() {
+		return "solr-event-log";
+	}
 
-    /**
-     * Gets a name for this plugin. This should be a descriptive name.
-     * 
-     * @return the plugin name
-     */
-    @Override
-    public String getName() {
-        return "Solr Event Log Subscriber";
-    }
+	/**
+	 * Gets a name for this plugin. This should be a descriptive name.
+	 * 
+	 * @return the plugin name
+	 */
+	@Override
+	public String getName() {
+		return "Solr Event Log Subscriber";
+	}
 
-    /**
-     * Gets a PluginDescription object relating to this plugin.
-     * 
-     * @return a PluginDescription
-     */
-    @Override
-    public PluginDescription getPluginDetails() {
-        return new PluginDescription(this);
-    }
+	/**
+	 * Gets a PluginDescription object relating to this plugin.
+	 * 
+	 * @return a PluginDescription
+	 */
+	@Override
+	public PluginDescription getPluginDetails() {
+		return new PluginDescription(this);
+	}
 
-    /**
-     * Initializes the plugin using the specified JSON String
-     * 
-     * @param jsonString JSON configuration string
-     * @throws PluginException if there was an error in initialization
-     */
-    @Override
-    public void init(String jsonString) throws SubscriberException {
-        try {
-            setConfig(new JsonSimpleConfig(jsonString));
-        } catch (IOException e) {
-            throw new SubscriberException(e);
-        }
-    }
+	/**
+	 * Initializes the plugin using the specified JSON String
+	 * 
+	 * @param jsonString
+	 *            JSON configuration string
+	 * @throws PluginException
+	 *             if there was an error in initialization
+	 */
+	@Override
+	public void init(String jsonString) throws SubscriberException {
+		try {
+			setConfig(new JsonSimpleConfig(jsonString));
+		} catch (IOException e) {
+			throw new SubscriberException(e);
+		}
+	}
 
-    /**
-     * Initializes the plugin using the specified JSON configuration
-     * 
-     * @param jsonFile JSON configuration file
-     * @throws SubscriberException if there was an error in initialization
-     */
-    @Override
-    public void init(File jsonFile) throws SubscriberException {
-        try {
-            setConfig(new JsonSimpleConfig(jsonFile));
-        } catch (IOException ioe) {
-            throw new SubscriberException(ioe);
-        }
-    }
+	/**
+	 * Initializes the plugin using the specified JSON configuration
+	 * 
+	 * @param jsonFile
+	 *            JSON configuration file
+	 * @throws SubscriberException
+	 *             if there was an error in initialization
+	 */
+	@Override
+	public void init(File jsonFile) throws SubscriberException {
+		try {
+			setConfig(new JsonSimpleConfig(jsonFile));
+		} catch (IOException ioe) {
+			throw new SubscriberException(ioe);
+		}
+	}
 
-    /**
-     * Initialization of Solr Access Control plugin
-     * 
-     * @param config The configuration to use
-     * @throws AuthenticationException if fails to initialize
-     */
-    private void setConfig(JsonSimpleConfig config) throws SubscriberException {
-        try {
-            // Find our solr index
-            uri = new URI(config.getString(null, "subscriber", getId(), "uri"));
-            if (uri == null) {
-                throw new SubscriberException("No Solr URI provided");
-            }
-            core = new CommonsHttpSolrServer(uri.toURL());
+	/**
+	 * Initialization of Solr Access Control plugin
+	 * 
+	 * @param config
+	 *            The configuration to use
+	 * @throws AuthenticationException
+	 *             if fails to initialize
+	 */
+	private void setConfig(JsonSimpleConfig config) throws SubscriberException {
+		try {
+			// Find our solr index
+			uri = new URI(config.getString(null, "subscriber", getId(), "uri"));
+			if (uri == null) {
+				throw new SubscriberException("No Solr URI provided");
+			}
+			core = new CommonsHttpSolrServer(uri.toURL());
 
-            // Small sleep whilst the solr index is still coming online
-            Thread.sleep(200);
-            // Make sure it is online
-            core.ping();
+			// Small sleep whilst the solr index is still coming online
+			Thread.sleep(200);
+			int pingCount = 0;
+			while (pingCount < 20) {
+				// Make sure it is online
+				try {
+					core.ping();
+					break;
+				} catch (Exception e) {
+					pingCount++;
+					log.error("Can't connect to Solr Server. Attempt "
+							+ pingCount + "of 20", e);
+					if(pingCount == 20) {
+						throw e;
+					}
+					Thread.sleep(1000);
+				}
 
-            // Buffering
-            docBuffer = new ArrayList<String>();
-            bufferSize = 0;
-            bufferOldest = 0;
-            bufferDocLimit = config.getInteger(BUFFER_LIMIT_DOCS,
-                    "subscriber", getId(), "buffer", "docLimit");
-            bufferSizeLimit = config.getInteger(BUFFER_LIMIT_SIZE,
-                    "subscriber", getId(), "buffer", "sizeLimit");
-            bufferTimeLimit = config.getInteger(BUFFER_LIMIT_TIME,
-                    "subscriber", getId(), "buffer", "timeLimit");
+			}
 
-            // Timeout 'tick' for buffer (10s)
-            timer = new Timer("SolrEventLog:" + this.toString(), true);
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    checkTimeout();
-                }
-            }, 0, 10000);
-        } catch (Exception ex) {
-            throw new SubscriberException(ex);
-        }
-    }
+			// Buffering
+			docBuffer = new ArrayList<String>();
+			bufferSize = 0;
+			bufferOldest = 0;
+			bufferDocLimit = config.getInteger(BUFFER_LIMIT_DOCS, "subscriber",
+					getId(), "buffer", "docLimit");
+			bufferSizeLimit = config.getInteger(BUFFER_LIMIT_SIZE,
+					"subscriber", getId(), "buffer", "sizeLimit");
+			bufferTimeLimit = config.getInteger(BUFFER_LIMIT_TIME,
+					"subscriber", getId(), "buffer", "timeLimit");
 
-    /**
-     * Add a new document into the buffer, and check if submission is required
-     *
-     * @param document : The Solr document to add to the buffer.
-     */
-    private void addToBuffer(String document) {
-        if (timerMDC == null) {
-            timerMDC = MDC.get("name");
-        }
+			// Timeout 'tick' for buffer (10s)
+			timer = new Timer("SolrEventLog:" + this.toString(), true);
+			timer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					checkTimeout();
+				}
+			}, 0, 10000);
+		} catch (Exception ex) {
+			throw new SubscriberException(ex);
+		}
+	}
 
-        int length = document.length();
-        // If this is the first document in the buffer, record its age
-        bufferYoungest = new Date().getTime();
-        if (docBuffer.isEmpty()) {
-            bufferOldest = new Date().getTime();
-            log.debug("=== New buffer starting: {}", bufferOldest);
-        }
-        // Add to the buffer
-        docBuffer.add(document);
-        bufferSize += length;
-        // Check if submission is required
-        checkBuffer();
-    }
+	/**
+	 * Add a new document into the buffer, and check if submission is required
+	 * 
+	 * @param document
+	 *            : The Solr document to add to the buffer.
+	 */
+	private void addToBuffer(String document) {
+		if (timerMDC == null) {
+			timerMDC = MDC.get("name");
+		}
 
-    /**
-     * Method to fire on timeout() events to ensure buffers don't go stale
-     * after the last item in a harvest passes through.
-     *
-     */
-    private void checkTimeout() {
-        if (timerMDC != null) {
-            MDC.put("name", timerMDC);
-        }
-        if (docBuffer.isEmpty()) return;
+		int length = document.length();
+		// If this is the first document in the buffer, record its age
+		bufferYoungest = new Date().getTime();
+		if (docBuffer.isEmpty()) {
+			bufferOldest = new Date().getTime();
+			log.debug("=== New buffer starting: {}", bufferOldest);
+		}
+		// Add to the buffer
+		docBuffer.add(document);
+		bufferSize += length;
+		// Check if submission is required
+		checkBuffer();
+	}
 
-        // How long has the NEWest item been waiting?
-        long wait = ((new Date().getTime()) - bufferYoungest) / 1000;
-        // If the buffer has been updated in the last 20s ignore it
-        if (wait < 20) return;
+	/**
+	 * Method to fire on timeout() events to ensure buffers don't go stale after
+	 * the last item in a harvest passes through.
+	 * 
+	 */
+	private void checkTimeout() {
+		if (timerMDC != null) {
+			MDC.put("name", timerMDC);
+		}
+		if (docBuffer.isEmpty())
+			return;
 
-        // Else, time to flush the buffer
-        log.debug("=== Flushing old buffer: {}s", wait);
-        submitBuffer(true);
-    }
+		// How long has the NEWest item been waiting?
+		long wait = ((new Date().getTime()) - bufferYoungest) / 1000;
+		// If the buffer has been updated in the last 20s ignore it
+		if (wait < 20)
+			return;
 
-    /**
-     * Assess the document buffer and decide is it is ready to submit
-     *
-     */
-    private void checkBuffer() {
-        // Doc count limit
-        if (docBuffer.size() >= bufferDocLimit) {
-            log.debug("=== Buffer check: Doc limit reached '{}'", docBuffer.size());
-            submitBuffer(false);
-            return;
-        }
-        // Size limit
-        if (bufferSize > bufferSizeLimit) {
-            log.debug("=== Buffer check: Size exceeded '{}'", bufferSize);
-            submitBuffer(false);
-            return;
-        }
-        // Time limit
-        long age = ((new Date().getTime()) - bufferOldest) / 1000;
-        if (age > bufferTimeLimit) {
-            log.debug("=== Buffer check: Age exceeded '{}s'", age);
-            submitBuffer(false);
-            return;
-        }
-    }
+		// Else, time to flush the buffer
+		log.debug("=== Flushing old buffer: {}s", wait);
+		submitBuffer(true);
+	}
 
-    /**
-     * Submit all documents currently in the buffer to Solr, then purge
-     *
-     */
-    private void submitBuffer(boolean forceCommit) {
-        int size = docBuffer.size();
-        if (size > 0) {
-            // Debugging
-            //String age = String.valueOf(
-            //        ((new Date().getTime()) - bufferOldest) / 1000);
-            //String length = String.valueOf(bufferSize);
-            //log.debug("Submitting buffer: " + size + " documents, " + length +
-            //        " bytes, " + age + "s");
-            log.debug("=== Submitting buffer: " + size + " documents");
+	/**
+	 * Assess the document buffer and decide is it is ready to submit
+	 * 
+	 */
+	private void checkBuffer() {
+		// Doc count limit
+		if (docBuffer.size() >= bufferDocLimit) {
+			log.debug("=== Buffer check: Doc limit reached '{}'",
+					docBuffer.size());
+			submitBuffer(false);
+			return;
+		}
+		// Size limit
+		if (bufferSize > bufferSizeLimit) {
+			log.debug("=== Buffer check: Size exceeded '{}'", bufferSize);
+			submitBuffer(false);
+			return;
+		}
+		// Time limit
+		long age = ((new Date().getTime()) - bufferOldest) / 1000;
+		if (age > bufferTimeLimit) {
+			log.debug("=== Buffer check: Age exceeded '{}s'", age);
+			submitBuffer(false);
+			return;
+		}
+	}
 
-            // Concatenate all documents in the buffer
-            String submission = "";
-            for (String doc : docBuffer) {
-                submission += doc;
-                //log.debug("DOC: {}", doc);
-            }
+	/**
+	 * Submit all documents currently in the buffer to Solr, then purge
+	 * 
+	 */
+	private void submitBuffer(boolean forceCommit) {
+		int size = docBuffer.size();
+		if (size > 0) {
+			// Debugging
+			// String age = String.valueOf(
+			// ((new Date().getTime()) - bufferOldest) / 1000);
+			// String length = String.valueOf(bufferSize);
+			// log.debug("Submitting buffer: " + size + " documents, " + length
+			// +
+			// " bytes, " + age + "s");
+			log.debug("=== Submitting buffer: " + size + " documents");
 
-            // Submit if the result is valid
-            if (!submission.equals("")) {
-                // Wrap in the basic Solr 'add' node
-                submission = "<add>" + submission + "</add>";
-                // And submit
-                try {
-                    core.request(new DirectXmlRequest("/update", submission));
-                } catch (Exception ex) {
-                    log.error("Error submitting documents to Solr!", ex);
-                }
-                // Commit if required
-                if (forceCommit) {
-                    log.info("Running forced commit!");
-                    try {
-                        core.commit();
-                    } catch (Exception e) {
-                        log.warn("Solr forced commit failed. Document will" +
-                                " not be visible until Solr autocommit fires." +
-                                " Error message: {}", e);
-                    }
-                }
-            }
-        }
-        purgeBuffer();
-    }
+			// Concatenate all documents in the buffer
+			String submission = "";
+			for (String doc : docBuffer) {
+				submission += doc;
+				// log.debug("DOC: {}", doc);
+			}
 
-    /**
-     * Purge the document buffer
-     *
-     */
-    private void purgeBuffer() {
-        docBuffer.clear();
-        bufferSize = 0;
-        bufferOldest = 0;
-        bufferYoungest = 0;
-    }
+			// Submit if the result is valid
+			if (!submission.equals("")) {
+				// Wrap in the basic Solr 'add' node
+				submission = "<add>" + submission + "</add>";
+				// And submit
+				try {
+					core.request(new DirectXmlRequest("/update", submission));
+				} catch (Exception ex) {
+					log.error("Error submitting documents to Solr!", ex);
+				}
+				// Commit if required
+				if (forceCommit) {
+					log.info("Running forced commit!");
+					try {
+						core.commit();
+					} catch (Exception e) {
+						log.warn(
+								"Solr forced commit failed. Document will"
+										+ " not be visible until Solr autocommit fires."
+										+ " Error message: {}", e);
+					}
+				}
+			}
+		}
+		purgeBuffer();
+	}
 
-    /**
-     * Shuts down the plugin
-     * 
-     * @throws SubscriberException if there was an error during shutdown
-     */
-    @Override
-    public void shutdown() throws SubscriberException {
-        timer.cancel();
-    }
+	/**
+	 * Purge the document buffer
+	 * 
+	 */
+	private void purgeBuffer() {
+		docBuffer.clear();
+		bufferSize = 0;
+		bufferOldest = 0;
+		bufferYoungest = 0;
+	}
 
-    /**
-     * Add the event to the index
-     *
-     * @param param : Map of key/value pairs to add to the index
-     * @throws Exception if there was an error
-     */
-    private void addToIndex(Map<String, String> param) throws Exception {
-        String doc = writeUpdateString(param);
-        addToBuffer(doc);
-    }
+	/**
+	 * Shuts down the plugin
+	 * 
+	 * @throws SubscriberException
+	 *             if there was an error during shutdown
+	 */
+	@Override
+	public void shutdown() throws SubscriberException {
+		timer.cancel();
+	}
 
-    /**
-     * Turn a a message into a Solr document
-     *
-     * @param param : Map of key/value pairs to add to the index
-     */
-    private String writeUpdateString(Map<String, String> param) {
-        String fieldStr = "";
-        for (String paramName : param.keySet()) {
-            fieldStr += "<field name=\"" + paramName + "\">" +
-                    StringEscapeUtils.escapeXml(param.get(paramName)) +
-                    "</field>";
-        }
-        return "<add><doc>" + fieldStr + "</doc></add>";
-    }
+	/**
+	 * Add the event to the index
+	 * 
+	 * @param param
+	 *            : Map of key/value pairs to add to the index
+	 * @throws Exception
+	 *             if there was an error
+	 */
+	private void addToIndex(Map<String, String> param) throws Exception {
+		String doc = writeUpdateString(param);
+		addToBuffer(doc);
+	}
 
-    /**
-     * Method to fire for incoming events
-     *
-     * @param param : Map of key/value pairs to add to the index
-     * @throws SubscriberException if there was an error
-     */
-    @Override
-    public void onEvent(Map<String, String> param) throws SubscriberException {
-        try {
-            addToIndex(param);
-        } catch (Exception e) {
-            throw new SubscriberException("Fail to add log to solr"
-                    + e.getMessage());
-        }
-    }
+	/**
+	 * Turn a a message into a Solr document
+	 * 
+	 * @param param
+	 *            : Map of key/value pairs to add to the index
+	 */
+	private String writeUpdateString(Map<String, String> param) {
+		String fieldStr = "";
+		for (String paramName : param.keySet()) {
+			fieldStr += "<field name=\"" + paramName + "\">"
+					+ StringEscapeUtils.escapeXml(param.get(paramName))
+					+ "</field>";
+		}
+		return "<add><doc>" + fieldStr + "</doc></add>";
+	}
+
+	/**
+	 * Method to fire for incoming events
+	 * 
+	 * @param param
+	 *            : Map of key/value pairs to add to the index
+	 * @throws SubscriberException
+	 *             if there was an error
+	 */
+	@Override
+	public void onEvent(Map<String, String> param) throws SubscriberException {
+		try {
+			addToIndex(param);
+		} catch (Exception e) {
+			throw new SubscriberException("Fail to add log to solr"
+					+ e.getMessage());
+		}
+	}
 
 }
