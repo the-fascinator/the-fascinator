@@ -76,6 +76,7 @@ import com.googlecode.fascinator.api.storage.StorageException;
  */
 public class PythonUtils {
     private static Logger log = LoggerFactory.getLogger(PythonUtils.class);
+    private static String DEFAULT_ACCESS_PLUGIN = "hibernateAccessControl";
 
     /** Security */
     private AccessControlManager access;
@@ -90,8 +91,11 @@ public class PythonUtils {
     private Session session;
     private MessageProducer producer;
     private Map<String, Destination> destinations;
+    private JsonSimple config;
+    private String current_access_plugin;
 
     public PythonUtils(JsonSimpleConfig config) throws PluginException {
+        this.config = config;
         // Security
         String accessControlType = "accessmanager";
         access = PluginManager.getAccessManager(accessControlType);
@@ -121,6 +125,14 @@ public class PythonUtils {
             destinations = new HashMap<String, Destination>();
         } catch (JMSException ex) {
             throw new PluginException(ex);
+        }
+        String access_plugin = config.getString(DEFAULT_ACCESS_PLUGIN,
+                "accesscontrol", "type");
+        if (access_plugin.indexOf(",") >= 0) {
+            String[] plugin_list = access_plugin.split(",");
+            current_access_plugin = plugin_list[0];
+        } else {
+            current_access_plugin = access_plugin;
         }
     }
 
@@ -381,6 +393,16 @@ public class PythonUtils {
     }
 
     /*****
+     * Return an empty access control schema from the first plugin on the list
+     * 
+     * @return AccessControlSchema returned by the first plugin on the list
+     */
+    public AccessControlSchema getAccessSchema() {
+        access.setActivePlugin(current_access_plugin);
+        return access.getEmptySchema();
+    }
+
+    /*****
      * Return an empty access control schema from the given plugin
      * 
      * @param plugin to request the schema from
@@ -407,6 +429,25 @@ public class PythonUtils {
 
         try {
             access.setActivePlugin(plugin);
+            access.applySchema(schema);
+        } catch (AccessControlException ex) {
+            log.error("Failed to add new access schema", ex);
+        }
+    }
+
+    /*****
+     * Submit a new access control schema to the current security plugin
+     * 
+     * @param schema to submit
+     * @param plugin to submit to
+     */
+    public void setAccessSchema(AccessControlSchema schema) {
+        if (access == null) {
+            return;
+        }
+
+        try {
+            access.setActivePlugin(current_access_plugin);
             access.applySchema(schema);
         } catch (AccessControlException ex) {
             log.error("Failed to add new access schema", ex);

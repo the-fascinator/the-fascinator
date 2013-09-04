@@ -521,6 +521,13 @@
 											<type>zip</type>
 											<version>0.1-SNAPSHOT</version>
 										</artifactItem>
+										<artifactItem>
+											<groupId>com.googlecode.the-fascinator.plugins</groupId>
+											<artifactId>plugin-access-derby</artifactId>
+										    <classifier>hibernate</classifier>  
+											<type>zip</type>
+											<version>1.2-SNAPSHOT</version>
+										</artifactItem>
 									</artifactItems>
 								</configuration>
 							</execution>
