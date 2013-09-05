@@ -7,17 +7,42 @@
 #if ($help)
 	<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 #end
-#if (!$format) #set($format="yy-mm-dd") #end
-#if (!$changeMonth) #set($changeMonth="true") #end
-#if (!$changeYear) #set($changeYear="true") #end	
+#if(!$format) #set($format="yy-mm-dd") #end
+#if(!$changeMonth) #set($changeMonth="true") #end
+#if(!$changeYear) #set($changeYear="true") #end
+#if(!$changeYear) #set($changeYear="true") #end	
+#if(!$currentText) #set($currentText = "Today") #end
+#if(!$closeText) #set($closeText = "Done") #end
+
+## $options: are boolean options, set in string format
 ##set($options = "numberOfMonths: 3, showButtonPanel: true")
 ##set($options = "showOtherMonths: true, selectOtherMonths: true")
+## Other options are used:
+##        showButtonPanel: true,
+
 <script>
  $(function() {
 	 $("[id='$field-name']").datepicker({
 		 dateFormat: '$format',
 		 changeMonth: $changeMonth,
-		 changeYear: $changeYear#if($options),$options#end
-		 });
+		 changeYear: $changeYear,
+         currentText: '$currentText',
+         closeText: '$closeText',
+         onClose: function(dateText, inst) {  
+             var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val(); 
+             var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val(); 
+             var day = inst.selectedDay;
+             $(this).val(jQuery.datepicker.formatDate($(this).datepicker( "option", "dateFormat" ), new Date(year, month, day, "00", "00", "00", "00") )); 
+         }
+         #if($options),$options#end
+	 });
+    $("[id='$field-name']").focus(function () {
+        #if($month-year) $(".ui-datepicker-calendar").hide(); #end
+        $("#ui-datepicker-div").position({
+            my: "center top",
+            at: "center bottom",
+            of: $(this)
+        });    
+    });
  });
 </script>
