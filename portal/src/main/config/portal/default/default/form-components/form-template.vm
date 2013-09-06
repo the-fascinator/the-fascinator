@@ -154,7 +154,7 @@
     		
         	$("[id='"+fieldId+"-errorButton']").click(function() { $("[id='"+validation["focusId"]+"']").focus();});
         }
-    	
+    	window.location.hash = '#errorbox-list';
 	}
     
     function matchesPrefix(field,prefixes) {
