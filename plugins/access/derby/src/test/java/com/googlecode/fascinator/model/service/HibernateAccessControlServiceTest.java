@@ -47,7 +47,7 @@ public class HibernateAccessControlServiceTest {
 	@Test
 	public void testNewRecord() {
 		String recordId = String.valueOf(System.currentTimeMillis());
-		Record inserted = hibernateAccessControlService.newRecord(recordId);
+		Record inserted = hibernateAccessControlService.createOrGetRecord(recordId);
 		Record fromDb = hibernateAccessControlService.getRecord(recordId);
 		assertEquals(inserted, fromDb);
 	}

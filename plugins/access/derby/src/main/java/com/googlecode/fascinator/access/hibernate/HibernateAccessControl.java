@@ -197,7 +197,7 @@ public class HibernateAccessControl implements AccessControl {
 			}
 		}
 		if (users.isEmpty()) {
-			hibernateService.newRecord(recordId);
+			hibernateService.createOrGetRecord(recordId);
 		}
 		hibernateService.grantUserAccess(recordId, username);
 	}
@@ -212,7 +212,7 @@ public class HibernateAccessControl implements AccessControl {
 			}
 		}
 		if (roles.isEmpty()) {
-			hibernateService.newRecord(recordId);
+			hibernateService.createOrGetRecord(recordId);
 		}
 		hibernateService.grantRoleAccess(recordId, role);
 	}

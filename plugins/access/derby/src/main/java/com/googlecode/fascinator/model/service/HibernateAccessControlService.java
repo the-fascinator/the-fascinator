@@ -71,10 +71,15 @@ public class HibernateAccessControlService {
 		return userDao.query("getUsers", params);
 	}
 	
-	public Record newRecord(String recordId) {
-		Record newRec = new Record(recordId);
-		recordDao.create(newRec);
-		return newRec;
+	public Record createOrGetRecord(String recordId) {
+		Record oldRec = getRecord(recordId);
+		if (oldRec != null) {
+			return oldRec;
+		} else {
+			Record newRec = new Record(recordId);
+			recordDao.create(newRec);
+			return newRec;
+		}
 	}
 	
 	public Record getRecord(String recordId) {
