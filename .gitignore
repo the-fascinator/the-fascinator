@@ -56,3 +56,9 @@ plugins/transformer/jython/.classpath
 portal/.classpath
 
 .gitignore
+/common/bin
+/core/bin
+/plugin-api/bin
+/plugins/access/derby/bin
+/plugins/authentication/filesystem/bin
+/plugins/authentication/internal/bin
