@@ -42,6 +42,8 @@ import com.googlecode.fascinator.api.authentication.AuthenticationException;
 import com.googlecode.fascinator.api.authentication.User;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUserService;
 import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
@@ -209,12 +211,20 @@ public class AuthenticationManager implements AuthManager {
                 try {
                     org.springframework.security.core.Authentication auth = authenticationManager
                             .authenticate(token);
+                    HibernateUserService hibernateAuthUserService = (HibernateUserService) ApplicationContextProvider
+                            .getApplicationContext().getBean(
+                                    "hibernateAuthUserService");
+                    log.debug("Auth manager adding user through hibernate...");
+                    hibernateAuthUserService.addUser(new HibernateUser(user));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } catch (BadCredentialsException e) {
                     // TODO: When we move completely to Spring Security we'll
                     // need to handle this.
                     // Our custom AuthManager will never throw this exception
                     // for the time being
+                } catch (Exception e) {
+                    // Ignoring as with most in this class...
+                    log.error("Exception thrown at Auth Manager:", e);
                 }
                 return user;
             } catch (AuthenticationException e) {

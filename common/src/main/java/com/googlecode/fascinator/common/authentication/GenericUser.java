@@ -19,13 +19,13 @@
 
 package com.googlecode.fascinator.common.authentication;
 
-import com.googlecode.fascinator.api.authentication.User;
-import com.googlecode.fascinator.common.JsonObject;
-
 import java.lang.reflect.Field;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.authentication.User;
+import com.googlecode.fascinator.common.JsonObject;
 
 /**
  * A basic user object, does not define its metadata schema, that is left to
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 public class GenericUser implements User {
     private Logger log = LoggerFactory.getLogger(GenericUser.class);
     private JsonObject response;
-    private String username;
-    private String authenticationSource;
+    protected String username;
+    protected String authenticationSource;
 
     /**
      * Will return a JSON string description of an extending classes' fields.
