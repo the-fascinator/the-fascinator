@@ -2,9 +2,11 @@
 
 #set($checkbox_id = 1)
 #foreach( $box in $boxes )
-    <label #if( $multiline )style="display:block;"><input name="$field-name" id="${field-name}.${checkbox_id}" class="jaffa-field"
-    #if( $box.checked ) checked="checked" #end 
-    type="checkbox"   #end value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
-   
+    <label 
+	#if( $multiline )  
+		 #if ($additional-class) class="$additional-class" #else style="display:block;" #end>
+		  <input  type="checkbox"  class="jaffa-field" name="$field-name" id="${field-name}.${checkbox_id}"
+		  #if( $box.checked ) checked="checked" #end 
+    #end value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
     #set($checkbox_id = $checkbox_id + 1)
 #end
