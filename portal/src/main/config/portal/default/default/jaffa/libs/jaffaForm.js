@@ -122,6 +122,7 @@ function jaffaForm(jaffaObject) {
             		element[i].checked = false;
             		if(element[i].value == value) {
             			element[i].checked = true;
+                        element.trigger('change');
             		}
             	}
             	return value; // a none null value
