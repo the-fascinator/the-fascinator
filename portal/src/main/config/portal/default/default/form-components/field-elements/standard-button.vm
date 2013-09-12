@@ -1,7 +1,11 @@
+## Save and redirect closeUrl if it is needed. If oid is needed, set appendOID: true
 #set($oid = $formData.get("oid"))
 <button id="$button-name" value="$action" #if($additional-classes)class="$additional-classes"#end>$label</button>
 <script type="text/javascript">
 $('#$button-name').click(function () { action= $(this).val();
-#if($closeUrl) closeUrl="$portalPath/$closeUrl"; #end
-								   	    jaffa.form.save();});
+#if($closeUrl) 
+	#if($appendOID) closeUrl="$portalPath/$closeUrl/$oid"; 
+	#else closeUrl="$portalPath/$closeUrl"; #end
+#end
+jaffa.form.save();});
 </script>

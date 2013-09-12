@@ -3,10 +3,12 @@
 <button id="$button-name" value="$action" >$label</button>
 <script type="text/javascript">
 $('#$button-name').click(function () { action= $(this).val();
-#if($closeUrl) closeUrl="$portalPath/$closeUrl"; #end
-										 if(validateSubmit()) {
-								   	    jaffa.form.save(true);
-								   	    }});
+	#if($closeUrl) 
+		#if($appendOID) closeUrl="$portalPath/$closeUrl/$oid"; 
+		#else closeUrl="$portalPath/$closeUrl"; #end
+	#end
+	 if(validateSubmit()) {  jaffa.form.save(true);  }
+});
 								   	    
 $(document).ready(function() {
 	function toggleSubmitButton() {
