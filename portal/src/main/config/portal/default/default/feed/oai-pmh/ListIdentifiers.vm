@@ -7,7 +7,7 @@
         </header>
     #end
 
-    #if ($self.getToken() != $nullValue)
-        <resumptionToken>$self.getToken().getToken():$self.getToken().getStart()</resumptionToken>
+    #if ($self.getToken().getToken() != $nullValue)
+        <resumptionToken>$self.getToken().getNextToken()</resumptionToken>
     #end
 </ListIdentifiers>

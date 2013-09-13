@@ -19,42 +19,37 @@ from java.sql import Timestamp
 from org.apache.commons.lang import StringEscapeUtils
 
 class ResumptionToken:
-    def __init__(self, token=None, start=0, metadataPrefix="", sessionExpiry=300000):
+    def __init__(self, token=None, metadataPrefix="", nextToken="", resultJson="", sessionExpiry=300000):
         if token is None:
             random.seed()
             token = "%016x" % random.getrandbits(128)
         self.__token = token
-        self.__start = start
         self.__metadataPrefix = metadataPrefix
-        self.__totalFound = 0
+        self.__nextToken = nextToken
+        self.__resultJson = resultJson
         self.__expiry = System.currentTimeMillis() + sessionExpiry
 
+    def getNextToken(self):
+        return self.__nextToken
+    
+    def getResultJson(self):
+        return self.__resultJson
+    
     def getExpiry(self):
         return self.__expiry
 
     def getMetadataPrefix(self):
         return self.__metadataPrefix
-
-    def getStart(self):
-        return self.__start
-
+   
     def getToken(self):
         return self.__token
 
     def resetExpiry(self, expiry):
         self.__expiry = System.currentTimeMillis() + expiry
 
-    def getTotalFound(self):
-        return self.__totalFound
-
     def setExpiry(self, expiry):
         self.__expiry = expiry
 
-    def setStart(self, start):
-        self.__start = start
-
-    def setTotalFound(self, totalFound):
-        self.__totalFound = totalFound
 
 class TokensDatabase:
     def __init__(self, context):
@@ -63,7 +58,7 @@ class TokensDatabase:
         self.dbName = "oaiTokens"
         self.error = False
         self.errorMsg = ""
-
+        
         # Does the database already exist?
         check = self.check()
         if check is None and not self.error:
@@ -109,8 +104,8 @@ CREATE TABLE resumptionTokens
 (token VARCHAR(50) NOT NULL,
 metadataPrefix VARCHAR(50) NOT NULL,
 expiry TIMESTAMP NOT NULL,
-totalFound INT NOT NULL,
-start INT NOT NULL,
+resultJson LONG VARCHAR NOT NULL,
+nextToken VARCHAR(50),
 PRIMARY KEY (token))
 """
             index = "resumptionTokens-CREATE"
@@ -134,8 +129,8 @@ PRIMARY KEY (token))
             "token": tokenObject.getToken(),
             "metadataPrefix": tokenObject.getMetadataPrefix(),
             "expiry": Timestamp(tokenObject.getExpiry()),
-            "totalFound": tokenObject.getTotalFound(),
-            "start": tokenObject.getStart()
+            "nextToken": tokenObject.getNextToken(),
+            "resultJson": tokenObject.getResultJson()
         }
         #self.log.debug("=== storeToken()")
         #self.log.debug("=== TOKEN: '{}'", tokenObject.getToken())
@@ -232,17 +227,12 @@ WHERE  token = ?
             # 4: Remove the extraneous trailing zero and re-attach microseconds
             expiry = "%s%s" % (epoch.replace(".0", ""), mSecs)
 
-            totalFound = result.get(0).get("TOTALFOUND")
-            start = result.get(0).get("START")
-            #self.log.debug("=== getToken()")
-            #self.log.debug("=== TOKEN: '{}'", tokenId)
-            #self.log.debug("=== METADATAPREFIX: '{}'", metadataPrefix)
-            #self.log.debug("=== EXPIRY: '{}'", expiry)
-            #self.log.debug("=== TOTALFOUND: '{}'", totalFound)
-            #self.log.debug("=== START: '{}'", start)
-            token = ResumptionToken(tokenId, start, metadataPrefix)
+            nextToken = result.get(0).get("NEXTTOKEN")
+            resultJson = result.get(0).get("RESULTJSON")
+            
+            token = ResumptionToken(tokenId, metadataPrefix,nextToken,resultJson)
             token.setExpiry(expiry)
-            token.setTotalFound(totalFound)
+            
             return token
         except Exception, e:
             # Something is wrong
@@ -257,7 +247,7 @@ WHERE  token = ?
         message = error.getMessage()
         i = message.find(":")
         if i != -1:
-            return message[i+1:].strip()
+            return message[i + 1:].strip()
         else:
             return message.strip()
 
@@ -465,15 +455,10 @@ class OaiData:
         # Check if there's a resumption token in the formData
         self.__currentToken = None
         resumptionToken = self.vc("formData").get("resumptionToken")
+        
         if resumptionToken is not None:
-            # Split out the start component from the actual resumption token
-            (resumptionTokenPart,start) = resumptionToken.strip().split(":") 
-            # This could still be be null
-            self.__currentToken = self.tokensDB.getToken(resumptionTokenPart)
-            # Code to handle null token is handled later on
-            if self.__currentToken is not None:
-                self.__currentToken.setStart(start)
-            
+            token = self.tokensDB.getToken(resumptionToken)
+            self.__currentToken = token
 
         # Process/parse the request we've received for validity
         self.vc("request").setAttribute("Content-Type", "text/xml")
@@ -492,9 +477,16 @@ class OaiData:
             if self.__metadataPrefix is None:
                 self.__metadataPrefix = self.__currentToken.getMetadataPrefix()
 
+            if resumptionToken is None:
+                self.__buildResumptionTokenSets()
+            else:
+                self.__result = SolrResult(self.__currentToken.getResultJson())
+            
+                    
             # Only list records if the metadata format is enabled in this view
-            if self.isInView(self.__metadataPrefix):
-                self.__search()
+            if self.isInView(self.__metadataPrefix) == False:
+                self.__result = None
+            
 
     # Get from velocity context
     def vc(self, index):
@@ -504,7 +496,7 @@ class OaiData:
             self.log.error("ERROR: Requested context entry '" + index + "' doesn't exist")
             return None
 
-    def isInView(self, format, view = None):
+    def isInView(self, format, view=None):
         # Sanity check
         if format is None or format == "":
             return False
@@ -569,12 +561,11 @@ class OaiData:
                 elementStr += "<%s>%s</%s>" % (elementName, value, elementName)
         return elementStr
 
-    def __search(self):
+    def __buildResumptionTokenSets(self):
         self.__result = SolrResult(None)
 
         portal = self.services.getPortalManager().get(self.__portalName)
         recordsPerPage = portal.recordsPerPage
-
         # Resolve our identifier
         id = self.vc("formData").get("identifier")
         query = "*:*"
@@ -624,20 +615,8 @@ class OaiData:
                 req.addParam("fq", queryStr)
 
         # Check if there's resumption token exist in the formData
-        newToken = None
-        if self.__currentToken is not None:
-            start = int(self.__currentToken.getStart())
-            totalFound = int(self.__currentToken.getTotalFound())
-            nextTokenStart = start + recordsPerPage
-            if nextTokenStart < totalFound:
-                newToken = self.__currentToken
-                newToken.resetExpiry(self.__sessionExpiry)
-                newToken.setStart(nextTokenStart)
-        # or start a new resumption token
-        else:
-            start = 0
-            newToken = ResumptionToken(None, recordsPerPage, \
-                        self.__metadataPrefix, self.__sessionExpiry)
+        start = 0
+        
 
         req.setParam("start", str(start))
 
@@ -646,37 +625,41 @@ class OaiData:
         self.__result = SolrResult(ByteArrayInputStream(out.toByteArray()))
 
         totalFound = self.__result.getNumFound()
-        if totalFound == 0:
-            newToken = None
-            # If an ID was requested, and not found, this is an error
-            if id is not None and id != "":
-                self.__request.setError("idDoesNotExist", "ID: '%s' not found" % id)
-            else:
-                self.__request.setError("noRecordsMatch", "No records match this request")
-
-        # We need to store this for NEW tokens
-        elif self.__currentToken is None:
-            # Assuming there are enough results to even keep the token
-            if newToken.getStart() < totalFound:
-                newToken.setTotalFound(totalFound)
-            else:
-                newToken = None
-        # Check if we need to remove the resumption token
-        else:
-            if (start + recordsPerPage) >= totalFound:
-                self.tokensDB.removeToken(self.__currentToken)
-                self.lastPage = True
-
-        # Store/update the resumption token
-        if newToken is not None:
-            # Brand new token
-            if self.__currentToken is None:
-                self.tokensDB.storeToken(newToken)
-            # Or update an old token
-            else:
-                self.tokensDB.updateToken(newToken)
-            self.__currentToken = newToken
-
+        
+        if totalFound > recordsPerPage:
+            
+            startRow = recordsPerPage
+            random.seed()
+            resumptionToken = "%016x" % random.getrandbits(128)
+            
+            nextResumptionToken = "%016x" % random.getrandbits(128)
+            firstLoop = True
+            while True:
+                
+                req.setParam("start", str(startRow)) 
+                out = ByteArrayOutputStream()
+                self.services.indexer.search(req, out)
+                result = SolrResult(ByteArrayInputStream(out.toByteArray()))
+                
+                tokenObject = ResumptionToken(resumptionToken,self.__metadataPrefix,nextResumptionToken,result.toString())
+                
+                if firstLoop:
+                    self.__currentToken = ResumptionToken(None,self.__metadataPrefix,resumptionToken,None) 
+                    firstLoop = False
+                    
+                startRow = startRow + recordsPerPage
+                self.log.debug("Resumption Token: " + nextResumptionToken)
+                if startRow > totalFound:
+                    self.log.debug(str(startRow) + " " + str(totalFound))
+                    tokenObject = ResumptionToken(resumptionToken,self.__metadataPrefix,"",result.toString())
+                    self.tokensDB.storeToken(tokenObject)
+                    break
+                self.tokensDB.storeToken(tokenObject)
+                
+                
+                resumptionToken = nextResumptionToken
+                nextResumptionToken = "%016x" % random.getrandbits(128)
+                    
     def getToken(self):
         if self.isInView(self.__metadataPrefix) and not self.lastPage:
             return self.__currentToken
