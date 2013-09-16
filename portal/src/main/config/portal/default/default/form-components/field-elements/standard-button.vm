@@ -1,7 +1,6 @@
 ## Save and redirect closeUrl if it is needed. If oid is needed, set appendOID: true
-## action: can be an action simpleworkflow.ajax understands or close for closing without saving
 #set($oid = $formData.get("oid"))
-<button id="$button-name" value="$action" #if($additional-classes)class="$additional-classes"#end>$label</button>
+<button id="$button-name" value="$action" #if($additional-classes)class="$additional-classes"#end #if($skip-validation) data-skip-validation="true" #end>$label</button>
 <script type="text/javascript">
 $('#$button-name').click( function () { 
 	action= $(this).val();
@@ -17,8 +16,13 @@ $('#$button-name').click( function () {
 		window.location = closeUrl;
 		}
 	} else {
-		jaffa.form.save();
+		if ($(this).data('skip-validation') == true) {
+			skipValidation = true;
+			jaffa.form.save(true);
+		} else {
+			jaffa.form.save();
 		}
 	}
+}
 );
 </script>
