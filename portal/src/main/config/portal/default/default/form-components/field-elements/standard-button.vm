@@ -1,11 +1,24 @@
 ## Save and redirect closeUrl if it is needed. If oid is needed, set appendOID: true
+## action: can be an action simpleworkflow.ajax understands or close for closing without saving
 #set($oid = $formData.get("oid"))
 <button id="$button-name" value="$action" #if($additional-classes)class="$additional-classes"#end>$label</button>
 <script type="text/javascript">
-$('#$button-name').click(function () { action= $(this).val();
-#if($closeUrl) 
-	#if($appendOID) closeUrl="$portalPath/$closeUrl/$oid"; 
-	#else closeUrl="$portalPath/$closeUrl"; #end
-#end
-jaffa.form.save();});
+$('#$button-name').click( function () { 
+	action= $(this).val();
+	#if($closeUrl) 
+		#if($appendOID) closeUrl="$portalPath/$closeUrl/$oid"; 
+		#else closeUrl="$portalPath/$closeUrl"; #end
+	#end
+	if (action == 'close') {
+		var r=confirm("Are you sure to close without saving?");
+		if (r==false) {
+		  return;
+		} else {
+		window.location = closeUrl;
+		}
+	} else {
+		jaffa.form.save();
+		}
+	}
+);
 </script>
