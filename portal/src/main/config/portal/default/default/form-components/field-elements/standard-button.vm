@@ -1,28 +1,30 @@
 ## Save and redirect closeUrl if it is needed. If oid is needed, set appendOID: true
 #set($oid = $formData.get("oid"))
-<button id="$button-name" value="$action" #if($additional-classes)class="$additional-classes"#end #if($skip-validation) data-skip-validation="true" #end>$label</button>
+<button id="$button-name" #if($action) value="$action" #end 
+#if($additional-classes)class="$additional-classes"#end>$label</button>
 <script type="text/javascript">
 $('#$button-name').click( function () { 
-	action= $(this).val();
 	#if($closeUrl) 
 		#if($appendOID) closeUrl="$portalPath/$closeUrl/$oid"; 
 		#else closeUrl="$portalPath/$closeUrl"; #end
 	#end
-	if (action == 'close') {
+	#if($closeWithoutSaving)
 		var r=confirm("Are you sure to close without saving?");
 		if (r==false) {
 		  return;
 		} else {
 		window.location = closeUrl;
 		}
-	} else {
-		if ($(this).data('skip-validation') == true) {
-			skipValidation = true;
+	#else
+		action= $(this).val();
+		#if($skipValidation)
+			skipValidation = true; ## Used by form-template::preSave 
 			jaffa.form.save(true);
-		} else {
+		#else
+			skipValidation = false; ## Clean previous setting
 			jaffa.form.save();
-		}
-	}
+		#end
+	#end	
 }
 );
 </script>

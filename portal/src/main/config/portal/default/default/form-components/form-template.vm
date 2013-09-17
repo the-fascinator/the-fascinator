@@ -3,7 +3,8 @@
 	var action = null;
 	var objectMetadataParams = null;
 	var closeUrl = null; 
-	    
+    var skipValidation = false;
+    
     // Fix in case there are some unchecked logging statements
     if(!window.console) {
         var console = {
@@ -168,9 +169,12 @@
     	return null;
     }
     
-    
     function preSave() {
-    	return validateSave();
+		if (skipValidation) {
+		    return true;
+		} else {
+		    return validateSave();
+		}
     }
 
 	function validateSubmit() {
