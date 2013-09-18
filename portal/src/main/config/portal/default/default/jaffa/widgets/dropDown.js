@@ -75,7 +75,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
 
             // Label
             var label = this.getConfig("label");
-            if (label != null) {
+            if (label != null && label.trim() != "") {
                 ui.append("<label for=\""+this.field+"\" class=\"widgetLabel\">"+label+"</label>");
             }
 
@@ -136,14 +136,14 @@ var DropDownWidgetBuilder = function($, jaffa) {
                     	select.append(option);
 	                }
 	            }
-            	
             }
             else{
 	            for (var i = 0; i < len; i++) {
 	                if (defaultValue == this.dropDownData[i].value) {
-	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
-                	option.attr('value', this.dropDownData[i].value);
-                    select.append(option);
+	                    var option = $("<option selected=\"selected\" value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
+                	    option.attr('value', this.dropDownData[i].value);
+                	    select.append(option);
+                        jaffa.form.value(this.labelField, this.dropDownData[i].label);
 	                } else {
 	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
                 		option.attr('value', this.dropDownData[i].value);
@@ -156,7 +156,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
 
             // Have we been asked to store the label?
             this.labelField = this.getConfig("label-field");
-            if (this.labelField != null) {
+            if (this.labelField != null && this.labelField.trim() != "") {
                 ui.append("<input type=\"hidden\" id=\""+this.labelField+"\" />");
                 jaffa.form.addField(this.labelField, this.id());
             }
