@@ -114,6 +114,7 @@ public class ProcessingSetJob implements StatefulJob {
             try {
                 Class procClass = Class.forName(procClassName);
                 Processor procInst = (Processor) procClass.newInstance();
+                dataMap.put(procClassName, procInst);
                 procInst.process(procId, procInputKey, procOutputKey,
                         stageName, procConfigPath, dataMap);
             } catch (Exception e) {

@@ -45,11 +45,10 @@ public class HibernateUserService {
     private GenericDao<HibernateUserAttribute, Long> hibernateAuthUserAttributeDao;
 
     private final Logger log = LoggerFactory
-
-    .getLogger(HibernateUserService.class);
+            .getLogger(HibernateUserService.class);
 
     @Transactional
-    public void addUser(HibernateUser user) throws Exception {
+    public synchronized void addUser(HibernateUser user) throws Exception {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("username", user.getUsername());
         params.put("source", user.getSource());
@@ -71,12 +70,12 @@ public class HibernateUserService {
     }
 
     @Transactional
-    public void saveUser(HibernateUser user) {
+    public synchronized void saveUser(HibernateUser user) {
         hibernateAuthUserDao.update(user);
     }
 
     @Transactional
-    public HibernateUser getUser(String username) {
+    public synchronized HibernateUser getUser(String username) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("username", username);
         List<HibernateUser> users = hibernateAuthUserDao.query("getUser",

@@ -20,15 +20,24 @@ package com.googlecode.fascinator.portal.process;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.mail.ByteArrayDataSource;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailAttachment;
+import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,16 +92,14 @@ public class EmailNotifier implements Processor {
      * the config.
      * 
      * @param solrDoc
-     * @param text
      * @param vars
      * @param config
-     * @return
+     * @param context
      */
-    private String replaceVars(SolrDoc solrDoc, String text, List<String> vars,
-            JsonSimple config) {
+    private void initVars(SolrDoc solrDoc, List<String> vars,
+            JsonSimple config, VelocityContext context) {
         for (String var : vars) {
             String varField = config.getString("", "mapping", var);
-            log.debug("Replacing '" + var + "' using field '" + varField + "'");
             String replacement = solrDoc.getString(var, varField);
             if (replacement == null || "".equals(replacement)) {
                 JSONArray arr = solrDoc.getArray(varField);
@@ -109,9 +116,18 @@ public class EmailNotifier implements Processor {
                     replacement = var;
                 }
             }
-            text = text.replace(var, replacement);
+            log.debug("Getting variable value '" + var + "' using field '"
+                    + varField + "', value:" + replacement);
+            context.put(var.replace("$", ""), replacement);
         }
-        return text;
+    }
+
+    private String evaluateStr(String source, VelocityContext context)
+            throws ParseErrorException, MethodInvocationException,
+            ResourceNotFoundException, IOException {
+        StringWriter writer = new StringWriter();
+        Velocity.evaluate(context, writer, "evaluateStr", source);
+        return writer.toString();
     }
 
     /**
@@ -178,21 +194,20 @@ public class EmailNotifier implements Processor {
             SolrResult resultObject = new SolrResult(result.toString());
             List<SolrDoc> results = resultObject.getResults();
             SolrDoc solrDoc = results.get(0);
-            String subject = replaceVars(solrDoc, subjectTemplate, vars, config);
-            String body = replaceVars(solrDoc, bodyTemplate, vars, config);
+            VelocityContext context = new VelocityContext();
+            initVars(solrDoc, vars, config, context);
+            String subject = evaluateStr(subjectTemplate, context);
+            String body = evaluateStr(bodyTemplate, context);
             String to = config.getString("", "to");
             String from = config.getString("", "from");
-            String recipient = to;
-            if (to.startsWith("$")) {
-                recipient = replaceVars(solrDoc, to, vars, config);
-                if (recipient.startsWith("$")) {
-                    // exception encountered...
-                    log.error("Failed to build the email recipient:'"
-                            + recipient
-                            + "'. Please check the mapping field and verify that it exists and is populated in Solr.");
-                    failedOids.add(oid);
-                    continue;
-                }
+            String recipient = evaluateStr(to, context);
+            if (recipient.startsWith("$")) {
+                // exception encountered...
+                log.error("Failed to build the email recipient:'"
+                        + recipient
+                        + "'. Please check the mapping field and verify that it exists and is populated in Solr.");
+                failedOids.add(oid);
+                continue;
             }
             if (!email(oid, from, recipient, subject, body)) {
                 failedOids.add(oid);
@@ -210,7 +225,7 @@ public class EmailNotifier implements Processor {
      * @param body
      * @return
      */
-    private boolean email(String oid, String from, String recipient,
+    public boolean email(String oid, String from, String recipient,
             String subject, String body) {
         try {
             Email email = new SimpleEmail();
@@ -244,6 +259,42 @@ public class EmailNotifier implements Processor {
             log.debug("Error sending notification mail for oid:" + oid, ex);
             return false;
         }
+        return true;
+    }
+
+    public boolean emailAttachment(String from, String recipient,
+            String subject, String body, byte[] attachData,
+            String attachDataType, String attachFileName, String attachDesc)
+            throws Exception {
+        MultiPartEmail email = new MultiPartEmail();
+        email.attach(new ByteArrayDataSource(attachData, attachDataType),
+                attachFileName, attachDesc, EmailAttachment.ATTACHMENT);
+        log.debug("Email host: " + host);
+        log.debug("Email port: " + port);
+        log.debug("Email username: " + username);
+        log.debug("Email from: " + from);
+        log.debug("Email to: " + recipient);
+        log.debug("Email Subject is: " + subject);
+        log.debug("Email Body is: " + body);
+        email.setHostName(host);
+        email.setSmtpPort(Integer.parseInt(port));
+        email.setAuthenticator(new DefaultAuthenticator(username, password));
+        // the method setSSL is deprecated on the newer versions of commons
+        // email...
+        email.setSSL("true".equalsIgnoreCase(ssl));
+        email.setTLS("true".equalsIgnoreCase(tls));
+        email.setFrom(from);
+        email.setSubject(subject);
+        email.setMsg(body);
+        if (recipient.indexOf(",") >= 0) {
+            String[] recs = recipient.split(",");
+            for (String rec : recs) {
+                email.addTo(rec);
+            }
+        } else {
+            email.addTo(recipient);
+        }
+        email.send();
         return true;
     }
 }
