@@ -1,3 +1,4 @@
-<$type #if ($additional-class) class="$additional-class" #end>#displayMessage($content)<span data-bind="text: $field-name"/>#if ($help)
+<$type #if ($additional-class) class="$additional-class" #end>#displayMessage($content)<span data-bind="text: $field-name"></span>
+#if ($help)
 		<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 #end</$type>
