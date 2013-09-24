@@ -19,6 +19,14 @@
     <from>^/verNum[0-9A-Za-z_.\-]+/([^\.]+)$</from>
     <to type="permanent-redirect">%{context-path}/$1</to>
   </rule>
+  <rule match-type="regex">
+    <name>No cache for pages</name>
+    <note>Set no cache on the response headers for pages</note>	 
+    <from>^/([^\.]+)$</from>
+    <set type="response-header" name="Cache-Control">max-age=0,no-cache,no-store,post-check=0,pre-check=0</set>
+    <set type="response-header" name="Expires">Mon, 26 Jul 1979 12:12:00 GMT</set>
+    <set type="response-header" name="Pragma">no-cache</set>
+  </rule>
   <rule>
     <name>UTF-8 Encoding</name>
     <note>Set UTF-8 Encoding header on some pages</note>
