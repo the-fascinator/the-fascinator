@@ -42,11 +42,13 @@ import com.googlecode.fascinator.api.indexer.SearchRequest;
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Payload;
 import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
 import com.googlecode.fascinator.common.JsonObject;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.common.solr.SolrResult;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * @author Shilo Banihit
@@ -105,63 +107,126 @@ public class HomeInstitutionNotifier implements Processor {
                     targetProp = (String) array.get(0);
                 }
             }
-            log.debug("Target property: " + targetProp);
+            log.debug("Target property value: " + targetProp);
             if (targetProp != null && targetProp.length() > 0) {
                 String channel = (String) homes.get(targetProp).get("channel");
-                log.debug("Using channel:" + channel);
                 if (channel != null) {
-                    String subjectTemplate = config.getString("", channel,
-                            "subject");
-                    String bodyTemplate = config.getString("", channel, "body");
-                    List<String> vars = config.getStringList(channel, "vars");
-
-                    VelocityContext context = new VelocityContext();
-                    initVars(solrDoc, vars, config, context, channel);
-
-                    String subject = evaluateStr(subjectTemplate, context);
-                    String body = evaluateStr(bodyTemplate, context);
-                    String to = config.getString("", channel, "to");
-                    String from = config.getString("", channel, "from");
-                    String recipient = evaluateStr(to, context);
-                    String attachDesc = config.getString("", channel,
-                            "attachDesc");
-                    String attachType = config.getString("", channel,
-                            "attachType");
-                    if (recipient.startsWith("$")) {
-                        // exception encountered...
-                        log.error("Failed to build the email recipient:'"
-                                + recipient
-                                + "'. Please check the mapping field and verify that it exists and is populated in Solr.");
-                        failedOids.add(oid);
-                        continue;
-                    }
-
-                    // send the message to the channel
-                    log.debug("Sending message to channel: " + channel);
-                    // find the proper payload
-                    DigitalObject object = storage.getObject(oid);
-                    Payload payload = object.getPayload(targetPayload);
-                    if (payload != null) {
-                        out = new ByteArrayOutputStream();
-                        IOUtils.copy(payload.open(), out);
-                        payload.close();
+                    log.debug("Using channel:" + channel);
+                    if (channel.endsWith("email")) {
+                        sendEmail(dataMap, failedOids, config, storage, out,
+                                targetPayload, oid, solrDoc, channel);
                     } else {
-                        log.debug("Target payload not found:" + targetPayload);
-                    }
-                    if (out != null) {
-                        EmailNotifier notifier = (EmailNotifier) dataMap
-                                .get(EmailNotifier.class.getName());
+                        log.debug("Sending message through the queue...");
+                        // defaults to queue
+                        MessageqNotifierService notifierService = ApplicationContextProvider
+                                .getApplicationContext().getBean(
+                                        channel + "_service",
+                                        MessageqNotifierService.class);
 
-                        if (!notifier.emailAttachment(recipient, from, subject,
-                                body, out.toByteArray(), attachType,
-                                targetPayload, attachDesc)) {
-                            failedOids.add(oid);
+                        out = extractPayload(storage, out, targetPayload, oid);
+                        if (out != null) {
+                            notifierService.sendMessage(out.toString("UTF-8"));
+                        } else {
+                            log.error("Payload not found: " + targetPayload
+                                    + ", for oid:" + oid);
                         }
                     }
+                } else {
+                    log.debug("Channel configuration not found, ignoring.");
                 }
+            } else {
+                log.debug("Target property has no value, ignoring.");
             }
         }
         return true;
+    }
+
+    /**
+     * @param dataMap
+     * @param failedOids
+     * @param config
+     * @param storage
+     * @param out
+     * @param targetPayload
+     * @param oid
+     * @param solrDoc
+     * @param channel
+     * @throws ParseErrorException
+     * @throws MethodInvocationException
+     * @throws ResourceNotFoundException
+     * @throws IOException
+     * @throws StorageException
+     * @throws Exception
+     */
+    private void sendEmail(HashMap<String, Object> dataMap,
+            HashSet<String> failedOids, JsonSimple config, Storage storage,
+            ByteArrayOutputStream out, String targetPayload, String oid,
+            SolrDoc solrDoc, String channel) throws ParseErrorException,
+            MethodInvocationException, ResourceNotFoundException, IOException,
+            StorageException, Exception {
+        String subjectTemplate = config.getString("", channel, "subject");
+        String bodyTemplate = config.getString("", channel, "body");
+        List<String> vars = config.getStringList(channel, "vars");
+
+        VelocityContext context = new VelocityContext();
+        initVars(solrDoc, vars, config, context, channel);
+
+        String subject = evaluateStr(subjectTemplate, context);
+        String body = evaluateStr(bodyTemplate, context);
+        String to = config.getString("", channel, "to");
+        String from = config.getString("", channel, "from");
+        String recipient = evaluateStr(to, context);
+        String attachDesc = config.getString("", channel, "attachDesc");
+        String attachType = config.getString("", channel, "attachType");
+        if (recipient.startsWith("$")) {
+            // exception encountered...
+            log.error("Failed to build the email recipient:'"
+                    + recipient
+                    + "'. Please check the mapping field and verify that it exists and is populated in Solr.");
+            failedOids.add(oid);
+        } else {
+            // send the message to the channel
+            log.debug("Sending message to channel: " + channel);
+            // find the proper payload
+            out = extractPayload(storage, out, targetPayload, oid);
+            if (out != null) {
+                EmailNotifier notifier = (EmailNotifier) dataMap
+                        .get(EmailNotifier.class.getName());
+
+                if (!notifier.emailAttachment(recipient, from, subject, body,
+                        out.toByteArray(), attachType, targetPayload,
+                        attachDesc)) {
+                    failedOids.add(oid);
+                }
+            } else {
+                log.error("Payload not found: " + targetPayload + ", for oid:"
+                        + oid);
+            }
+        }
+    }
+
+    /**
+     * @param storage
+     * @param out
+     * @param targetPayload
+     * @param oid
+     * @return
+     * @throws StorageException
+     * @throws IOException
+     */
+    private ByteArrayOutputStream extractPayload(Storage storage,
+            ByteArrayOutputStream out, String targetPayload, String oid)
+            throws StorageException, IOException {
+        DigitalObject object = storage.getObject(oid);
+        Payload payload = object.getPayload(targetPayload);
+        if (payload != null) {
+            out = new ByteArrayOutputStream();
+            IOUtils.copy(payload.open(), out);
+            payload.close();
+        } else {
+            log.debug("Target payload not found:" + targetPayload);
+        }
+        return out;
     }
 
     /**
