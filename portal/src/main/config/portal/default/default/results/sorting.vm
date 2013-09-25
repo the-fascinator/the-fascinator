@@ -1,7 +1,8 @@
 #if($hasResult)
     #set($sortFields = $self.sortFields)
     <div class="sorting">
-        <form id="sort-form" action="$portalPath/search" method="post">
+    	#set($portalFormPath = $portalPath.replaceAll("verNum[0-9A-Za-z_.\\-]+/",""))
+        <form id="sort-form" action="$portalFormPath/search" method="post">
             <label for="sort-field">Sort by</label>
             <select id="sort-field" name="sort-field">
                 <option value="score">Relevancy</option>
