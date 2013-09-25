@@ -18,6 +18,8 @@
  */
 package com.googlecode.fascinator.indexer;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +30,11 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.naming.directory.SearchResult;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -61,6 +66,9 @@ import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.PythonUtils;
 import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.common.solr.SolrResult;
+import com.googlecode.fascinator.common.solr.SolrDoc;
+
 
 /**
  * <p>
@@ -993,5 +1001,26 @@ public class SolrIndexer implements Indexer {
             return configCache.get(oid);
         }
         return null;
+    }
+    
+    @Override
+    public List<Object> getJsonObjectWithField(String fieldName, String fieldValue) throws IndexerException {
+        List<Object> objects = new ArrayList<Object>();
+        try  {
+            String query = fieldName + ":" + fieldValue;
+            log.debug("getJsonObjectWithField Query: " + query);
+            SearchRequest request = new SearchRequest(query);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            search(request, out);
+            SolrResult results = new SolrResult(new ByteArrayInputStream(out.toByteArray()));
+            log.debug("getJsonObjectWithField number of results: " + results.getNumFound());
+            for (SolrDoc result : results.getResults()) {
+                objects.add(result);
+            }
+        } catch (Exception ex) {
+            log.debug("getJsonObjectWithField exception : " + ex);
+            throw new IndexerException(ex);
+        }
+        return objects;
     }
 }
