@@ -460,13 +460,13 @@ public class PythonUtils {
      * @param schema to remove
      * @param plugin to remove to
      */
-    public void removeAccessSchema(AccessControlSchema schema, String plugin) {
+    public void removeAccessSchema(AccessControlSchema schema) {
         if (access == null) {
             return;
         }
 
         try {
-            access.setActivePlugin(plugin);
+            access.setActivePlugin(current_access_plugin);
             access.removeSchema(schema);
         } catch (AccessControlException ex) {
             log.error("Failed to revoke existing access schema", ex);
