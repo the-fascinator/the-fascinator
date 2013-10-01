@@ -17,11 +17,23 @@
  ******************************************************************************/
 package com.googlecode.fascinator.portal.process;
 
+import org.springframework.integration.annotation.Header;
+import org.springframework.integration.annotation.Payload;
+
 /**
  * @author Shilo Banihit
  * 
  */
-public interface MessageqNotifierService {
+public interface EmailNotifierService {
+    public void email(@Header("from") String from,
+            @Header("replyTo") String replyTo, @Header("to") String to,
+            @Header("subject") String subject, @Payload String body);
 
-    public void sendMessage(String messageText);
+    public void emailAttachment(@Header("from") String from,
+            @Header("replyTo") String replyTo, @Header("to") String to,
+            @Header("subject") String subject, @Payload String body,
+            @Header("attachData") byte[] attachData,
+            @Header("attachDataType") String attachDataType,
+            @Header("attachFileName") String attachFileName,
+            @Header("attachDesc") String attachDesc);
 }

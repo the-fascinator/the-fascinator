@@ -175,6 +175,7 @@ public class HomeInstitutionNotifier implements Processor {
         String body = evaluateStr(bodyTemplate, context);
         String to = config.getString("", channel, "to");
         String from = config.getString("", channel, "from");
+        String replyTo = config.getString("", channel, "replyTo");
         String recipient = evaluateStr(to, context);
         String attachDesc = config.getString("", channel, "attachDesc");
         String attachType = config.getString("", channel, "attachType");
@@ -190,14 +191,21 @@ public class HomeInstitutionNotifier implements Processor {
             // find the proper payload
             out = extractPayload(storage, out, targetPayload, oid);
             if (out != null) {
-                EmailNotifier notifier = (EmailNotifier) dataMap
-                        .get(EmailNotifier.class.getName());
-
-                if (!notifier.emailAttachment(recipient, from, subject, body,
-                        out.toByteArray(), attachType, targetPayload,
-                        attachDesc)) {
-                    failedOids.add(oid);
-                }
+                // EmailNotifier notifier = (EmailNotifier) dataMap
+                // .get(EmailNotifier.class.getName());
+                // if (!notifier.emailAttachment(recipient, from, subject, body,
+                // out.toByteArray(), attachType, targetPayload,
+                // attachDesc)) {
+                // failedOids.add(oid);
+                // }
+                EmailNotifierService notify_mailService = ApplicationContextProvider
+                        .getApplicationContext().getBean("notify_mailService",
+                                EmailNotifierService.class);
+                notify_mailService.email(from, replyTo, recipient, subject,
+                        body);
+                // notify_mailService.emailAttachment(from, replyTo, recipient,
+                // subject, body, out.toByteArray(), attachType,
+                // targetPayload, attachDesc);
             } else {
                 log.error("Payload not found: " + targetPayload + ", for oid:"
                         + oid);

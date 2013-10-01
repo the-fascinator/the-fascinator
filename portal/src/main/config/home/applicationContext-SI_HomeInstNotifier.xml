@@ -13,10 +13,42 @@
             http://www.springframework.org/schema/integration/jms
             http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd" >
 
+	<!--  Mail Configuration -->
 	
+	<bean id="notify_mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="465" />
+		<property name="username" value="shilo@redboxresearchdata.com.au" />
+		<property name="password" value="Oldtechspw!" />		
+		<property name="javaMailProperties">
+		<props>
+			<prop key="mail.smtp.auth">true</prop>
+			<prop key="mail.smtp.starttls.enable">true</prop>
+		</props>
+		</property>
+	</bean>
+	<int:channel id="notify_homeinst_email_outbound" >
+		<int:interceptors>
+			<int:wire-tap channel="notify_homeinst_loggingChannel" />
+		</int:interceptors>
+	</int:channel>
+	<int:channel id="notify_homeinst_email" />
+	<int:channel id="notify_homeinst_email_withAttachment" />
+	<int-mail:outbound-channel-adapter channel="notify_homeinst_email_outbound" mail-sender="notify_mailSender" />	
+	<int:gateway id="notify_mailService" service-interface="com.googlecode.fascinator.portal.process.EmailNotifierService" default-request-channel="notify_homeinst_email"  >
+		<int:method name="email" request-channel="notify_homeinst_email" />
+		<int:method name="emailAttachment" request-channel="notify_homeinst_email_withAttachment" />		
+	</int:gateway>
+	  
+	<int:transformer input-channel="notify_homeinst_email" output-channel="notify_homeinst_email_outbound" ref="notify_mailTransformer" method="transform"/>
+	<int:transformer input-channel="notify_homeinst_email_withAttachment" output-channel="notify_homeinst_email_outbound" ref="notify_mailTransformer" method="transformWithAttachment"/>		
+    <bean id="notify_mailTransformer" class="com.googlecode.fascinator.portal.process.EmailNotifierTransformer"/>
+    
+    
+    <!--  End of Mail configuration -->
 	<!--  Message Queue configuration -->
 	<int:logging-channel-adapter id="notify_homeinst_loggingChannel"
-		expression="'Sending message to queue...'" />	
+		expression="'Sending notification message...'" />	
 	<!--  
 		Start of broker / request queue specific configuration.
 		
