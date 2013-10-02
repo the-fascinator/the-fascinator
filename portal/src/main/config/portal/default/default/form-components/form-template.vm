@@ -218,6 +218,12 @@ $formFooterHtml
 	prepareHelps();
  	$('#ui-datepicker-div').hide();
  	$('#simpleworkflow-form').block();
+ // Modified based the code from http://bugs.jqueryui.com/ticket/3999 jQuery datepicker hack
+ 	$('.ui-datepicker-clear').click(function(){
+ 		var inst = jQuery(jQuery(this).parent().find("input"));
+		inst.attr('value', '');
+		jQuery.datepicker._clearDate(inst)
+	});
  	$validatorFunctions
  });
 </script>
