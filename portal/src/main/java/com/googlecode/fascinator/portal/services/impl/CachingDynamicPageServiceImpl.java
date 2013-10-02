@@ -44,6 +44,10 @@ import org.python.core.PyObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.common.IndexAndPayloadComposite;
+import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.StorageDataUtil;
 import com.googlecode.fascinator.common.solr.SolrDoc;
@@ -389,11 +393,6 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         }
         // log.debug("parentPageObject: '{}'", parentPageObject);
 
-        objectContext.put("pageName", template);
-        objectContext.put("displayType", displayType);
-        objectContext.put("parent", parentPageObject);
-        objectContext.put("metadata", metadata);
-
         // evaluate the context script if exists
         Set<String> messages = null;
         if (objectContext.containsKey("renderMessages")) {
@@ -402,9 +401,52 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
             messages = new HashSet<String>();
             context.put("renderMessages", messages);
         }
+
+        // get the DigitalObject to replace the metadata with the tfpackage
+        Storage storage = scriptingServices.getStorage();
+        DigitalObject obj = null;
+        JsonSimple tfpackage = null;
+        IndexAndPayloadComposite compositeData = null;
+        try {
+            obj = storage.getObject(metadata.get("id"));
+            if (obj != null) {
+                for (String payloadId : obj.getPayloadIdList()) {
+                    if (payloadId.endsWith("tfpackage")) {
+                        tfpackage = new JsonSimple(obj.getPayload(payloadId)
+                                .open());
+                        compositeData = new IndexAndPayloadComposite(metadata,
+                                tfpackage);
+                        break;
+                    }
+                }
+                if (tfpackage == null) {
+                    compositeData = new IndexAndPayloadComposite(metadata, null);
+                }
+            } else {
+                log.error("Failed rendering display page: {}", templateName);
+                messages.add("DigitalObject not found in storage!");
+            }
+        } catch (Exception e) {
+            log.error("Failed rendering display page: {}", templateName);
+            ByteArrayOutputStream eOut = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(eOut));
+            String eMsg = eOut.toString();
+            messages.add("Page content template error: " + templateName + "\n"
+                    + eMsg);
+        }
+
+        objectContext.put("pageName", template);
+        objectContext.put("displayType", displayType);
+        objectContext.put("parent", parentPageObject);
+        objectContext.put("indexedData", metadata);
+        objectContext.put("metadata", compositeData);
+        objectContext.put("tfpackage", tfpackage);
+
         Map<String, Object> bindings = (Map<String, Object>) objectContext
                 .get("bindings");
-        bindings.put("metadata", metadata);
+        bindings.put("metadata", compositeData);
+        bindings.put("indexedData", metadata);
+        bindings.put("tfpackage", tfpackage);
         objectContext.put("self",
                 evalScript(portalId, templateName, bindings, messages));
 
