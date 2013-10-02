@@ -3,7 +3,15 @@
 ## "MM yy": month year
 ## more: http://api.jqueryui.com/datepicker/?rdfrom=http%3A%2F%2Fdocs.jquery.com%2Fmw%2Findex.php%3Ftitle%3DUI%2FDatepicker%2FformatDate%26redirect%3Dno#utility-formatDate
 <label for="$field-name" #if($label-classes)class="$label-classes"#end>#displayMessage($label)</label>
-<input class="jaffa-field #if($additional-classes)$additional-classes#end" type="text" id="$field-name" #if($disabled) disabled="disabled" #end #if($placeholder && $!placeholder != "")placeholder="$placeholder"#end/>
+	#if($clear-date)
+<span>
+	<input class="jaffa-field #if($additional-classes)$additional-classes#end" type="text" id="$field-name" #if($disabled) disabled="disabled" #end #if($placeholder && $!placeholder != "")placeholder="$placeholder"#end/>
+	<button class="ui-datepicker-clear">Clear</button>
+</span>
+#else
+	<input class="jaffa-field #if($additional-classes)$additional-classes#end" type="text" id="$field-name" #if($disabled) disabled="disabled" #end #if($placeholder && $!placeholder != "")placeholder="$placeholder"#end/>
+#end
+
 #if ($help)
 	<div id="${field-name}-help" class="pre-help-content">#displayMessage($help)</div>
 #end
