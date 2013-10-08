@@ -55,12 +55,15 @@ import com.googlecode.fascinator.api.roles.RolesManager;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUserService;
 import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.JsonSessionState;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.PortalSecurityManager;
 import com.googlecode.fascinator.portal.sso.SSOInterface;
 import com.googlecode.fascinator.portal.tapestry.TapestryRequestUtil;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * The security manager coordinates access to various security plugins when
@@ -563,6 +566,11 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             if (user != null) {
                 session.set("username", user.getUsername());
                 session.set("source", ssoId);
+                HibernateUserService hibernateAuthUserService = (HibernateUserService) ApplicationContextProvider
+                        .getApplicationContext().getBean(
+                                "hibernateAuthUserService");
+                log.debug("Auth manager adding user through hibernate...");
+                hibernateAuthUserService.addUser(new HibernateUser(user));
                 return true;
             }
         }

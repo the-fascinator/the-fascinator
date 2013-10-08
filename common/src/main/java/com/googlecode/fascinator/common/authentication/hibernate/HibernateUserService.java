@@ -48,7 +48,7 @@ public class HibernateUserService {
             .getLogger(HibernateUserService.class);
 
     @Transactional
-    public synchronized void addUser(HibernateUser user) throws Exception {
+    public synchronized void addUser(HibernateUser user) {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("username", user.getUsername());
         params.put("source", user.getSource());
@@ -60,7 +60,7 @@ public class HibernateUserService {
         } else {
             HibernateUser fromdb = users.get(0);
             if (!user.getSource().equalsIgnoreCase(fromdb.getSource())) {
-                throw new Exception(
+                throw new RuntimeException(
                         "Username exists in the database from a different source");
             } else {
                 fromdb.mergeAttributes(user);
