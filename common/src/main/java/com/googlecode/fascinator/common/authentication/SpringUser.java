@@ -19,12 +19,11 @@
 
 package com.googlecode.fascinator.common.authentication;
 
-
 /**
  * A basic user object, does not define its metadata schema, that is left to
  * extending classes, but creates access methods against an unknown schema.
  * 
- * @author Greg Pendlebury
+ * @author Andrew Brazzatti
  */
 public class SpringUser extends GenericUser {
     private boolean ssoRolesSet;
