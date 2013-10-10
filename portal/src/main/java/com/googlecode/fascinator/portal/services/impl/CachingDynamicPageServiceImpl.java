@@ -350,6 +350,12 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
 
         return mimeType;
     }
+    
+    @Override
+    public String renderObject(Context context, String template,
+            IndexAndPayloadComposite metadata) {
+        return renderObject(context, template, metadata.getIndexedData());
+    }
 
     /**
      * Renders a display template. This is generally used by calling the

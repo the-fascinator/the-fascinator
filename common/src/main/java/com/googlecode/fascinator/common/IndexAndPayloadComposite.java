@@ -185,4 +185,12 @@ public class IndexAndPayloadComposite {
         }
         return indexedData.getJsonObject();
     }
+
+    public SolrDoc getIndexedData() {
+        return indexedData;
+    }
+
+    public JsonSimple getPayloadData() {
+        return payloadData;
+    }
 }
