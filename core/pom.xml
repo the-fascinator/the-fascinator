@@ -156,10 +156,6 @@
 					<groupId>com.googlecode.the-fascinator.plugins</groupId>
 					<artifactId>plugin-access-derby</artifactId>
 				</dependency>
-				<dependency>
-					<groupId>com.googlecode.the-fascinator.plugins</groupId>
-					<artifactId>plugin-subscriber-solrEventLog</artifactId>
-				</dependency>
 			</dependencies>
 			<build>
 				<plugins>

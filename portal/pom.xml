@@ -403,10 +403,6 @@
 					<groupId>com.googlecode.the-fascinator.plugins</groupId>
 					<artifactId>plugin-roles-internal</artifactId>
 				</dependency>
-				<dependency>
-					<groupId>com.googlecode.the-fascinator.plugins</groupId>
-					<artifactId>plugin-subscriber-solrEventLog</artifactId>
-				</dependency>
 				<!-- Still used? <dependency> <groupId>org.fedora-commons</groupId> <artifactId>fedora-client</artifactId> 
 					<version>2.2.4</version> </dependency> <dependency> <groupId>org.trippi</groupId> 
 					<artifactId>trippi-core</artifactId> <version>1.4.1</version> </dependency> 

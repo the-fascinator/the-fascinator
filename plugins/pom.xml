@@ -22,7 +22,6 @@
         <module>roles/internal</module>
         <module>storage/filesystem</module>
         <module>storage/ram</module>
-        <module>subscriber/solrEventLog</module>
         <module>transformer/aperture</module>
         <module>transformer/ffmpeg</module>
         <module>transformer/ice2</module>
