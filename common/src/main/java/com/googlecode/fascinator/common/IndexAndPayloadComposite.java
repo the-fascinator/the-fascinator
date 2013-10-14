@@ -193,4 +193,8 @@ public class IndexAndPayloadComposite {
     public JsonSimple getPayloadData() {
         return payloadData;
     }
+
+    public void setPayloadData(JsonSimple payloadData) {
+        this.payloadData = payloadData;
+    }
 }
