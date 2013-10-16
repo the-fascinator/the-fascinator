@@ -35,9 +35,11 @@
             #if($self.isIndexed())
                 #if($self.isDetail())
                     #renderObject($metadata "detail/title")
+					#if(!$self.payloadId)
                     <div class="grid_4">
                         #renderObject($metadata "detail/navigation")
                     </div>
+					#end
                     <div class="grid_12">
                         #renderObject($metadata "detail")
                     </div>

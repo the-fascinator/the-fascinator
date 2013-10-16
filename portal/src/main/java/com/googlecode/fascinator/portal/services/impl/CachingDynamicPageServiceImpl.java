@@ -496,7 +496,8 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
                     }
                 }
                 if (compositeData == null) {
-                    compositeData = new IndexAndPayloadComposite(metadata, null);
+                    compositeData = new IndexAndPayloadComposite(metadata,
+                            tfpackage);
                 } else {
                     compositeData.setPayloadData(tfpackage);
                 }

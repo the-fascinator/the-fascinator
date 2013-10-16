@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.googlecode.fascinator.common.solr.SolrDoc;
 
@@ -35,6 +37,8 @@ public class IndexAndPayloadComposite {
 
     private SolrDoc indexedData;
     private JsonSimple payloadData;
+    private static Logger log = LoggerFactory
+            .getLogger(IndexAndPayloadComposite.class);
 
     /**
      * Builds an instance using the indexed data, accessing the storage for the
@@ -48,13 +52,32 @@ public class IndexAndPayloadComposite {
         this.payloadData = payloadData;
     }
 
+    /**
+     * Retrieves the object from the composite, prioritizes payload then
+     * indexed.
+     * 
+     * Attempts to replace "_" in field names to ":" to prioritize payload
+     * content.
+     * 
+     * @param field
+     * @return
+     */
     public Object getPath(String field) {
         Object object = null;
+        if (field.indexOf("_") != -1) {
+            String convertedFieldName = field.replace("_", ":");
+            object = getPath(convertedFieldName);
+            if (object != null) {
+                return object;
+            }
+        }
         if (payloadData != null) {
             object = payloadData.getPath(field);
+            // log.debug("Using payload: " + field + " with value: " + object);
         }
         if (object == null) {
             object = indexedData.getPath(field);
+            // log.debug("Using Indexed: " + field + " with value: " + object);
         }
         return object;
     }
