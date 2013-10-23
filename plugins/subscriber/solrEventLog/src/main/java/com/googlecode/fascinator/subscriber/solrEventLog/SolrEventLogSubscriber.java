@@ -436,14 +436,6 @@ public class SolrEventLogSubscriber implements Subscriber {
         fieldStringBuffer.insert(0,"<add><doc>").append("</doc></add>");
         
         return fieldStringBuffer.toString();
-        
-        /*String fieldStr = "";
-        for (String paramName : param.keySet()) {
-            fieldStr += "<field name=\"" + paramName + "\">" +
-                    StringEscapeUtils.escapeXml(param.get(paramName)) +
-                    "</field>";
-        }
-        return "<add><doc>" + fieldStr + "</doc></add>";*/
     }
 
     /**

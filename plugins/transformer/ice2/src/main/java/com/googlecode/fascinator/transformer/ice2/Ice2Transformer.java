@@ -752,12 +752,6 @@ public class Ice2Transformer implements Transformer {
                     .append(entry.getValue().toString()).append(",");
         }
 
-        /*String resizeJson = "";
-        for (String key : resizeConfig.keySet()) {
-            JsonSimple j = resizeConfig.get(key);
-            resizeJson += "\"" + key + "\":" + j.toString() + ",";
-        }*/
-
         PostMethod post = new PostMethod(convertUrl);
         try {
             Part[] parts = {

@@ -641,15 +641,6 @@ public class PythonUtils {
         }
         resultBuffer.append("</doc>");
         return resultBuffer.toString();
-
-        /*String result = "<doc>";
-        for (String field : fields.keySet()) {
-            for (String value : fields.get(field)) {
-                result += solrField(field, value);
-            }
-        }
-        result += "</doc>";
-        return result; */
     }
 
     /*****
