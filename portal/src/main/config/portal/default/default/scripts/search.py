@@ -1,3 +1,21 @@
+# The Fascinator - Access Manager
+# Copyright (C) 2013 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
 import os.path
 
 from com.googlecode.fascinator.api.indexer import SearchRequest
@@ -266,7 +284,10 @@ class SearchData:
         return fq in self.__selected
     
     def getSelectedFacetIds(self):
-        return [ DigestUtils.md5Hex(fq) for fq in self.__selected]
+        ## Returns a native Python array
+        ## Python has indicator of u' for unicode string which causes JS complain.
+        ## Because MD5 hash is made from letters we can encode them in ascii 
+        return [ DigestUtils.md5Hex(fq).encode("ascii","ignore") for fq in self.__selected]
     
     def getFileName(self, path):
         return os.path.splitext(os.path.basename(path))[0]
