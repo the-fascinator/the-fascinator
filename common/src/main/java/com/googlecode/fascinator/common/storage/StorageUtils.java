@@ -1,7 +1,8 @@
 /* 
  * The Fascinator - Common Library
  * Copyright (C) 2008 University of Southern Queensland
- * 
+ * Copyright (C) 2013 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
+ *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -42,7 +43,10 @@ import com.googlecode.fascinator.api.storage.StorageException;
  * Storage API utility methods.
  * 
  * @author Oliver Lucido
+ * @author Andrew Brazzatti
+ * @author Jianfeng Li
  */
+
 public class StorageUtils {
 
     /** Default host name */
@@ -191,6 +195,24 @@ public class StorageUtils {
             }
         }
         return object;
+    }
+
+    /**
+     * Get a payload object in the specified Storage instance by its object ID
+     * and the name of payload
+     * 
+     * @param storage : Storage object
+     * @param oid : ID of a Digital object
+     * @param payloadName : name of payload
+     * @return a Payload object
+     * @throws StorageException
+     */
+    public static Payload getPayload(Storage storage, String oid,
+            String payloadName) throws StorageException {
+        DigitalObject digitalObject = getDigitalObject(storage, oid);
+
+        Payload payload = digitalObject.getPayload(payloadName);
+        return payload;
     }
 
     /**

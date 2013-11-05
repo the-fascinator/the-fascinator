@@ -1,5 +1,5 @@
 /* 
- * Then Fascinator - StorageDataUtil
+ * The Fascinator - StorageDataUtil
  * Copyright (C) 2013 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.storage.StorageUtils;
 
 /**
  * Utility class for stored data in JSON format
@@ -52,6 +55,52 @@ public class StorageDataUtil {
 
     /** Logger */
     static Logger log = LoggerFactory.getLogger(StorageDataUtil.class);
+
+    /**
+     * Get a playload in JsonSimple format in the specified Storage instance by
+     * its object ID and the name of payload. Useful for loading payloads which
+     * are in JSON format
+     * 
+     * @param storage : Storage object
+     * @param oid : object ID
+     * @param payloadName : name of palyload
+     * @return JsonSimple or null
+     */
+    public JsonSimple getPayloadJsonSimple(Storage storage, String oid,
+            String payloadName) {
+        if (storage == null) {
+            return null;
+        }
+        try {
+            Payload payload = StorageUtils
+                    .getPayload(storage, oid, payloadName);
+            return getPayloadJsonSimple(payload);
+        } catch (Exception e) {
+            log.error("Failed to retrive payload. Name = {}, more: {}",
+                    payloadName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get a playload in JsonSimple format from the payload instance
+     * 
+     * @param payload : Payload object
+     * @return JsonSimple or null
+     */
+    public JsonSimple getPayloadJsonSimple(Payload payload) {
+        JsonSimple jsonSimple = null;
+        if (payload == null) {
+            return null;
+        }
+        try {
+            jsonSimple = new JsonSimple(payload.open());
+        } catch (Exception e) {
+            log.error("Failed to retrive payload. ID of payload: {}, more: {}",
+                    payload.getId(), e.getMessage());
+        }
+        return jsonSimple;
+    }
 
     /**
      * Getlist method to get the values of key from the sourceMap
