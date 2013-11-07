@@ -364,6 +364,34 @@ public class MessagingServices {
     }
 
     /**
+     * Sends a textual message to a named JMS topic on the local broker
+     * 
+     * @param name The queue to send to
+     * @param msg The message to send
+     * @throws MessagingException If any errors occur in resolving the
+     *             destination or sending.
+     */
+    public void topicMessage(String name, String msg) throws MessagingException {
+        topicMessage(localBroker, name, msg);
+    }
+
+    /**
+     * Sends a textual message to a named JMS topic on any broker.
+     * 
+     * @param brokerUrl The broker to send to
+     * @param name The queue to send to
+     * @param msg The message to send
+     * @throws MessagingException If any errors occur in resolving the
+     *             destination or sending.
+     */
+    public void topicMessage(String brokerUrl, String name, String msg)
+            throws MessagingException {
+        Destination destination = getDestination(brokerUrl, name, false);
+        TextMessage message = prepareMessage(brokerUrl, msg);
+        sendMessage(brokerUrl, destination, message);
+    }
+
+    /**
      * Sends a JMS message to an instantiated JMS destination.
      * 
      * @param brokerUrl The broker with an existing producer to use in sending
