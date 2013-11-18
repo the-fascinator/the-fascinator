@@ -53,6 +53,8 @@ public class ScriptingServicesImpl implements ScriptingServices {
     private DynamicPageService pageService;
 
     @Inject
+    @Autowired
+    @Qualifier(value = "fascinatorIndexer")
     private Indexer indexerService;
 
     @Inject
