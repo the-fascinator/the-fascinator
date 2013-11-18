@@ -245,6 +245,17 @@ public class SolrIndexer implements Indexer {
         return pyUtils;
     }
 
+    private MessagingServices getMessaging() {
+        if (messaging == null) {
+            try {
+                messaging = MessagingServices.getInstance();
+            } catch (MessagingException ex) {
+                log.error("Failed to start connection: {}", ex.getMessage());
+            }
+        }
+        return messaging;
+    }
+
     public SolrIndexer() {
         loaded = false;
     }
@@ -333,11 +344,6 @@ public class SolrIndexer implements Indexer {
             configCache = new HashMap<String, JsonSimpleConfig>();
             useCache = config.getBoolean(true, "indexer", "useCache");
 
-            try {
-                messaging = MessagingServices.getInstance();
-            } catch (MessagingException ex) {
-                log.error("Failed to start connection: {}", ex.getMessage());
-            }
         }
         loaded = true;
     }
@@ -690,7 +696,8 @@ public class SolrIndexer implements Indexer {
      */
     private void sendToIndex(String message) {
         try {
-            messaging.queueMessage(SolrWrapperQueueConsumer.QUEUE_ID, message);
+            getMessaging().queueMessage(SolrWrapperQueueConsumer.QUEUE_ID,
+                    message);
         } catch (MessagingException ex) {
             log.error("Unable to send message: ", ex);
         }
