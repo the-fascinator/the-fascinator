@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -66,6 +68,9 @@ public class GenericDigitalObject implements DigitalObject {
 
     /** Source id of the DigitalObject */
     private String sourceId;
+
+    /** Key for date created */
+    private final String DATE_CREATED = "date_object_created";
 
     /**
      * Creates a DigitalObject with the specified identifier and no metadata
@@ -311,6 +316,13 @@ public class GenericDigitalObject implements DigitalObject {
         if (metadata != null) {
             if (!man.containsKey(METADATA_PAYLOAD)) {
                 throw new StorageException("Metadata payload not found");
+            }
+            String date_created = (String) metadata.get(DATE_CREATED);
+            if (date_created == null) {
+                SimpleDateFormat formatter = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH':'mm':'ss'Z'");
+                date_created = formatter.format(new Date());
+                metadata.put(DATE_CREATED, date_created);
             }
             try {
                 ByteArrayOutputStream metaOut = new ByteArrayOutputStream();
