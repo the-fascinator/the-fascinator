@@ -1,4 +1,4 @@
-<span #if( $multiline )style="display:block;" #end>#displayMessage($box-for)</span>
+#if($box-for)<span #if( $multiline )style="display:block;" #end>#displayMessage($box-for)</span>#end
 
 #if ($boxes.size() > 1)
     #set($checkbox_id = 1)
