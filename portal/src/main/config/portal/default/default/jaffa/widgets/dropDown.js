@@ -86,9 +86,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
             	select.attr('class', classList);
             }
             this.dropDownData = this.getJsonData() || this.getConfig("option-data");
-            if(this.dropDownData != 'array') {
-              return;
-            }
+            
             var defaultValue = this.getConfig("default-value");
             var allowEmpty = this.getConfig("allow-empty");
             if (allowEmpty !== false) {
@@ -106,6 +104,11 @@ var DropDownWidgetBuilder = function($, jaffa) {
                 this.dropDownData = this.dropDownData[dataListKey];
             }
 
+             if(Object.prototype.toString.call(this.dropDownData) != '[object Array]') {
+              ui.append("<span style='color:red;'> [Error&nbsp;loading&nbsp;data... widget '" + this.id() + "' did not load.] </span>");
+              return;
+            } 
+            
             //sorting dropDownData...
             if  (dataIdKey != null){
                 this.dropDownData.sort(function (a, b){
@@ -121,6 +124,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
                     return a1> b1? 1: -1;
                 });
             }
+            
 
             var len = this.dropDownData.length;            
             
