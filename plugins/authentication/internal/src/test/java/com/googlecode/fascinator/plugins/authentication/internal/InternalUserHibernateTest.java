@@ -12,14 +12,14 @@ import com.googlecode.fascinator.authentication.internal.InternalUser;
 import com.googlecode.fascinator.common.authentication.hibernate.HibernateUser;
 import com.googlecode.fascinator.common.authentication.hibernate.HibernateUserService;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration({ "file:src/test/resources/test-applicationContext.xml" })
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({ "file:src/test/resources/test-applicationContext.xml" })
 public class InternalUserHibernateTest {
 
 	@Autowired
     private HibernateUserService hibernateAuthUserService;
 	
-//	@Test
+	  @Test
     public void testInternalUser() throws Exception {
         InternalUser intUser = new InternalUser();
         String username = "user-" + System.currentTimeMillis();

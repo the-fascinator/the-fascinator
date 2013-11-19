@@ -52,6 +52,13 @@
     		<version>${fascinator.version}</version>
     		<scope>test</scope>
     	</dependency>
+          	<dependency>
+            <groupId>com.googlecode.the-fascinator.plugins</groupId>
+    		<artifactId>plugin-indexer-solr</artifactId>
+    		<version>${fascinator.version}</version>
+    		<scope>test</scope>
+    	</dependency>
+
     	<dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>

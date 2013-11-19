@@ -36,7 +36,7 @@ public class HibernateAccessSchemaTest {
 		assertEquals(schema1, schema2);
 	}
 	
-//	@Test
+	@Test
 	public void testWithNullRoleEquality() {		
 		HibernateAccessSchema schema1 = getStandardSchema();		
 		HibernateAccessSchema schema2 = getStandardSchema();
@@ -44,7 +44,7 @@ public class HibernateAccessSchemaTest {
 		assertFalse(schema1.equals(schema2));
 	}
 	
-//	@Test
+	@Test
 	public void testWithNullUserEquality() {		
 		HibernateAccessSchema schema1 = getStandardSchema();		
 		HibernateAccessSchema schema2 = getStandardSchema();
@@ -52,7 +52,7 @@ public class HibernateAccessSchemaTest {
 		assertFalse(schema1.equals(schema2));
 	}
 	
-//	@Test
+	@Test
 	public void testWithNullRecIdEquality() {		
 		HibernateAccessSchema schema1 = getStandardSchema();		
 		HibernateAccessSchema schema2 = getStandardSchema();
@@ -60,7 +60,7 @@ public class HibernateAccessSchemaTest {
 		assertFalse(schema1.equals(schema2));
 	}
 	
-//	@Test
+	@Test
 	public void testWithNullEquality() {		
 		HibernateAccessSchema schema1 = getStandardSchema();		
 		HibernateAccessSchema schema2 = new HibernateAccessSchema();		

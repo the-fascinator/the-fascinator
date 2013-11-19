@@ -42,8 +42,8 @@ import com.googlecode.fascinator.model.Record;
 import com.googlecode.fascinator.model.service.HibernateAccessControlService;
 import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration({"file:src/test/resources/test-applicationContext.xml"})
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({"file:src/test/resources/test-applicationContext.xml"})
 public class HibernateAccessControlTest {
 
 	@Autowired
@@ -65,7 +65,7 @@ public class HibernateAccessControlTest {
 		hibernateAccessControl.shutdown();
 	}
 
-//	@Test
+	@Test
 	public void testRoleSchema() throws AccessControlException {		
 		HibernateAccessSchema inserted = getNewSchema();		
 		String recordId = inserted.getRecordId();
@@ -81,7 +81,7 @@ public class HibernateAccessControlTest {
 		assertEquals(inserted, schemaList.get(0));
 	}
 	
-//	@Test
+	@Test
 	public void testUserSchema() throws AccessControlException {		
 		HibernateAccessSchema inserted = getNewSchema();		
 		String recordId = inserted.getRecordId();
