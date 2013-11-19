@@ -86,6 +86,9 @@ var DropDownWidgetBuilder = function($, jaffa) {
             	select.attr('class', classList);
             }
             this.dropDownData = this.getJsonData() || this.getConfig("option-data");
+            if(this.dropDownData != 'array') {
+              return;
+            }
             var defaultValue = this.getConfig("default-value");
             var allowEmpty = this.getConfig("allow-empty");
             if (allowEmpty !== false) {
