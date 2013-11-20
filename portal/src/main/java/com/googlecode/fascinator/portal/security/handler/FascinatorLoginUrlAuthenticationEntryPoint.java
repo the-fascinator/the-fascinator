@@ -22,7 +22,14 @@ public class FascinatorLoginUrlAuthenticationEntryPoint extends
             AuthenticationException exception) {
         String path = request.getServletPath();
         path = path.substring(1, path.length());
-        String portal = path.substring(0, path.indexOf("/"));
+        int nextSlash = path.indexOf("/");
+        String portal;
+        if (nextSlash == -1) {
+            portal = path;
+            path = "";
+        } else {
+            portal = path.substring(0, path.indexOf("/"));
+        }
         String redirectPath = path.substring(path.indexOf("/") + 1,
                 path.length());
         return "/" + portal + "/login?fromUrl=" + redirectPath;
