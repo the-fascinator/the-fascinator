@@ -20,6 +20,7 @@ package com.googlecode.fascinator.messaging;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.List;
 
 import com.googlecode.fascinator.api.PluginDescription;
 import com.googlecode.fascinator.api.PluginException;
@@ -143,5 +144,12 @@ public class FakeIndexer implements Indexer {
     public void search(SearchRequest request, OutputStream result, String format)
             throws IndexerException {
         log(" * INDEXER: search()");
+    }
+
+    @Override
+    public List<Object> getJsonObjectWithField(String fieldName,
+            String fieldValue) throws IndexerException {
+        log(" * INDEXER: getJsonObjectWithField()");
+        return null;
     }
 }

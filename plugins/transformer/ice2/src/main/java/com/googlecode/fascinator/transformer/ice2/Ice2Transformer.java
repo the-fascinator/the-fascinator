@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -745,10 +746,10 @@ public class Ice2Transformer implements Transformer {
             }
         }
 
-        String resizeJson = "";
-        for (String key : resizeConfig.keySet()) {
-            JsonSimple j = resizeConfig.get(key);
-            resizeJson += "\"" + key + "\":" + j.toString() + ",";
+        StringBuffer resizeJsonBuffer = new StringBuffer();
+        for (Entry<String, JsonSimple> entry : resizeConfig.entrySet()) {
+            resizeJsonBuffer.append("\"").append(entry.getKey()).append("\":")
+                    .append(entry.getValue().toString()).append(",");
         }
 
         PostMethod post = new PostMethod(convertUrl);
@@ -762,8 +763,9 @@ public class Ice2Transformer implements Transformer {
                     new StringPart("pathext", ext),
                     new StringPart("template", getTemplate()),
                     new StringPart("multipleImageOptions", "{"
-                            + StringUtils.substringBeforeLast(resizeJson, ",")
-                            + "}"), new StringPart("mode", "download"),
+                            + StringUtils.substringBeforeLast(
+                                    resizeJsonBuffer.toString(), ",") + "}"),
+                    new StringPart("mode", "download"),
                     new FilePart("file", sourceFile) };
             post.setRequestEntity(new MultipartRequestEntity(parts, post
                     .getParams()));

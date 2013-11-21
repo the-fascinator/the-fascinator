@@ -19,6 +19,7 @@
 package com.googlecode.fascinator.api.indexer;
 
 import java.io.OutputStream;
+import java.util.List;
 
 import com.googlecode.fascinator.api.Plugin;
 
@@ -142,4 +143,7 @@ public interface Indexer extends Plugin {
      */
     public void searchByIndex(SearchRequest request, OutputStream response,
             String indexName) throws IndexerException;
+
+    public List<Object> getJsonObjectWithField(String fieldName,
+            String fieldValue) throws IndexerException;
 }

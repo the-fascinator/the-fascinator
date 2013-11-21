@@ -18,11 +18,6 @@
  */
 package com.googlecode.fascinator.indexer;
 
-import com.googlecode.fascinator.common.FascinatorHome;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.GenericListener;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -56,17 +52,22 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.xml.sax.SAXException;
 
+import com.googlecode.fascinator.common.FascinatorHome;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
+
 /**
  * Consumer for documents to index in Solr. Aggregating the final write in this
  * location allows for a common buffer to prevent timing issues from threaded
  * buffers, as well as allowing us to run thread safe embedded solr.
- *
+ * 
  * @author Greg Pendlebury
  */
 public class SolrWrapperQueueConsumer implements GenericListener {
     /** Default Solr path if running embedded */
-    private static final String DEFAULT_SOLR_HOME =
-            FascinatorHome.getPath("solr");
+    private static final String DEFAULT_SOLR_HOME = FascinatorHome
+            .getPath("solr");
 
     /** Buffer Limit : Document count */
     private static Integer BUFFER_LIMIT_DOCS = 200;
@@ -81,7 +82,8 @@ public class SolrWrapperQueueConsumer implements GenericListener {
     public static final String QUEUE_ID = "solrwrapper";
 
     /** Logging */
-    private Logger log = LoggerFactory.getLogger(SolrWrapperQueueConsumer.class);
+    private Logger log = LoggerFactory
+            .getLogger(SolrWrapperQueueConsumer.class);
 
     /** JSON configuration */
     private JsonSimpleConfig globalConfig;
@@ -120,7 +122,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
     private String password;
 
     /** Buffer of documents waiting submission */
-    private Map<String,String> docBuffer;
+    private Map<String, String> docBuffer;
 
     /** Time the oldest document was written into the buffer */
     private long bufferOldest;
@@ -148,7 +150,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Constructor required by ServiceLoader. Be sure to use init()
-     *
+     * 
      */
     public SolrWrapperQueueConsumer() {
         thread = new Thread(this, QUEUE_ID);
@@ -156,7 +158,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Start thread running
-     *
+     * 
      */
     @Override
     public void run() {
@@ -168,8 +170,8 @@ public class SolrWrapperQueueConsumer implements GenericListener {
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
                     "messaging", "url");
-            ActiveMQConnectionFactory connectionFactory =
-                    new ActiveMQConnectionFactory(brokerUrl);
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                    brokerUrl);
             connection = connectionFactory.createConnection();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             consumer = session.createConsumer(session.createQueue(QUEUE_ID));
@@ -179,7 +181,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
             // Solr
             solr = initCore("solr");
             // Timeout 'tick' for buffer (10s)
-            timer = new Timer("SolrWrapper:" + this.toString(), true);
+            timer = new Timer("SolrWrapper:" + toString(), true);
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
@@ -193,7 +195,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Initialization method
-     *
+     * 
      * @param config Configuration to use
      * @throws Exception if any errors occur
      */
@@ -207,8 +209,8 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
         try {
             globalConfig = new JsonSimpleConfig();
-            autoCommit = globalConfig.getBoolean(true,
-                    "indexer", "solr", "autocommit");
+            autoCommit = globalConfig.getBoolean(true, "indexer", "solr",
+                    "autocommit");
 
             // Buffering
             docBuffer = new LinkedHashMap<String, String>();
@@ -229,36 +231,35 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Initialize a Solr core object.
-     *
+     * 
      * @param coreName : The core to initialize
      * @return SolrServer : The initialized core
      */
     private SolrServer initCore(String core) {
-        boolean isEmbedded = globalConfig.getBoolean(false,
-                "indexer", core, "embedded");
+        boolean isEmbedded = globalConfig.getBoolean(false, "indexer", core,
+                "embedded");
         try {
             // Embedded Solr
             if (isEmbedded) {
                 // Solr over HTTP - Needed to run commits
-                //   so the core web server sees them.
-                String uri = globalConfig.getString(null,
-                        "indexer", core, "uri");
+                // so the core web server sees them.
+                String uri = globalConfig.getString(null, "indexer", core,
+                        "uri");
                 if (uri == null) {
                     log.error("No URI provided for core: '{}'", core);
                     return null;
                 }
                 URI solrUri = new URI(uri);
-                commit = new CommonsHttpSolrServer(
-                        solrUri.toURL());
-                username = globalConfig.getString(null,
-                        "indexer", core, "username");
-                password = globalConfig.getString(null,
-                        "indexer", core, "password");
+                commit = new CommonsHttpSolrServer(solrUri.toURL());
+                username = globalConfig.getString(null, "indexer", core,
+                        "username");
+                password = globalConfig.getString(null, "indexer", core,
+                        "password");
                 if (username != null && password != null) {
-                    UsernamePasswordCredentials credentials =
-                            new UsernamePasswordCredentials(username, password);
-                    HttpClient hc =
-                            ((CommonsHttpSolrServer) solr).getHttpClient();
+                    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+                            username, password);
+                    HttpClient hc = ((CommonsHttpSolrServer) solr)
+                            .getHttpClient();
                     hc.getParams().setAuthenticationPreemptive(true);
                     hc.getState().setCredentials(AuthScope.ANY, credentials);
                 }
@@ -276,24 +277,24 @@ public class SolrWrapperQueueConsumer implements GenericListener {
                     System.setProperty("solr.solr.home",
                             homeDir.getAbsolutePath());
                     File coreXmlFile = new File(homeDir, "solr.xml");
-                    coreContainer = new CoreContainer(homeDir.getAbsolutePath(),
-                            coreXmlFile);
+                    coreContainer = new CoreContainer(
+                            homeDir.getAbsolutePath(), coreXmlFile);
                     for (SolrCore aCore : coreContainer.getCores()) {
                         log.info("Loaded core: {}", aCore.getName());
                     }
                 }
-                String coreName = globalConfig.getString(null,
-                        "indexer", core, "coreName");
+                String coreName = globalConfig.getString(null, "indexer", core,
+                        "coreName");
                 if (coreName == null) {
                     log.error("No 'coreName' node for core: '{}'", core);
                     return null;
                 }
                 return new EmbeddedSolrServer(coreContainer, coreName);
 
-            // Solr over HTTP
+                // Solr over HTTP
             } else {
-                String uri = globalConfig.getString(null,
-                        "indexer", core, "uri");
+                String uri = globalConfig.getString(null, "indexer", core,
+                        "uri");
                 if (uri == null) {
                     log.error("No URI provided for core: '{}'", core);
                     return null;
@@ -302,14 +303,14 @@ public class SolrWrapperQueueConsumer implements GenericListener {
                 URI solrUri = new URI(uri);
                 CommonsHttpSolrServer thisCore = new CommonsHttpSolrServer(
                         solrUri.toURL());
-                username = globalConfig.getString(null,
-                        "indexer", core, "username");
-                password = globalConfig.getString(null,
-                        "indexer", core, "password");
+                username = globalConfig.getString(null, "indexer", core,
+                        "username");
+                password = globalConfig.getString(null, "indexer", core,
+                        "password");
                 if (username != null && password != null) {
-                    UsernamePasswordCredentials credentials =
-                            new UsernamePasswordCredentials(username, password);
-                    HttpClient hc = ((CommonsHttpSolrServer) thisCore).getHttpClient();
+                    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+                            username, password);
+                    HttpClient hc = thisCore.getHttpClient();
                     hc.getParams().setAuthenticationPreemptive(true);
                     hc.getState().setCredentials(AuthScope.ANY, credentials);
                 }
@@ -332,7 +333,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Return the ID string for this listener
-     *
+     * 
      */
     @Override
     public String getId() {
@@ -341,7 +342,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Start the queue based on the name identifier
-     *
+     * 
      * @throws JMSException if an error occurred starting the JMS connections
      */
     @Override
@@ -387,7 +388,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Callback function for incoming messages.
-     *
+     * 
      * @param message The incoming message
      */
     @Override
@@ -434,7 +435,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Add a new document into the buffer, and check if submission is required
-     *
+     * 
      * @param document : The Solr document to add to the buffer.
      */
     private void addToBuffer(String index, String document) {
@@ -464,20 +465,24 @@ public class SolrWrapperQueueConsumer implements GenericListener {
     }
 
     /**
-     * Method to fire on timeout() events to ensure buffers don't go stale
-     * after the last item in a harvest passes through.
-     *
+     * Method to fire on timeout() events to ensure buffers don't go stale after
+     * the last item in a harvest passes through.
+     * 
      */
     private void checkTimeout() {
         if (timerMDC != null) {
             MDC.put("name", timerMDC);
         }
-        if (docBuffer.isEmpty()) return;
+        if (docBuffer.isEmpty()) {
+            return;
+        }
 
         // How long has the NEWest item been waiting?
         long wait = ((new Date().getTime()) - bufferYoungest) / 1000;
         // If the buffer has been updated in the last 20s ignore it
-        if (wait < 20) return;
+        if (wait < 20) {
+            return;
+        }
 
         // Else, time to flush the buffer
         log.debug("=== Flushing old buffer: {}s", wait);
@@ -486,12 +491,13 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Assess the document buffer and decide is it is ready to submit
-     *
+     * 
      */
     private void checkBuffer() {
         // Doc count limit
         if (docBuffer.size() >= bufferDocLimit) {
-            log.debug("=== Buffer check: Doc limit reached '{}'", docBuffer.size());
+            log.debug("=== Buffer check: Doc limit reached '{}'",
+                    docBuffer.size());
             submitBuffer(false);
             return;
         }
@@ -512,30 +518,32 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Submit all documents currently in the buffer to Solr, then purge
-     *
+     * 
      */
     private void submitBuffer(boolean forceCommit) {
         int size = docBuffer.size();
         if (size > 0) {
             // Debugging
-            //String age = String.valueOf(
-            //        ((new Date().getTime()) - bufferOldest) / 1000);
-            //String length = String.valueOf(bufferSize);
-            //log.debug("Submitting buffer: " + size + " documents, " + length +
-            //        " bytes, " + age + "s");
+            // String age = String.valueOf(
+            // ((new Date().getTime()) - bufferOldest) / 1000);
+            // String length = String.valueOf(bufferSize);
+            // log.debug("Submitting buffer: " + size + " documents, " + length
+            // +
+            // " bytes, " + age + "s");
             log.debug("=== Submitting buffer: " + size + " documents");
 
             // Concatenate all documents in the buffer
-            String submission = "";
+            StringBuffer submissionBuffer = new StringBuffer();
             for (String doc : docBuffer.keySet()) {
-                submission += docBuffer.get(doc);
-                //log.debug("DOC: {}", doc);
+                submissionBuffer.append(docBuffer.get(doc));
+                // log.debug("DOC: {}", doc);
             }
 
             // Submit if the result is valid
-            if (!submission.equals("")) {
+            if (submissionBuffer.length() > 0) {
                 // Wrap in the basic Solr 'add' node
-                submission = "<add>" + submission + "</add>";
+                String submission = submissionBuffer.insert(0, "<add>")
+                        .append("</add>").toString();
                 // And submit
                 try {
                     solr.request(new DirectXmlRequest("/update", submission));
@@ -550,14 +558,15 @@ public class SolrWrapperQueueConsumer implements GenericListener {
                         if (commit != null) {
                             solr.commit();
                             commit.commit();
-                        // or just HTTP on it's own
+                            // or just HTTP on it's own
                         } else {
                             solr.commit();
                         }
                     } catch (Exception e) {
-                        log.warn("Solr forced commit failed. Document will" +
-                                " not be visible until Solr autocommit fires." +
-                                " Error message: {}", e);
+                        log.warn(
+                                "Solr forced commit failed. Document will"
+                                        + " not be visible until Solr autocommit fires."
+                                        + " Error message: {}", e);
                     }
                 }
             }
@@ -567,7 +576,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Purge the document buffer
-     *
+     * 
      */
     private void purgeBuffer() {
         docBuffer.clear();
@@ -578,7 +587,7 @@ public class SolrWrapperQueueConsumer implements GenericListener {
 
     /**
      * Sets the priority level for the thread. Used by the OS.
-     *
+     * 
      * @param newPriority The priority level to set the thread at
      */
     @Override

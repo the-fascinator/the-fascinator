@@ -21,6 +21,7 @@ package com.googlecode.fascinator.portal.services.impl;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -204,5 +205,10 @@ public class IndexerServiceImpl implements IndexerService {
             throws IndexerException {
         indexer.search(request, result, format);
 
+    }
+
+    public List<Object> getJsonObjectWithField(String fieldName,
+            String fieldValue) throws IndexerException {
+        return indexer.getJsonObjectWithField(fieldName, fieldValue);
     }
 }
