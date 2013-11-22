@@ -21,6 +21,7 @@ package com.googlecode.fascinator.common.solr;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,6 +172,12 @@ public class SpringIndexerWrapper implements Indexer {
     public void searchByIndex(SearchRequest arg0, OutputStream arg1, String arg2)
             throws IndexerException {
         indexerPlugin.searchByIndex(arg0, arg1, arg2);
+    }
+
+    @Override
+    public List<Object> getJsonObjectWithField(String fieldName,
+            String fieldValue) throws IndexerException {
+        return indexerPlugin.getJsonObjectWithField(fieldName, fieldValue);
     }
 
 }
