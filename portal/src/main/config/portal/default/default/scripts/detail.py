@@ -5,7 +5,7 @@ from userAgreement import AgreementData
 
 from com.googlecode.fascinator.api.indexer import SearchRequest
 from com.googlecode.fascinator.api.storage import StorageException
-from com.googlecode.fascinator.common import JsonSimple
+from com.googlecode.fascinator.common import JsonSimple, IndexAndPayloadComposite
 from com.googlecode.fascinator.common.solr import SolrDoc, SolrResult
 
 from java.io import ByteArrayInputStream, ByteArrayOutputStream
@@ -64,6 +64,24 @@ class DetailData:
             if self.__isPreview:
                 q = "?preview=true"
             self.response.sendRedirect("%s%s/%s" % (context["urlBase"], uri, q))
+            
+        self.log = context["log"]
+        self.request = context["request"]                
+        self.payloadId = self.request.getParameter("payloadId")
+        self.log.debug("payloadId is %s" % self.payloadId)
+        if self.payloadId is not None:
+            self.metadata = context["metadata"]
+            self.log.debug("Overriding main payload with parked payload")
+            oid = self.__oid             
+            storage = self.services.getStorage()
+            obj = storage.getObject(oid)            
+            parkedPayload = JsonSimple(obj.getPayload(self.payloadId).open())
+            if self.metadata is None:
+                self.metadata = IndexAndPayloadComposite(self.getMetadata(), parkedPayload)
+            else:
+                self.metadata.setPayloadData(parkedPayload)
+            obj.close()                        
+            self.log.debug("Override complete.")
 
     def getAllowedRoles(self):
         metadata = self.getMetadata()

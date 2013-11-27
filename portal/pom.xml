@@ -1,5 +1,6 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.googlecode.the-fascinator</groupId>
 	<artifactId>fascinator-portal</artifactId>
@@ -8,9 +9,12 @@
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>the-fascinator</artifactId>
-		<version>1.1.6-SNAPSHOT</version>
+		<version>1.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+	<properties>
+		<spring.integration.version>2.2.3.RELEASE</spring.integration.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
@@ -92,6 +96,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+    		<groupId>org.mockito</groupId>
+	    	<artifactId>mockito-all</artifactId>
+    		<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -101,13 +112,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-all</artifactId>
-			<version>5.3.0</version>
+			<artifactId>activemq-core</artifactId>
+			<version>5.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activeio-core</artifactId>
+			<version>3.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-web</artifactId>
-			<version>5.3.0</version>
+			<version>5.7.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.codehaus.jackson</groupId>
@@ -130,6 +146,11 @@
 					<artifactId>spring</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>1.6.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -222,6 +243,48 @@
 			<artifactId>jfreechart</artifactId>
 			<version>1.0.14</version>
 		</dependency>
+	 	  
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-core</artifactId>
+			<version>${spring.integration.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>					
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-tx</artifactId>					
+				</exclusion>				
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-mail</artifactId>
+			<version>${spring.integration.version}</version>			
+ 		</dependency>
+ 		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jms</artifactId>
+			<version>${spring.integration.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>					
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-tx</artifactId>					
+				</exclusion>				
+			</exclusions>						
+ 		</dependency> 		
+ 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>3.0.5.RELEASE</version>			
+		</dependency>
+ 		
 	</dependencies>
 	<profiles>
 		<profile>
@@ -482,6 +545,45 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.1</version>
+						<executions>
+							<execution>
+								<id>unpack-configdb-conf</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/target/portal/</outputDirectory>
+									<artifactItems>
+										<artifactItem>
+											<groupId>com.googlecode.the-fascinator</groupId>
+											<artifactId>fascinator-config-db</artifactId>
+											<classifier>fascinator-config</classifier>
+											<type>zip</type>
+											<version>0.1-SNAPSHOT</version>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.googlecode.the-fascinator.plugins</groupId>
+											<artifactId>plugin-access-derby</artifactId>
+										    <classifier>hibernate</classifier>  
+											<type>zip</type>
+											<version>1.2-SNAPSHOT</version>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.googlecode.the-fascinator</groupId>
+											<artifactId>fascinator-common</artifactId>
+										    <classifier>hibernateauth</classifier>  
+											<type>zip</type>
+											<version>1.2-SNAPSHOT</version>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1.1</version>

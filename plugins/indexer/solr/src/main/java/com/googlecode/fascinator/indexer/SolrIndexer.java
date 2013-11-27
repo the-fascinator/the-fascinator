@@ -242,6 +242,28 @@ public class SolrIndexer implements Indexer {
         return new PluginDescription(this);
     }
 
+    private PythonUtils getPyUtils() throws IndexerException {
+        if (pyUtils == null) {
+            try {
+                pyUtils = new PythonUtils(config);
+            } catch (PluginException ex) {
+                throw new IndexerException(ex);
+            }
+        }
+        return pyUtils;
+    }
+
+    private MessagingServices getMessaging() {
+        if (messaging == null) {
+            try {
+                messaging = MessagingServices.getInstance();
+            } catch (MessagingException ex) {
+                log.error("Failed to start connection: {}", ex.getMessage());
+            }
+        }
+        return messaging;
+    }
+
     public SolrIndexer() {
         loaded = false;
     }
@@ -325,21 +347,11 @@ public class SolrIndexer implements Indexer {
 
             customParams = new HashMap<String, String>();
 
-            try {
-                pyUtils = new PythonUtils(config);
-            } catch (PluginException ex) {
-                throw new IndexerException(ex);
-            }
             // Caching
             scriptCache = new HashMap<String, PyObject>();
             configCache = new HashMap<String, JsonSimpleConfig>();
             useCache = config.getBoolean(true, "indexer", "useCache");
 
-            try {
-                messaging = MessagingServices.getInstance();
-            } catch (MessagingException ex) {
-                log.error("Failed to start connection: {}", ex.getMessage());
-            }
         }
         loaded = true;
     }
@@ -399,7 +411,7 @@ public class SolrIndexer implements Indexer {
      */
     @Override
     public void shutdown() throws PluginException {
-        pyUtils.shutdown();
+        getPyUtils().shutdown();
     }
 
     /**
@@ -439,18 +451,20 @@ public class SolrIndexer implements Indexer {
             throw new IndexerException(ioe);
         }
     }
-    
+
     /**
-     * Perform a Solr search and stream the results into the provided output format
+     * Perform a Solr search and stream the results into the provided output
+     * format
      * 
      * @param request : A prepared SearchRequest object
      * @param response : The OutputStream to send results to
-     * @param format : Output format - passed directly to SOlr as the "wt" parameter
+     * @param format : Output format - passed directly to SOlr as the "wt"
+     *            parameter
      * @throws IndexerException if there were errors during the search
      */
     @Override
-    public void search(SearchRequest request, OutputStream response, String format)
-            throws IndexerException {
+    public void search(SearchRequest request, OutputStream response,
+            String format) throws IndexerException {
         SolrSearcher searcher = new SolrSearcher(
                 ((CommonsHttpSolrServer) solr).getBaseURL());
         String username = usernameMap.get("solr");
@@ -690,7 +704,8 @@ public class SolrIndexer implements Indexer {
      */
     private void sendToIndex(String message) {
         try {
-            messaging.queueMessage(SolrWrapperQueueConsumer.QUEUE_ID, message);
+            getMessaging().queueMessage(SolrWrapperQueueConsumer.QUEUE_ID,
+                    message);
         } catch (MessagingException ex) {
             log.error("Unable to send message: ", ex);
         }
@@ -836,7 +851,7 @@ public class SolrIndexer implements Indexer {
             bindings.put("object", object);
             bindings.put("payload", payload);
             bindings.put("params", props);
-            bindings.put("pyUtils", pyUtils);
+            bindings.put("pyUtils", getPyUtils());
             bindings.put("log", log);
 
             // Run the data through our script
@@ -848,7 +863,7 @@ public class SolrIndexer implements Indexer {
                 log.warn("Activation method not found!");
             }
 
-            return pyUtils.solrDocument(fields);
+            return getPyUtils().solrDocument(fields);
         } catch (Exception e) {
             throw new RuleException(e);
         }

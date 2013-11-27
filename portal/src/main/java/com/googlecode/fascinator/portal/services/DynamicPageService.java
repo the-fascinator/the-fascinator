@@ -18,14 +18,15 @@
  */
 package com.googlecode.fascinator.portal.services;
 
-import com.googlecode.fascinator.common.solr.SolrDoc;
-import com.googlecode.fascinator.portal.FormData;
-import com.googlecode.fascinator.portal.JsonSessionState;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.velocity.context.Context;
+
+import com.googlecode.fascinator.common.IndexAndPayloadComposite;
+import com.googlecode.fascinator.common.solr.SolrDoc;
+import com.googlecode.fascinator.portal.FormData;
+import com.googlecode.fascinator.portal.JsonSessionState;
 
 public interface DynamicPageService {
 
@@ -43,4 +44,7 @@ public interface DynamicPageService {
 
     public String renderObject(Context context, String template,
             SolrDoc metadata);
+
+    String renderObject(Context context, String template,
+            IndexAndPayloadComposite metadata);
 }

@@ -1,3 +1,3 @@
-<div class="simple-workflow component-wrapper">
+<div class="simple-workflow component-wrapper $!wrapper-class">
 $elementHtml
 </div>

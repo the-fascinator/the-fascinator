@@ -9,7 +9,7 @@ $buttonHtml
 </span>
 <script type="text/javascript">
    function saveData(functionName,unmanagedData, isValid, serverData) {
-   		if(isValid) {  
+   		 
    			var url = null;
    			if(objectMetadataParams != null) {
    				url = '$portalPath/workflows/simpleworkflow.ajax?func=action&action='+action+'&oid=$oid&objMeta='+objectMetadataParams;
@@ -31,7 +31,6 @@ $buttonHtml
 			action = null;
 			objectMetadataParams = null;
 			 
-		}
     }
     
 

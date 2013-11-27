@@ -69,6 +69,11 @@ public class JavaPropertiesLanguageService implements LanguageService {
     }
 
     @Override
+    public String displayMessage(String messageCode, String region) {
+        return displayMessage(messageCode);
+    }
+
+    @Override
     public String displayMessage(String messageCode) {
         for (Properties propertyFile : propertiesFiles) {
             if (propertyFile.get(messageCode) != null) {
@@ -78,4 +83,5 @@ public class JavaPropertiesLanguageService implements LanguageService {
 
         return messageCode;
     }
+
 }

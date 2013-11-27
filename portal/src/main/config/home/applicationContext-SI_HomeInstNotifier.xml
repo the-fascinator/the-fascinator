@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+    xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/mail
+            http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+            http://www.springframework.org/schema/integration/jms
+            http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd" >
+
+	
+	<!--  Message Queue configuration -->
+	<int:logging-channel-adapter id="notify_homeinst_loggingChannel"
+		expression="'Sending message to queue...'" />	
+	<!--  
+		Start of broker / request queue specific configuration.
+		
+		Configure the block below for EACH unique broker-request queue pair.   	
+	-->	
+	<int:channel id="notify_homeinst_messageq_org2" >
+		<int:interceptors>
+			<int:wire-tap channel="notify_homeinst_loggingChannel" />
+		</int:interceptors>
+	</int:channel>
+	<int:gateway service-interface="com.googlecode.fascinator.portal.process.MessageqNotifierService" id="notify_homeinst_messageq_org2_service" default-request-channel="notify_homeinst_messageq_org2" />								
+	<int-jms:outbound-channel-adapter id="jmsOut" destination="notify_homeinst_requestQueue_org2" channel="notify_homeinst_messageq_org2" connection-factory="notify_homeinst_connectionFactory_org2" />					
+	<bean id="notify_homeinst_connectionFactory_org2" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${broker.url.org2}" />
+    </bean>
+    <bean id="notify_homeinst_requestQueue_org2" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="${request.queue.name.org2}"/>
+	</bean>
+	<!--  End of broker / request queue configuration -->
+</beans>
+

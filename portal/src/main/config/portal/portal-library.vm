@@ -34,3 +34,64 @@
 #macro(displayMessage $message)
 ## All on one line to avoid line breaks
 #set($languageService = $Services.getService("languageService"))#if($languageService && $message)#set($message = $languageService.displayMessage($message))#end$message#end
+
+## Like above but is region bound
+##
+#macro(displayMessage $message $region)
+#set($languageService = $Services.getService("languageService"))#if($languageService && $message)#set($message = $languageService.displayMessage($message, $region))#end$message#end
+
+##
+## Display a value or an empty string
+##
+## $key : the key of field
+##
+#macro(getValue $key)
+    $StringEscapeUtils.escapeHtml("$jsonUtil.getEmptyIfNull($item, $key)")
+#end
+
+
+##
+## Display an arrary of strings in an un-ordered list
+##
+## $vals : an array of strings for display
+##
+#macro(displayUL $vals)
+	#displayList("ul" $vals)
+#end
+
+##
+## Display an arrary of strings in a list
+##
+## $listType : either ul or ol
+## $vals : an array of strings for display
+##
+#macro(displayList $listType $vals)
+<$listType>
+	#foreach( $v in $vals )
+	#if ($v && $v != 'null' && $!v != "")
+	<li>$StringEscapeUtils.escapeHtml($v)</li> #end
+	#end
+</$listType>
+#end
+
+##
+## Display an arrary of repeatables, e.g. ANZSRC-FOR in an un-ordered list
+##
+## $baseKey : main key, e.g. "dc:subject.anzsrc:for" 
+## $subKey : sub key, e.g. "skos:prefLabel"
+##
+#macro(displayRepeatablesUL $baseKey $subKey)
+	#set($repeats = $jsonUtil.getJavaList($item, "$baseKey"))
+	#set( $valStr = '' )
+	#foreach($v in $repeats)
+		#set($v = $v.get("$subKey").trim())
+		#if($v && $!v != '')
+			#set( $valStr = "${valStr},${v}" )
+		#end
+	#end
+	#if( $valStr != '')
+	  #set($vals = $valStr.split(","))
+	  #displayUL($vals)
+	#end
+#end
+

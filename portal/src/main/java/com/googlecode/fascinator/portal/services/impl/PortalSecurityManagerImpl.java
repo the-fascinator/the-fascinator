@@ -34,6 +34,7 @@ import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -44,6 +45,7 @@ import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.googlecode.fascinator.api.access.AccessControlManager;
 import com.googlecode.fascinator.api.authentication.AuthManager;
@@ -53,11 +55,15 @@ import com.googlecode.fascinator.api.roles.RolesManager;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.authentication.GenericUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUser;
+import com.googlecode.fascinator.common.authentication.hibernate.HibernateUserService;
 import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.JsonSessionState;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.PortalSecurityManager;
 import com.googlecode.fascinator.portal.sso.SSOInterface;
+import com.googlecode.fascinator.portal.tapestry.TapestryRequestUtil;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * The security manager coordinates access to various security plugins when
@@ -66,6 +72,7 @@ import com.googlecode.fascinator.portal.sso.SSOInterface;
  * 
  * @author Greg Pendlebury
  */
+@Component(value = "portalSecurityManager")
 public class PortalSecurityManagerImpl implements PortalSecurityManager {
 
     /** Prefix for storing SSO parameters whilst round-tripping */
@@ -96,6 +103,7 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
     private AuthManager authManager;
 
     /** Role Manager - user groups */
+    @Resource(name = "fascinatorRoleManager")
     @Inject
     private RolesManager roleManager;
 
@@ -461,7 +469,10 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
         // Find out what page we are on
         String path = request.getAttribute("RequestURI").toString();
         String currentAddress = serverUrlBase + path;
-
+        if (!StringUtils.isEmpty(TapestryRequestUtil.getQueryString(request))) {
+            currentAddress = currentAddress + "?"
+                    + TapestryRequestUtil.getQueryString(request);
+        }
         // Store the portal URL, might be required by implementers to build
         // an interface (images etc).
         session.set("ssoPortalUrl", serverUrlBase + portalId);
@@ -555,6 +566,11 @@ public class PortalSecurityManagerImpl implements PortalSecurityManager {
             if (user != null) {
                 session.set("username", user.getUsername());
                 session.set("source", ssoId);
+                HibernateUserService hibernateAuthUserService = (HibernateUserService) ApplicationContextProvider
+                        .getApplicationContext().getBean(
+                                "hibernateAuthUserService");
+                log.debug("Auth manager adding user through hibernate...");
+                hibernateAuthUserService.addUser(new HibernateUser(user));
                 return true;
             }
         }

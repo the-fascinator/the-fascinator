@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
@@ -42,7 +44,12 @@ import org.python.core.PyObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.common.IndexAndPayloadComposite;
+import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.StorageDataUtil;
 import com.googlecode.fascinator.common.solr.SolrDoc;
 import com.googlecode.fascinator.portal.FormData;
 import com.googlecode.fascinator.portal.JsonSessionState;
@@ -261,11 +268,14 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         bindings.put("log", log);
         bindings.put("notifications", houseKeeping.getUserMessages());
         bindings.put("bindings", bindings);
-
+        StorageDataUtil dataUtil = new StorageDataUtil();
+        bindings.put("jsonUtil", dataUtil);
         // run page and template scripts
         Set<String> messages = new HashSet<String>();
         bindings.put("page",
                 evalScript(portalId, layoutName, bindings, messages));
+        bindings.put("StringUtils", StringUtils.class);
+        bindings.put("StringEscapeUtils", StringEscapeUtils.class);
         bindings.put("self", evalScript(portalId, pageName, bindings, messages));
 
         // try to return the proper MIME type
@@ -341,6 +351,13 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         return mimeType;
     }
 
+    @Override
+    public String renderObject(Context context, String template,
+            IndexAndPayloadComposite metadata) {
+        context.put("metadata", metadata);
+        return renderObject(context, template, metadata.getIndexedData());
+    }
+
     /**
      * Renders a display template. This is generally used by calling the
      * #parseDisplayTemplate() method in the portal-library.vm.
@@ -383,11 +400,6 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
         }
         // log.debug("parentPageObject: '{}'", parentPageObject);
 
-        objectContext.put("pageName", template);
-        objectContext.put("displayType", displayType);
-        objectContext.put("parent", parentPageObject);
-        objectContext.put("metadata", metadata);
-
         // evaluate the context script if exists
         Set<String> messages = null;
         if (objectContext.containsKey("renderMessages")) {
@@ -396,9 +408,39 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
             messages = new HashSet<String>();
             context.put("renderMessages", messages);
         }
+
+        // get the DigitalObject to replace the metadata with the tfpackage
+        Storage storage = scriptingServices.getStorage();
+
+        JsonSimple tfpackage = null;
+        IndexAndPayloadComposite compositeData = (objectContext.get("metadata") instanceof IndexAndPayloadComposite ? (IndexAndPayloadComposite) objectContext
+                .get("metadata") : null);
+        // check if there's already a composite...
+        if (compositeData == null) {
+            compositeData = loadComposite(storage, compositeData, metadata,
+                    templateName, messages);
+        } else {
+            // if there's a composite but there's no main payload, attempt to
+            // reload it
+            if (compositeData.getPayloadData() == null) {
+                loadComposite(storage, compositeData, metadata, templateName,
+                        messages);
+            }
+            tfpackage = compositeData.getPayloadData();
+        }
+
+        objectContext.put("pageName", template);
+        objectContext.put("displayType", displayType);
+        objectContext.put("parent", parentPageObject);
+        objectContext.put("indexedData", metadata);
+        objectContext.put("metadata", compositeData);
+        objectContext.put("tfpackage", tfpackage);
+
         Map<String, Object> bindings = (Map<String, Object>) objectContext
                 .get("bindings");
-        bindings.put("metadata", metadata);
+        bindings.put("metadata", compositeData);
+        bindings.put("indexedData", metadata);
+        bindings.put("tfpackage", tfpackage);
         objectContext.put("self",
                 evalScript(portalId, templateName, bindings, messages));
 
@@ -422,6 +464,56 @@ public class CachingDynamicPageServiceImpl implements DynamicPageService {
 
         // log.debug("========== END renderObject ==========");
         return content;
+    }
+
+    /**
+     * Attempts to load the main data payload from storage.
+     * 
+     * Supports reloading the payload to an existing instance of the composite.
+     * 
+     * Adds the pay
+     * 
+     * @param storage
+     * @param compositeData
+     * @param metadata
+     * @param templateName
+     * @param messages
+     * @return
+     */
+    private IndexAndPayloadComposite loadComposite(Storage storage,
+            IndexAndPayloadComposite compositeData, SolrDoc metadata,
+            String templateName, Set<String> messages) {
+        DigitalObject obj = null;
+        JsonSimple tfpackage = null;
+        try {
+            obj = storage.getObject(metadata.get("id"));
+            if (obj != null) {
+                for (String payloadId : obj.getPayloadIdList()) {
+                    if (payloadId.endsWith("tfpackage")) {
+                        tfpackage = new JsonSimple(obj.getPayload(payloadId)
+                                .open());
+                        break;
+                    }
+                }
+                if (compositeData == null) {
+                    compositeData = new IndexAndPayloadComposite(metadata,
+                            tfpackage);
+                } else {
+                    compositeData.setPayloadData(tfpackage);
+                }
+            } else {
+                log.error("Failed rendering display page: {}", templateName);
+                messages.add("DigitalObject not found in storage!");
+            }
+        } catch (Exception e) {
+            log.error("Failed rendering display page: {}", templateName);
+            ByteArrayOutputStream eOut = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(eOut));
+            String eMsg = eOut.toString();
+            messages.add("Page content template error: " + templateName + "\n"
+                    + eMsg);
+        }
+        return compositeData;
     }
 
     /**

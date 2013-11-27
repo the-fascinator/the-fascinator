@@ -21,18 +21,17 @@ package com.googlecode.fascinator.api.authentication;
 
 /**
  * A User object that authentication plugins will pass around.
- *
- * Should encapsulate the metadata schema of an user for
- * any implementing plugin.
- *
+ * 
+ * Should encapsulate the metadata schema of an user for any implementing
+ * plugin.
+ * 
  * @author Greg Pendlebury
  */
 public interface User {
 
     /**
-     * Will return a JSON string description of an extending classes'
-     * fields.
-     *
+     * Will return a JSON string description of an extending classes' fields.
+     * 
      * @param property The class field to retrieve
      * @return The value of the property
      */
@@ -40,7 +39,7 @@ public interface User {
 
     /**
      * Retrieves a given property for this user object.
-     *
+     * 
      * @param property The class field to retrieve
      * @return The value of the property
      */
@@ -48,29 +47,43 @@ public interface User {
 
     /**
      * Sets a given property for this user object.
-     *
+     * 
      * @param property The class field to set
      * @param value The value to place in the field
      */
     public void set(String property, String value);
 
     /**
+     * Returns the username :)
+     * 
+     * @return username
+     */
+    public String getUsername();
+
+    /**
+     * Sets the username
+     * 
+     * @param newName
+     */
+    public void setUsername(String newName);
+
+    /**
      * Retrieves how the user should be shown on-screen.
-     *
+     * 
      * @return The value of the property
      */
     public String realName();
 
     /**
      * Used by the authentication manager to track the user's origin
-     *
+     * 
      * @param plugin The id of the authentication plugin
      */
     public void setSource(String plugin);
 
     /**
      * Used by the authentication manager to track the user's origin
-     *
+     * 
      * @return The id of the authentication plugin
      */
     public String getSource();

@@ -2,5 +2,10 @@
 <button id="$button-name" value="$action" >$label</button>
 <script type="text/javascript">
 $('#$button-name').click(function () { action= $(this).val();
-								   	    jaffa.form.save();});
-</script>								   	    
+#if($closeUrl) closeUrl="$portalPath/$closeUrl"; #end
+								if(action =='save' || validateSubmit()) {  
+								   	    jaffa.form.save(true);
+								  }
+								  });
+}
+</script>

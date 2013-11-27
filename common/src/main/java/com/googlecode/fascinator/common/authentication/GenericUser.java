@@ -19,13 +19,15 @@
 
 package com.googlecode.fascinator.common.authentication;
 
-import com.googlecode.fascinator.api.authentication.User;
-import com.googlecode.fascinator.common.JsonObject;
-
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.fascinator.api.authentication.User;
+import com.googlecode.fascinator.common.JsonObject;
 
 /**
  * A basic user object, does not define its metadata schema, that is left to
@@ -36,8 +38,12 @@ import org.slf4j.LoggerFactory;
 public class GenericUser implements User {
     private Logger log = LoggerFactory.getLogger(GenericUser.class);
     private JsonObject response;
-    private String username;
-    private String authenticationSource;
+    protected String username;
+    protected String authenticationSource;
+
+    // Capture any attributes that aren't defined in the User Model for this
+    // authentication type in a map
+    private Map<String, String> additionalAttributesMap = new HashMap<String, String>();
 
     /**
      * Will return a JSON string description of an extending classes' fields.
@@ -62,6 +68,12 @@ public class GenericUser implements User {
                 response.put(element.getName(), element.getType()
                         .getSimpleName());
             }
+
+            // now add the additional attributes
+            for (String key : additionalAttributesMap.keySet()) {
+                response.put(key, "String");
+            }
+
             return response.toString();
         } catch (ClassNotFoundException ex) {
             log.error("Error retrieving user specification", ex);
@@ -102,7 +114,7 @@ public class GenericUser implements User {
             return null;
         }
 
-        return null;
+        return additionalAttributesMap.get(property);
     }
 
     /**
@@ -113,20 +125,27 @@ public class GenericUser implements User {
      */
     @Override
     public final void set(String property, String value) {
+
         String class_name = this.getClass().getCanonicalName();
         try {
             Class<?> ref_class = Class.forName(class_name);
             Field field_list[] = ref_class.getDeclaredFields();
+            boolean foundElement = false;
             for (Field element : field_list) {
                 if (property.equals(element.getName())) {
                     try {
                         element.set(this, value);
+                        foundElement = true;
+                        break;
                     } catch (IllegalArgumentException ex) {
                         log.error("Security Object, Illegal argument : {}", ex);
                     } catch (IllegalAccessException ex) {
                         log.error("Security Object, Illegal access : {}", ex);
                     }
                 }
+            }
+            if (!foundElement) {
+                additionalAttributesMap.put(property, value);
             }
         } catch (ClassNotFoundException ex) {
             log.error("Error setting user data", ex);

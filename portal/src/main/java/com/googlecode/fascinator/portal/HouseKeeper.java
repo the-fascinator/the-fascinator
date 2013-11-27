@@ -76,6 +76,7 @@ import com.googlecode.fascinator.common.messaging.GenericListener;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.portal.quartz.ExternalJob;
 import com.googlecode.fascinator.portal.quartz.HarvestJob;
+import com.googlecode.fascinator.portal.quartz.ProcessingSetJob;
 
 /**
  * The House Keeper is a messaging object that periodically wakes itself up to
@@ -319,7 +320,8 @@ public class HouseKeeper implements GenericListener {
                 // External is the default, also provides legacy support
                 type = "external";
             }
-            if (!(type.equals("external") || type.equals("harvest"))) {
+            if (!(type.equals("external") || type.equals("harvest") || type
+                    .equals("processingSet"))) {
                 log.error("Unknown job type provided ('{}')", type);
                 continue;
             }
@@ -371,6 +373,13 @@ public class HouseKeeper implements GenericListener {
                     continue;
                 }
                 job.getJobDataMap().put("configFile", configFile);
+            }
+            // One-off processing set jobs
+            if (type.equals("processingSet")) {
+                log.debug("Scheduling a ProcessingSetJob...");
+                job = new JobDetail(name, null, ProcessingSetJob.class);
+                job.getJobDataMap().put("jobConfig", thisJob);
+                job.getJobDataMap().put("indexer", indexer);
             }
 
             // Step 4 - Schedule the job

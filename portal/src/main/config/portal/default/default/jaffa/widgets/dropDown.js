@@ -75,7 +75,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
 
             // Label
             var label = this.getConfig("label");
-            if (label != null) {
+            if (label != null && label.trim() != "") {
                 ui.append("<label for=\""+this.field+"\" class=\"widgetLabel\">"+label+"</label>");
             }
 
@@ -86,6 +86,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
             	select.attr('class', classList);
             }
             this.dropDownData = this.getJsonData() || this.getConfig("option-data");
+            
             var defaultValue = this.getConfig("default-value");
             var allowEmpty = this.getConfig("allow-empty");
             if (allowEmpty !== false) {
@@ -103,6 +104,11 @@ var DropDownWidgetBuilder = function($, jaffa) {
                 this.dropDownData = this.dropDownData[dataListKey];
             }
 
+             if(Object.prototype.toString.call(this.dropDownData) != '[object Array]') {
+              ui.append("<span style='color:red;'> [Error&nbsp;loading&nbsp;data... widget '" + this.id() + "' did not load.] </span>");
+              return;
+            } 
+            
             //sorting dropDownData...
             if  (dataIdKey != null){
                 this.dropDownData.sort(function (a, b){
@@ -118,6 +124,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
                     return a1> b1? 1: -1;
                 });
             }
+            
 
             var len = this.dropDownData.length;            
             
@@ -136,14 +143,14 @@ var DropDownWidgetBuilder = function($, jaffa) {
                     	select.append(option);
 	                }
 	            }
-            	
             }
             else{
 	            for (var i = 0; i < len; i++) {
 	                if (defaultValue == this.dropDownData[i].value) {
-	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
-                	option.attr('value', this.dropDownData[i].value);
-                    select.append(option);
+	                    var option = $("<option selected=\"selected\" value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
+                	    option.attr('value', this.dropDownData[i].value);
+                	    select.append(option);
+                        jaffa.form.value(this.labelField, this.dropDownData[i].label);
 	                } else {
 	                    var option = $("<option value=\""+this.dropDownData[i].value+"\">"+this.dropDownData[i].label+"</option>");
                 		option.attr('value', this.dropDownData[i].value);
@@ -156,7 +163,7 @@ var DropDownWidgetBuilder = function($, jaffa) {
 
             // Have we been asked to store the label?
             this.labelField = this.getConfig("label-field");
-            if (this.labelField != null) {
+            if (this.labelField != null && this.labelField.trim() != "") {
                 ui.append("<input type=\"hidden\" id=\""+this.labelField+"\" />");
                 jaffa.form.addField(this.labelField, this.id());
             }
@@ -204,10 +211,14 @@ var DropDownWidgetBuilder = function($, jaffa) {
         change: function(fieldName, isValid) {
             // To avoid double handling, just pay attention to the actual value field
             if (fieldName == this.field) {
-                // Update our label field if we have one
-                if (this.labelField != null) {
-                    var label = jaffa.form.field(fieldName).find(":selected").text();
-                    jaffa.form.value(this.labelField, label);
+                // Update our label field if we have one and only when there is an associated value
+				if (this.labelField != null) {
+					var selected = jaffa.form.field(fieldName).find(":selected");
+					if (selected.val()) {
+						jaffa.form.value(this.labelField, selected.text());
+					} else {
+						jaffa.form.value(this.labelField, "");
+					}
                 }
                 // Complex relations, we want to look like a jQuery automcomplete
                 //  to leverage the same methods on the base widget

@@ -1,1 +1,2 @@
 com.googlecode.fascinator.access.derby.DerbyAccessControl
+com.googlecode.fascinator.access.hibernate.HibernateAccessControl

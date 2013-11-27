@@ -145,7 +145,7 @@
 
 #else
 
-#set ($msg = "Choose from the authentication plugins on the tabs below to manager users.")
+#set ($msg = "Choose from the authentication plugins on the tabs below to manage users.")
 #buildTabbedLayout("Users" "users" $msg $page.authentication.get_plugins_auth() "")
 
 #set ($msg = "Choose from the security plugins on the tabs below to manager user roles.")

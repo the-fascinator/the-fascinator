@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +98,8 @@ public class InternalRoles implements Roles {
     private Properties file_store;
     private Map<String, List<String>> user_list;
     private Map<String, List<String>> role_list;
-
+    private String[] defaultRoles = null;
+    
     @Override
     public String getId() {
         return "internal";
@@ -104,6 +107,7 @@ public class InternalRoles implements Roles {
 
     @Override
     public String getName() {
+    	
         return "Internal Roles";
     }
 
@@ -139,9 +143,13 @@ public class InternalRoles implements Roles {
         // Get the basics
         file_path   = config.getString(null, "roles", "internal", "path");
         loadRoles();
+        JSONArray roleJsonArray = (JSONArray)config.getObject("roles", "internal").get("defaultRoles");
+        if(roleJsonArray != null) {
+        	defaultRoles = Arrays.copyOf(roleJsonArray.toArray(), roleJsonArray.size(), String[].class);
+        }
     }
 
-    private void loadRoles() throws IOException {
+    public void loadRoles() throws IOException {
         file_store  = new Properties();
 
         // Load our userbase from disk
@@ -217,7 +225,11 @@ public class InternalRoles implements Roles {
         if (user_list.containsKey(username)) {
             return user_list.get(username).toArray(new String[0]);
         } else {
-            return new String[0];
+        	if(defaultRoles == null) {
+        		return new String[0];
+        	} else {
+        		return defaultRoles;
+        	}
         }
     }
 

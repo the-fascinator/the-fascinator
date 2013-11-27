@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.internal.KeyValue;
 import org.apache.velocity.VelocityContext;
 import org.json.simple.JSONArray;
@@ -31,12 +33,15 @@ import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.TransactionManagerQueueConsumer;
 import com.googlecode.fascinator.portal.FormData;
+import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.VelocityService;
 import com.googlecode.fascinator.portal.workflow.components.HtmlButton;
 import com.googlecode.fascinator.portal.workflow.components.HtmlComponent;
 import com.googlecode.fascinator.portal.workflow.components.HtmlDiv;
 import com.googlecode.fascinator.portal.workflow.components.HtmlFieldElement;
 import com.googlecode.fascinator.portal.workflow.components.HtmlForm;
+import com.googlecode.fascinator.portal.workflow.components.HtmlFormLayout;
+import com.googlecode.fascinator.portal.workflow.components.HtmlValidationFunction;
 
 public class SimpleWorkflowHelper {
 
@@ -270,13 +275,75 @@ public class SimpleWorkflowHelper {
         String htmlFooter = (String) ((JsonObject) ((JsonObject) formConfiguration
                 .getJsonObject().get("stages")).get(workflowMetadata.getString(
                 null, "step"))).get("form-footer");
+
         if (htmlFooter != null) {
             form.setHtmlFooter(htmlFooter);
         }
 
+        JsonObject validationFunction = (JsonObject) ((JsonObject) ((JsonObject) formConfiguration
+                .getJsonObject().get("stages")).get(workflowMetadata.getString(
+                null, "step"))).get("validation-function");
+
+        if (validationFunction != null) {
+            form.setValidationFunction(getValidationFunction(validationFunction));
+        }
+
+        JSONArray customValidators = formConfiguration.getArray("stages",
+                workflowMetadata.getString(null, "step"), "validators");
+
+        if (customValidators != null) {
+            form.setCustomValidators(getValidatorList(customValidators));
+        }
+
+        JsonObject formLayout = (JsonObject) ((JsonObject) ((JsonObject) formConfiguration
+                .getJsonObject().get("stages")).get(workflowMetadata.getString(
+                null, "step"))).get("form-layout");
+
+        if (formLayout != null) {
+            form.setHtmlFormLayout(getFormLayout(formLayout));
+        }
         String output = renderFormHtml(form);
 
         return output;
+    }
+
+    private List<String> getValidatorList(JSONArray customValidators) {
+        List<String> validatorList = new ArrayList<String>();
+        for (int i = 0; i < customValidators.size(); i++) {
+            validatorList.add((String) customValidators.get(i));
+        }
+        return validatorList;
+    }
+
+    private HtmlValidationFunction getValidationFunction(JsonObject jsonObject) {
+        HtmlValidationFunction htmlValidationFunction = new HtmlValidationFunction();
+        htmlValidationFunction.setComponentTemplateName((String) jsonObject
+                .get("component-type"));
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        Set<Object> keys = jsonObject.keySet();
+        for (Object key : keys) {
+            parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        htmlValidationFunction.setParameterMap(parameterMap);
+        return htmlValidationFunction;
+    }
+
+    private HtmlFormLayout getFormLayout(JsonObject jsonObject) {
+        HtmlFormLayout htmlFormLayout = new HtmlFormLayout();
+        htmlFormLayout.setComponentTemplateName((String) jsonObject
+                .get("component-type"));
+
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        Set<Object> keys = jsonObject.keySet();
+        for (Object key : keys) {
+            parameterMap.put((String) key, jsonObject.get(key));
+        }
+
+        htmlFormLayout.setParameterMap(parameterMap);
+
+        return htmlFormLayout;
     }
 
     private String renderFormHtml(HtmlForm form) throws Exception {
@@ -288,6 +355,16 @@ public class SimpleWorkflowHelper {
 
         String buttonElementsHtml = renderButtonElementsHtml(form);
 
+        String validationFunction = renderValidationFunction(form
+                .getValidationFunction());
+        String formLayout = StringUtils.EMPTY;
+        if (form.getHtmlFormLayout() != null) {
+            formLayout = renderFormLayoutCode(form.getHtmlFormLayout());
+        }
+
+        String validatorFunctions = renderValidatorFunctions(form
+                .getCustomValidators());
+
         String formFooterHtml = renderFormFooterHtml(form.getHtmlFooter());
 
         // Now that we have generated the elements we need for the html form.
@@ -297,12 +374,106 @@ public class SimpleWorkflowHelper {
         vc.put("buttonElementsHtml", buttonElementsHtml);
         vc.put("divElementsHtml", divElementsHtml);
         vc.put("formFooterHtml", formFooterHtml);
+        vc.put("formLayoutCode", formLayout);
+        vc.put("validationFunction", validationFunction);
+        vc.put("validatorFunctions", validatorFunctions);
 
         StringWriter pageContentWriter = new StringWriter();
         velocityService.renderTemplate(portalId,
                 "form-components/form-template", vc, pageContentWriter);
 
         return pageContentWriter.toString();
+    }
+
+    private String renderValidatorFunctions(List<String> customValidators)
+            throws Exception {
+        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+
+        String portalHome = systemConfiguration.getString(
+                PortalManager.DEFAULT_PORTAL_HOME, "portal", "home");
+
+        File coreValidatorDir = new File(portalHome
+                + "/default/default/form-components/validators");
+        if (coreValidatorDir.exists()) {
+            String[] defaultValidators = coreValidatorDir
+                    .list(new SuffixFileFilter(".vm"));
+            for (String defaultValidator : defaultValidators) {
+                customValidators.add(defaultValidator.substring(0,
+                        defaultValidator.length() - 3));
+            }
+        }
+        String validatorFunctions = "";
+        for (String validator : customValidators) {
+            if (velocityService.resourceExists(portalId,
+                    "form-components/validators/" + validator + ".vm") != null) {
+
+                StringWriter pageContentWriter = new StringWriter();
+                velocityService.renderTemplate(portalId,
+                        "form-components/validators/" + validator, vc,
+                        pageContentWriter);
+                validatorFunctions += pageContentWriter.toString();
+
+            }
+
+        }
+
+        return validatorFunctions;
+    }
+
+    private String renderFormLayoutCode(HtmlFormLayout htmlFormLayout)
+            throws Exception {
+        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+
+        if (velocityService.resourceExists(
+                portalId,
+                "form-components/form-layouts/"
+                        + htmlFormLayout.getComponentTemplateName() + ".vm") != null) {
+            Map<String, Object> parameterMap = htmlFormLayout.getParameterMap();
+            Set<String> keySet = parameterMap.keySet();
+            for (String key : keySet) {
+                vc.put(key, parameterMap.get(key));
+            }
+            // Render the component's velocity template as a String
+            StringWriter pageContentWriter = new StringWriter();
+            velocityService.renderTemplate(
+                    portalId,
+                    "form-components/form-layouts/"
+                            + htmlFormLayout.getComponentTemplateName(), vc,
+                    pageContentWriter);
+            return pageContentWriter.toString();
+        }
+        // no layout
+        String formLayoutCode = "";
+        return formLayoutCode;
+    }
+
+    private String renderValidationFunction(
+            HtmlValidationFunction validationFunction) throws Exception {
+        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        String validationFunctionTemplate = validationFunction
+                .getComponentTemplateName();
+        if (velocityService.resourceExists(portalId,
+                "form-components/validation-functions/"
+                        + validationFunctionTemplate + ".vm") != null) {
+
+            Map<String, Object> parameterMap = validationFunction
+                    .getParameterMap();
+            Set<String> keySet = parameterMap.keySet();
+            for (String key : keySet) {
+                vc.put(key, parameterMap.get(key));
+            }
+            // Render the component's velocity template as a String
+            StringWriter pageContentWriter = new StringWriter();
+            velocityService
+                    .renderTemplate(portalId,
+                            "form-components/validation-functions/"
+                                    + validationFunctionTemplate, vc,
+                            pageContentWriter);
+            return pageContentWriter.toString();
+        }
+        // no validation
+        String validationFunctionString = "function doValidation() { return true;}";
+        return validationFunctionString;
     }
 
     private String renderFormFooterHtml(String htmlFooterTemplate)
@@ -415,55 +586,69 @@ public class SimpleWorkflowHelper {
             if ("group".equals(htmlFieldElement.getComponentTemplateName())) {
                 fieldElementsHtml += renderGroupElement(htmlFieldElement);
             } else {
-                String pageName = "form-components/field-elements/"
+                String fieldElementName = "form-components/field-elements/"
                         + htmlFieldElement.getComponentTemplateName();
-                if (velocityService.resourceExists(portalId, pageName + ".vm") != null) {
-                    VelocityContext vc = new VelocityContext();
-
-                    Object[] parentKeys = parentVelocityContext.getKeys();
-                    for (Object key : parentKeys) {
-                        vc.put((String) key,
-                                parentVelocityContext.get((String) key));
-                    }
-
-                    Map<String, Object> parameterMap = htmlFieldElement
-                            .getParameterMap();
-                    Set<String> keySet = parameterMap.keySet();
-                    for (String key : keySet) {
-                        vc.put(key, parameterMap.get(key));
-                    }
-
-                    // Render the component's velocity template as a String
-                    StringWriter pageContentWriter = new StringWriter();
-                    velocityService.renderTemplate(portalId, pageName, vc,
-                            pageContentWriter);
-                    String componentHtml = pageContentWriter.toString();
-
-                    if (htmlFieldElement.hasValidation()) {
-                        vc.put("validation", htmlFieldElement.getValidation());
-                        vc.put("elementHtml", componentHtml);
-                        pageContentWriter = new StringWriter();
-                        velocityService.renderTemplate(portalId,
-                                "form-components/validation-wrapper", vc,
-                                pageContentWriter);
-                        componentHtml = pageContentWriter.toString();
-                    }
-
-                    // Inject this components html for use in the
-                    // component-wrapper
-                    // template
-                    vc.put("elementHtml", componentHtml);
-
-                    pageContentWriter = new StringWriter();
-                    velocityService.renderTemplate(portalId,
-                            "form-components/component-wrapper", vc,
-                            pageContentWriter);
-
-                    fieldElementsHtml += pageContentWriter.toString();
+                String buttonElementName = "form-components/button-elements/"
+                        + htmlFieldElement.getComponentTemplateName();
+                String fieldElementHtml = "";
+                if (velocityService.resourceExists(portalId, fieldElementName
+                        + ".vm") != null) {
+                    fieldElementHtml = renderHtmlFieldElement(htmlFieldElement,
+                            fieldElementName);
+                } else if (velocityService.resourceExists(portalId,
+                        buttonElementName + ".vm") != null) {
+                    fieldElementHtml = renderHtmlFieldElement(htmlFieldElement,
+                            buttonElementName);
                 }
+
+                fieldElementsHtml += fieldElementHtml;
             }
         }
         return fieldElementsHtml;
+    }
+
+    private String renderHtmlFieldElement(HtmlFieldElement htmlFieldElement,
+            String fieldElementName) throws Exception {
+        VelocityContext vc = new VelocityContext();
+
+        Object[] parentKeys = parentVelocityContext.getKeys();
+        for (Object key : parentKeys) {
+            vc.put((String) key, parentVelocityContext.get((String) key));
+        }
+
+        Map<String, Object> parameterMap = htmlFieldElement.getParameterMap();
+        Set<String> keySet = parameterMap.keySet();
+        for (String key : keySet) {
+            vc.put(key, parameterMap.get(key));
+        }
+
+        // Render the component's velocity template as a String
+        StringWriter pageContentWriter = new StringWriter();
+        velocityService.renderTemplate(portalId, fieldElementName, vc,
+                pageContentWriter);
+        String componentHtml = pageContentWriter.toString();
+
+        if (htmlFieldElement.hasValidation()) {
+            vc.put("validation", htmlFieldElement.getValidation());
+            vc.put("elementHtml", componentHtml);
+            pageContentWriter = new StringWriter();
+            velocityService
+                    .renderTemplate(portalId,
+                            "form-components/validation-wrapper", vc,
+                            pageContentWriter);
+            componentHtml = pageContentWriter.toString();
+        }
+
+        // Inject this components html for use in the
+        // component-wrapper
+        // template
+        vc.put("elementHtml", componentHtml);
+
+        pageContentWriter = new StringWriter();
+        velocityService.renderTemplate(portalId,
+                "form-components/component-wrapper", vc, pageContentWriter);
+        String fieldElementHtml = pageContentWriter.toString();
+        return fieldElementHtml;
     }
 
     private String renderGroupElement(HtmlFieldElement htmlFieldElement)
