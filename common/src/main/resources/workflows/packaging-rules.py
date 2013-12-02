@@ -144,16 +144,16 @@ class IndexData:
         return valueList
 
     def __grantAccess(self, newRole):
-        schema = self.utils.getAccessSchema("derby");
+        schema = self.utils.getAccessSchema();
         schema.setRecordId(self.oid)
         schema.set("role", newRole)
-        self.utils.setAccessSchema(schema, "derby")
+        self.utils.setAccessSchema(schema)
 
     def __revokeAccess(self, oldRole):
-        schema = self.utils.getAccessSchema("derby");
+        schema = self.utils.getAccessSchema();
         schema.setRecordId(self.oid)
         schema.set("role", oldRole)
-        self.utils.removeAccessSchema(schema, "derby")
+        self.utils.removeAccessSchema(schema)
 
     def __metadata(self):
         self.title = None

@@ -6,9 +6,13 @@ from com.googlecode.fascinator.common import FascinatorHome, JsonSimpleConfig, M
 from com.googlecode.fascinator.common.storage import StorageUtils
 from com.googlecode.fascinator.spring import ApplicationContextProvider
 from com.googlecode.fascinator.common import JsonSimple
+from com.googlecode.fascinator.api.indexer import SearchRequest
+from com.googlecode.fascinator.common.solr import SolrResult
+from java.io import ByteArrayInputStream, ByteArrayOutputStream
+
 
 from java.io import File, FileOutputStream, OutputStreamWriter
-from java.lang import Exception,String
+from java.lang import Exception,String,Thread
 
 from org.apache.commons.io import FileUtils, IOUtils
 
@@ -19,6 +23,7 @@ class PackagingData:
 
     def __activate__(self, context):
         self.velocityContext = context
+        self.indexer = self.velocityContext["Services"].getIndexer()
         #self.vc("log").debug("formData = {}", self.vc("formData"))
 
         result = "{}"
@@ -105,11 +110,21 @@ class PackagingData:
             if harvester is not None:
                 harvester.shutdown()
             return '{ "status": "failed" }'
+        
+        while not self.__packageIndexed(manifestId):
+            Thread.sleep(500)
         # clean up
         self.__deselect()
         # return url to workflow screen
         return '{"status": "ok", "url": "%s/workflow/%s", "oid": "%s" }' % (self.vc("portalPath"), manifestId,manifestId)
 
+    def __packageIndexed(self, oid):
+        req = SearchRequest("storage_id:%s" % oid)
+        out = ByteArrayOutputStream()
+        self.indexer.search(req, out)
+        solrResult = SolrResult(ByteArrayInputStream(out.toByteArray()))
+        return solrResult.getRows() > 0
+        
     def __createFromSelected(self):
         self.vc("log").debug("Creating package from selected...")
         packageType, jsonConfigFile = self.__getPackageTypeAndJsonConfigFile()
@@ -239,6 +254,7 @@ class PackagingData:
     def __getPackageTypeAndJsonConfigFile(self):
         try:
             packageType = self.vc("formData").get("packageType", "default")
+            
             if packageType == "":
                 packageType = "default"
             types = JsonSimpleConfig().getJsonSimpleMap(["portal", "packageTypes"])
@@ -248,7 +264,9 @@ class PackagingData:
             if pt is None:
                 configFile = "packaging-config.json"
             else:
+                self.vc("log").error("Getting pt: %s" % pt)
                 configFile = pt.getString("packaging-config.json", ["jsonconfig"])
+                self.vc("log").error("Getting configFile: %s" % configFile)
         except Exception, e:
             configFile = "packaging-config.json"
         return (packageType, configFile)
