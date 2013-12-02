@@ -52,7 +52,7 @@
 		class="com.googlecode.fascinator.portal.security.handler.FascinatorLoginUrlAuthenticationEntryPoint"
 		p:loginFormUrl="/default/login"/>
 
-	
+	<bean id="simpleWorkflowPageCache" class="java.util.concurrent.ConcurrentHashMap"/>
 
 	<bean id="customAuthenticationFailureHandler"
 		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"
