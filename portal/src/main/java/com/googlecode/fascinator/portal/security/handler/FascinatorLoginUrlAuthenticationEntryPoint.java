@@ -14,24 +14,27 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
  * 
  */
 public class FascinatorLoginUrlAuthenticationEntryPoint extends
-        LoginUrlAuthenticationEntryPoint {
+		LoginUrlAuthenticationEntryPoint {
 
-    @Override
-    protected String determineUrlToUseForThisRequest(
-            HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException exception) {
-        String path = request.getServletPath();
-        path = path.substring(1, path.length());
-        int nextSlash = path.indexOf("/");
-        String portal;
-        if (nextSlash == -1) {
-            portal = path;
-            path = "";
-        } else {
-            portal = path.substring(0, path.indexOf("/"));
-        }
-        String redirectPath = path.substring(path.indexOf("/") + 1,
-                path.length());
-        return "/" + portal + "/login?fromUrl=" + redirectPath;
-    }
+	@Override
+	protected String determineUrlToUseForThisRequest(
+			HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException exception) {
+		String path = request.getServletPath();
+		path = path.substring(1, path.length());
+		int nextSlash = path.indexOf("/");
+		if (path.startsWith("verNum")) {
+			path = path.substring(path.indexOf("/") + 1, path.length());
+		}
+		String portal;
+		if (nextSlash == -1) {
+			portal = path;
+			path = "";
+		} else {
+			portal = path.substring(0, path.indexOf("/"));
+		}
+		String redirectPath = path.substring(path.indexOf("/") + 1,
+				path.length());
+		return "/" + portal + "/login?fromUrl=" + redirectPath;
+	}
 }
