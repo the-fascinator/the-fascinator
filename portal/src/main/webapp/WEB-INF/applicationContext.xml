@@ -52,7 +52,7 @@
 		class="com.googlecode.fascinator.portal.security.handler.FascinatorLoginUrlAuthenticationEntryPoint"
 		p:loginFormUrl="/default/login"/>
 
-	<bean id="simpleWorkflowPageCache" class="java.util.concurrent.ConcurrentHashMap"/>
+	<bean id="simpleWorkflowPageCache" class="com.googlecode.fascinator.portal.workflow.SimpleWorkflowPageCache"/>
 
 	<bean id="customAuthenticationFailureHandler"
 		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"
@@ -64,7 +64,7 @@
 	
 	<bean id="accessDeniedHandler" class="com.googlecode.fascinator.portal.security.handler.FascinatorAccessDeniedHandler" />
 	
-	
+
 	<import resource="file:${FASCINATOR_HOME}/applicationContext-*.xml" />
 	
 	<context:component-scan base-package="com.googlecode.fascinator" />
