@@ -20,8 +20,17 @@ package com.googlecode.fascinator.portal.services.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.jms.JMSException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -37,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import com.googlecode.fascinator.common.JsonSimple;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.portal.services.DynamicPageCache;
+import com.googlecode.fascinator.portal.services.DynamicPageCacheMXBean;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.ScriptingServices;
 import com.googlecode.fascinator.portal.services.VelocityService;
@@ -47,204 +57,233 @@ import com.googlecode.fascinator.portal.services.cache.JythonCacheEntryFactory;
  * 
  * @author Oliver Lucido
  */
-public class EhcacheDynamicPageCacheImpl implements DynamicPageCache {
+public class EhcacheDynamicPageCacheImpl implements DynamicPageCache,
+		DynamicPageCacheMXBean {
 
-    /** Script cache id */
-    private static final String SCRIPT_CACHE_ID = "scriptObjects";
+	/** Script cache id */
+	private static final String SCRIPT_CACHE_ID = "scriptObjects";
 
-    /** Path lookup cache id */
-    private static final String PATH_CACHE_ID = "pathLookup";
+	/** Path lookup cache id */
+	private static final String PATH_CACHE_ID = "pathLookup";
 
-    /** Default cache profile */
-    private static final String DEFAULT_PROFILE = "default";
+	/** Default cache profile */
+	private static final String DEFAULT_PROFILE = "default";
 
-    /** Logging */
-    private Logger log = LoggerFactory
-            .getLogger(EhcacheDynamicPageCacheImpl.class);
+	/** Logging */
+	private Logger log = LoggerFactory
+			.getLogger(EhcacheDynamicPageCacheImpl.class);
 
-    /** PortalManager instance */
-    private PortalManager portalManager;
+	/** PortalManager instance */
+	private PortalManager portalManager;
 
-    /** Ehcache manager */
-    private CacheManager cacheManager;
+	/** Ehcache manager */
+	private CacheManager cacheManager;
 
-    /** Cache for jython script objects */
-    private Ehcache scriptCache;
+	/** Cache for jython script objects */
+	private Ehcache scriptCache;
 
-    /** Cache for path lookups */
-    private Ehcache pathCache;
+	/** Cache for path lookups */
+	private Ehcache pathCache;
 
-    /** Whether or not to check last modified timestamp on script files */
-    private boolean lastModifiedCheck;
+	/** Whether or not to check last modified timestamp on script files */
+	private boolean lastModifiedCheck;
 
-    /** Last modified timestamp cache */
-    private Map<String, Long> lastModifiedMap;
+	/** Last modified timestamp cache */
+	private Map<String, Long> lastModifiedMap;
 
-    /**
-     * Construct and configure the caches.
-     * 
-     * @param portalManager PortalManager instance
-     * @param velocityService VelocityService instance
-     * @param scriptingServices ScriptingServices instance
-     */
-    public EhcacheDynamicPageCacheImpl(PortalManager portalManager,
-            VelocityService velocityService, ScriptingServices scriptingServices) {
+	/**
+	 * Construct and configure the caches.
+	 * 
+	 * @param portalManager
+	 *            PortalManager instance
+	 * @param velocityService
+	 *            VelocityService instance
+	 * @param scriptingServices
+	 *            ScriptingServices instance
+	 */
+	public EhcacheDynamicPageCacheImpl(PortalManager portalManager,
+			VelocityService velocityService, ScriptingServices scriptingServices) {
 
-        this.portalManager = portalManager;
+		this.portalManager = portalManager;
 
-        cacheManager = new CacheManager();
-        cacheManager.addCache(SCRIPT_CACHE_ID);
-        cacheManager.addCache(PATH_CACHE_ID);
+		cacheManager = new CacheManager();
+		cacheManager.addCache(SCRIPT_CACHE_ID);
+		cacheManager.addCache(PATH_CACHE_ID);
 
-        try {
-            JsonSimpleConfig config = new JsonSimpleConfig();
+		try {
+			JsonSimpleConfig config = new JsonSimpleConfig();
 
-            Map<String, JsonSimple> cacheProfiles = config.getJsonSimpleMap(
-                    "portal", "caching", "profiles");
-            Map<String, JsonSimple> cacheConfigs = config.getJsonSimpleMap(
-                    "portal", "caching", "caches");
-            for (String cacheId : cacheConfigs.keySet()) {
-                // log.debug("{}: {}", cacheId, cacheConfigs.get(cacheId));
-                Ehcache cache = cacheManager.getCache(cacheId);
-                if (cache == null) {
-                    log.warn("Cache '{}' does not exist!", cacheId);
-                } else {
-                    JsonSimple jsonConfig = cacheConfigs.get(cacheId);
-                    String profileId = jsonConfig.getString(DEFAULT_PROFILE,
-                            "profile");
-                    if (cacheProfiles.containsKey(profileId)) {
-                        log.debug("Configuring cache '{}' with profile '{}'",
-                                cacheId, profileId);
-                        JsonSimple profile = cacheProfiles.get(profileId);
-                        CacheConfiguration cacheConfig = cache
-                                .getCacheConfiguration();
-                        cacheConfig.setMaxElementsInMemory(profile.getInteger(
-                                10000, "maxElementsInMemory"));
-                        cacheConfig.setEternal(profile.getBoolean(false,
-                                "eternal"));
-                        if (!cacheConfig.isEternal()) {
-                            cacheConfig.setTimeToIdleSeconds(profile
-                                    .getInteger(120, "timeToIdleSeconds"));
-                            cacheConfig.setTimeToLiveSeconds(profile
-                                    .getInteger(120, "timeToLiveSeconds"));
-                        }
-                        cacheConfig.setOverflowToDisk(profile.getBoolean(false,
-                                "overflowToDisk"));
-                        cacheConfig.setMaxElementsOnDisk(profile.getInteger(
-                                10000, "maxElementsOnDisk"));
-                        cacheConfig.setMemoryStoreEvictionPolicy(profile
-                                .getString("LRU", "memoryStoreEvictionPolicy"));
-                    } else {
-                        log.warn("Cache profile '{}' does not exist!",
-                                profileId);
-                    }
-                }
-            }
+			Map<String, JsonSimple> cacheProfiles = config.getJsonSimpleMap(
+					"portal", "caching", "profiles");
+			Map<String, JsonSimple> cacheConfigs = config.getJsonSimpleMap(
+					"portal", "caching", "caches");
+			for (String cacheId : cacheConfigs.keySet()) {
+				// log.debug("{}: {}", cacheId, cacheConfigs.get(cacheId));
+				Ehcache cache = cacheManager.getCache(cacheId);
+				if (cache == null) {
+					log.warn("Cache '{}' does not exist!", cacheId);
+				} else {
+					JsonSimple jsonConfig = cacheConfigs.get(cacheId);
+					String profileId = jsonConfig.getString(DEFAULT_PROFILE,
+							"profile");
+					if (cacheProfiles.containsKey(profileId)) {
+						log.debug("Configuring cache '{}' with profile '{}'",
+								cacheId, profileId);
+						JsonSimple profile = cacheProfiles.get(profileId);
+						CacheConfiguration cacheConfig = cache
+								.getCacheConfiguration();
+						cacheConfig.setMaxElementsInMemory(profile.getInteger(
+								10000, "maxElementsInMemory"));
+						cacheConfig.setEternal(profile.getBoolean(false,
+								"eternal"));
+						if (!cacheConfig.isEternal()) {
+							cacheConfig.setTimeToIdleSeconds(profile
+									.getInteger(120, "timeToIdleSeconds"));
+							cacheConfig.setTimeToLiveSeconds(profile
+									.getInteger(120, "timeToLiveSeconds"));
+						}
+						cacheConfig.setOverflowToDisk(profile.getBoolean(false,
+								"overflowToDisk"));
+						cacheConfig.setMaxElementsOnDisk(profile.getInteger(
+								10000, "maxElementsOnDisk"));
+						cacheConfig.setMemoryStoreEvictionPolicy(profile
+								.getString("LRU", "memoryStoreEvictionPolicy"));
+					} else {
+						log.warn("Cache profile '{}' does not exist!",
+								profileId);
+					}
+				}
+			}
 
-            lastModifiedCheck = config.getBoolean(false, "portal", "caching",
-                    "caches", SCRIPT_CACHE_ID, "lastModifiedCheck");
-            if (lastModifiedCheck) {
-                lastModifiedMap = new HashMap<String, Long>();
-            }
+			lastModifiedCheck = config.getBoolean(false, "portal", "caching",
+					"caches", SCRIPT_CACHE_ID, "lastModifiedCheck");
+			if (lastModifiedCheck) {
+				lastModifiedMap = new HashMap<String, Long>();
+			}
 
-            scriptCache = new SelfPopulatingCache(
-                    cacheManager.getCache(SCRIPT_CACHE_ID),
-                    new JythonCacheEntryFactory(portalManager, velocityService,
-                            scriptingServices));
-            pathCache = cacheManager.getCache(PATH_CACHE_ID);
+			scriptCache = new SelfPopulatingCache(
+					cacheManager.getCache(SCRIPT_CACHE_ID),
+					new JythonCacheEntryFactory(portalManager, velocityService,
+							scriptingServices));
+			pathCache = cacheManager.getCache(PATH_CACHE_ID);
 
-        } catch (IOException ioe) {
-            log.warn("Failed to configure caches, using defaults...", ioe);
-        }
-    }
+		} catch (IOException ioe) {
+			log.warn("Failed to configure caches, using defaults...", ioe);
+		}
+		try {
+			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			ObjectName mxbeanName = new ObjectName(
+					"com.googlecode.fascinator.portal:type=DynamicPageCache");
+			mbs.registerMBean(this, mxbeanName);
+			
+		} catch (MalformedObjectNameException e) {
+			log.error("Error configuring MBean, invalid name", e);
+		} catch (InstanceAlreadyExistsException e) {
+			log.error("Error configuring MBean, instance exists.", e);
+		} catch (MBeanRegistrationException e) {
+			log.error("Error registering MBean. ", e);
+		} catch (NotCompliantMBeanException e) {
+			log.error("Error configuring Mbean, non-compliant!", e);
+		}
+	}
 
-    /**
-     * Shutdown the caches properly when Tapestry shuts down.
-     */
-    @Override
-    public void registryDidShutdown() {
-        if (cacheManager != null) {
-            cacheManager.shutdown();
-        }
-    }
+	/**
+	 * Shutdown the caches properly when Tapestry shuts down.
+	 */
+	@Override
+	public void registryDidShutdown() {
+		if (cacheManager != null) {
+			cacheManager.shutdown();
+		}
+	}
 
-    /**
-     * Gets the script object with the specified path. If not already cached the
-     * script object will be created by the JythonCacheEntryFactory.
-     * 
-     * @param path jython script path - including portal and skin. this should
-     *            be a valid Velocity resource
-     * @return a script object or null if an error occurred
-     */
-    @Override
-    public PyObject getScriptObject(String path) {
-        // log.debug("getScriptObject: '{}'", path);
-        if (lastModifiedCheck) {
-            // check if the script was modified and remove from cache
-            File scriptFile = new File(portalManager.getHomeDir(), path);
-            long lastModified = scriptFile.lastModified();
-            // log.debug("lastModified: {}:{}", scriptFile, lastModified);
-            if (lastModifiedMap.containsKey(path)) {
-                if (lastModified > lastModifiedMap.get(path)) {
-                    // log.debug("Expiring {} because it was modified!", path);
-                    scriptCache.remove(path);
-                }
-            }
-            lastModifiedMap.put(path, lastModified);
-        }
-        Element element = scriptCache.get(path);
-        if (element != null) {
-            Object objectValue = element.getObjectValue();
-            if (objectValue instanceof PyInstance) {
-                return new LocalPyInstance((PyInstance) objectValue);
-            }
-        }
-        return null;
-    }
+	/**
+	 * Gets the script object with the specified path. If not already cached the
+	 * script object will be created by the JythonCacheEntryFactory.
+	 * 
+	 * @param path
+	 *            jython script path - including portal and skin. this should be
+	 *            a valid Velocity resource
+	 * @return a script object or null if an error occurred
+	 */
+	@Override
+	public PyObject getScriptObject(String path) {
+		// log.debug("getScriptObject: '{}'", path);
+		if (lastModifiedCheck) {
+			// check if the script was modified and remove from cache
+			File scriptFile = new File(portalManager.getHomeDir(), path);
+			long lastModified = scriptFile.lastModified();
+			// log.debug("lastModified: {}:{}", scriptFile, lastModified);
+			if (lastModifiedMap.containsKey(path)) {
+				if (lastModified > lastModifiedMap.get(path)) {
+					// log.debug("Expiring {} because it was modified!", path);
+					scriptCache.remove(path);
+				}
+			}
+			lastModifiedMap.put(path, lastModified);
+		}
+		Element element = scriptCache.get(path);
+		if (element != null) {
+			Object objectValue = element.getObjectValue();
+			if (objectValue instanceof PyInstance) {
+				return new LocalPyInstance((PyInstance) objectValue);
+			}
+		}
+		return null;
+	}
 
-    /**
-     * Gets the fully resolved path for the specified path including the skin.
-     * 
-     * @param pathId a path to resolve
-     * @return resolved path
-     */
-    @Override
-    public String getPath(String pathId) {
-        // log.debug("getPath: {}", pathId);
-        Element element = pathCache.get(pathId);
-        if (element != null) {
-            return element.getObjectValue().toString();
-        }
-        return null;
-    }
+	/**
+	 * Gets the fully resolved path for the specified path including the skin.
+	 * 
+	 * @param pathId
+	 *            a path to resolve
+	 * @return resolved path
+	 */
+	@Override
+	public String getPath(String pathId) {
+		// log.debug("getPath: {}", pathId);
+		Element element = pathCache.get(pathId);
+		if (element != null) {
+			return element.getObjectValue().toString();
+		}
+		return null;
+	}
 
-    /**
-     * Puts an entry into the path lookup cache.
-     * 
-     * @param pathId path to resolve
-     * @param path resolved path
-     */
-    @Override
-    public void putPath(String pathId, String path) {
-        // log.debug("putPath: {} {}", pathId, path);
-        pathCache.put(new Element(pathId, path));
-    }
+	/**
+	 * Puts an entry into the path lookup cache.
+	 * 
+	 * @param pathId
+	 *            path to resolve
+	 * @param path
+	 *            resolved path
+	 */
+	@Override
+	public void putPath(String pathId, String path) {
+		// log.debug("putPath: {} {}", pathId, path);
+		pathCache.put(new Element(pathId, path));
+	}
 
-    /**
-     * Internal wrapper class for PyInstance to keep variables contained within
-     * the executing thread.
-     */
-    private class LocalPyInstance extends PyInstance {
-        /** Serializable - required */
-        private static final long serialVersionUID = 1L;
+	/**
+	 * Internal wrapper class for PyInstance to keep variables contained within
+	 * the executing thread.
+	 */
+	private class LocalPyInstance extends PyInstance {
+		/** Serializable - required */
+		private static final long serialVersionUID = 1L;
 
-        public LocalPyInstance(PyInstance instance) {
-            super(instance.instclass);
-            // make sure objects assigned in the __init__ method are visible
-            for (PyObject key : instance.__dict__.asIterable()) {
-                __dict__.__setitem__(key.__str__(),
-                        instance.__dict__.__finditem__(key));
-            }
-        }
-    }
+		public LocalPyInstance(PyInstance instance) {
+			super(instance.instclass);
+			// make sure objects assigned in the __init__ method are visible
+			for (PyObject key : instance.__dict__.asIterable()) {
+				__dict__.__setitem__(key.__str__(),
+						instance.__dict__.__finditem__(key));
+			}
+		}
+	}
+
+	@Override
+	public void clearCache() {
+		pathCache.removeAll();
+	}
+
 }
