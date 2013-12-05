@@ -40,6 +40,7 @@ import com.googlecode.fascinator.api.roles.Roles;
 import com.googlecode.fascinator.api.roles.RolesException;
 import com.googlecode.fascinator.api.roles.RolesManager;
 import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * Search and management of roles.
@@ -250,6 +251,14 @@ public class RoleManager implements RolesManager {
      */
     @Override
     public void setRole(String username, String newrole) throws RolesException {
+    	
+    	RoleManager springRoleManager =(RoleManager)ApplicationContextProvider.getApplicationContext().getBean("fascinatorRoleManager");
+    	//TODO: Remove this once we remove the Tapestry DI
+    	// Check if we are the Spring Role Manager
+    	if(this != springRoleManager) {
+    		springRoleManager.setRole(username, newrole);	
+    	}
+    	
         // Try the active plugin first
         try {
             plugins.get(active).setRole(username, newrole);
