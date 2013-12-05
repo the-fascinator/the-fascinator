@@ -1,0 +1,5 @@
+<ul #if ($type) style="list-style-type: $type;" #end>
+ #foreach( $element in $list-elements )
+<li>#displayMessage($element.value)</li>
+#end
+</ul>
