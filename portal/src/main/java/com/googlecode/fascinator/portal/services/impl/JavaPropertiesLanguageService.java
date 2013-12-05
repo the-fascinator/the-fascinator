@@ -45,7 +45,29 @@ public class JavaPropertiesLanguageService implements LanguageService {
     @Override
     public void init() {
         log.debug("Initializing JavaPropertiesLanguageService...");
-        File propertiesDir = new File(config.getString(null, "config",
+        reloadLanguageFiles();
+    }
+
+    @Override
+    public String displayMessage(String messageCode, String region) {
+        return displayMessage(messageCode);
+    }
+
+    @Override
+    public String displayMessage(String messageCode) {
+        for (Properties propertyFile : propertiesFiles) {
+            if (propertyFile.get(messageCode) != null) {
+                return (String) propertyFile.get(messageCode);
+            }
+        }
+
+        return messageCode;
+    }
+
+	@Override
+	public void reloadLanguageFiles() {
+		propertiesFiles.clear();
+		File propertiesDir = new File(config.getString(null, "config",
                 "propertiesDir"));
         if (!propertiesDir.exists()) {
             log.error("Can't find properties directory "
@@ -66,22 +88,7 @@ public class JavaPropertiesLanguageService implements LanguageService {
                         + propertyFile.getPath(), e);
             }
         }
-    }
-
-    @Override
-    public String displayMessage(String messageCode, String region) {
-        return displayMessage(messageCode);
-    }
-
-    @Override
-    public String displayMessage(String messageCode) {
-        for (Properties propertyFile : propertiesFiles) {
-            if (propertyFile.get(messageCode) != null) {
-                return (String) propertyFile.get(messageCode);
-            }
-        }
-
-        return messageCode;
-    }
+		
+	}
 
 }

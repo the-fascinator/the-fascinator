@@ -46,35 +46,7 @@ public class RegionSpecificJavaPropertiesLanguageService implements
     @Override
     public void init() {
         log.debug("Initializing RegionSpecificJavaPropertiesLanguageService ...");
-        File propertiesDir = new File(config.getString(null, "config",
-                "propertiesDir"));
-        if (!propertiesDir.exists()) {
-            log.error("Can't find properties directory "
-                    + propertiesDir.getPath());
-            return;
-        }
-
-        log.debug("Loading from {} ", propertiesDir.getPath());
-
-        File[] file = propertiesDir.listFiles();
-        for (File propertyFileDirectory : file) {
-            if (propertyFileDirectory.isDirectory()) {
-                String regionName = propertyFileDirectory.getName();
-                Properties mergedProperties = new Properties();
-                for (File propertyFile : propertyFileDirectory.listFiles()) {
-                    try {
-                        Properties properties = new Properties();
-                        properties.load(new FileInputStream(propertyFile));
-                        mergedProperties.putAll(properties);
-                    } catch (Exception e) {
-                        log.error("Can't find properties properties file "
-                                + propertyFile.getPath(), e);
-                    }
-                }
-
-                propertiesFiles.put(regionName, mergedProperties);
-            }
-        }
+        reloadLanguageFiles();
     }
 
     /*
@@ -104,5 +76,42 @@ public class RegionSpecificJavaPropertiesLanguageService implements
     public String displayMessage(String messageCode) {
         return displayMessage(messageCode, "default");
     }
+
+	@Override
+	public void reloadLanguageFiles() {
+		propertiesFiles.clear();
+		File propertiesDir = new File(config.getString(null, "config",
+                "propertiesDir"));
+        if (!propertiesDir.exists()) {
+            log.error("Can't find properties directory "
+                    + propertiesDir.getPath());
+            return;
+        }
+
+        log.debug("Loading from {} ", propertiesDir.getPath());
+
+        File[] file = propertiesDir.listFiles();
+        for (File propertyFileDirectory : file) {
+            if (propertyFileDirectory.isDirectory()) {
+                String regionName = propertyFileDirectory.getName();
+                Properties mergedProperties = new Properties();
+                for (File propertyFile : propertyFileDirectory.listFiles()) {
+                    try {
+                        Properties properties = new Properties();
+                        FileInputStream propertyFileInputStream = new FileInputStream(propertyFile);
+                        properties.load(propertyFileInputStream);
+                        propertyFileInputStream.close();
+                        mergedProperties.putAll(properties);
+                        
+                    } catch (Exception e) {
+                        log.error("Can't find properties properties file "
+                                + propertyFile.getPath(), e);
+                    }
+                }
+
+                propertiesFiles.put(regionName, mergedProperties);
+            }
+        }		
+	}
 
 }

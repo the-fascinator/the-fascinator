@@ -39,9 +39,11 @@ import com.googlecode.fascinator.portal.services.DynamicPageService;
 import com.googlecode.fascinator.portal.services.FascinatorService;
 import com.googlecode.fascinator.portal.services.HarvestManager;
 import com.googlecode.fascinator.portal.services.HouseKeepingManager;
+import com.googlecode.fascinator.portal.services.LanguageServiceMXBean;
 import com.googlecode.fascinator.portal.services.PortalManager;
 import com.googlecode.fascinator.portal.services.ScriptingServices;
 import com.googlecode.fascinator.portal.services.VelocityService;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 @Component(value = "scriptingServices")
 public class ScriptingServicesImpl implements ScriptingServices {
@@ -76,6 +78,9 @@ public class ScriptingServicesImpl implements ScriptingServices {
 
     @Inject
     private VelocityService velocityService;
+    
+    @Autowired
+    private LanguageServiceMXBean languageServiceMXBean;
 
     private Map<String, FascinatorService> services;
 
@@ -105,6 +110,12 @@ public class ScriptingServicesImpl implements ScriptingServices {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        
+        //check if this is the tapestry initialized instance
+        if(languageServiceMXBean == null) {
+        	languageServiceMXBean = (LanguageServiceMXBean)ApplicationContextProvider.getApplicationContext().getBean("languageServiceMXBean");
+        	((LanguageServiceMXBeanImpl)languageServiceMXBean).setTapestryScriptingService(this);
         }
     }
 

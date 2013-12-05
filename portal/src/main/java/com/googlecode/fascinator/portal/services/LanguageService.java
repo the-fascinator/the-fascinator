@@ -6,4 +6,6 @@ public interface LanguageService extends FascinatorService {
 
     public abstract String displayMessage(String messageCode, String region);
 
+	public abstract void reloadLanguageFiles();
+
 }

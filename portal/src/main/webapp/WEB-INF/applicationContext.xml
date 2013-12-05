@@ -53,7 +53,16 @@
 		p:loginFormUrl="/default/login"/>
 
 	<bean id="simpleWorkflowPageCache" class="com.googlecode.fascinator.portal.workflow.SimpleWorkflowPageCache"/>
+	<bean id="languageServiceMXBean" class="com.googlecode.fascinator.portal.services.impl.LanguageServiceMXBeanImpl"/>
 
+	<bean id="exporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+    <property name="beans">
+      <map>
+        <entry key="com.googlecode.fascinator.portal:type=LanguageService" value-ref="languageServiceMXBean"/>
+      </map>
+    </property>
+  </bean>
+  
 	<bean id="customAuthenticationFailureHandler"
 		class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"
 		p:defaultFailureUrl="/default/login?error=true" />
