@@ -85,7 +85,7 @@ public class FascinatorWebSecurityExpressionRoot extends
         return hasDownloadAccess(OID_PATTERN);
     }
 
-    private boolean hasDownloadAccess(String oidPattern) {
+    public boolean hasDownloadAccess(String oidPattern) {
         if (isAdmin()) {
             return true;
         }
@@ -176,7 +176,7 @@ public class FascinatorWebSecurityExpressionRoot extends
         return isInAllowedUsers(OID_PATTERN);
     }
 
-    private boolean isInAllowedUsers(String oid) {
+    public boolean isInAllowedUsers(String oid) {
         String userName = (String) authentication.getPrincipal();
         try {
             List<String> allowedUsers = accessControl.getUsers(oid);
@@ -254,7 +254,7 @@ public class FascinatorWebSecurityExpressionRoot extends
     /**
      * Check whether user has the correct role to edit
      */
-    private boolean isInAllowedRoles(String oid) {
+    public boolean isInAllowedRoles(String oid) {
         List<String> allowedRoles;
         try {
             allowedRoles = accessControl.getRoles(oid);
@@ -283,7 +283,7 @@ public class FascinatorWebSecurityExpressionRoot extends
     /**
      * Check editing access
      */
-    private boolean hasWorkflowAccess(String oidPattern) {
+    public boolean hasWorkflowAccess(String oidPattern) {
         boolean hasAccess = false;
         try {
             String oid = getOid(oidPattern);
@@ -353,6 +353,17 @@ public class FascinatorWebSecurityExpressionRoot extends
         }
     }
 
+    public boolean hasAPIAccess() {
+    	String apiKey = request.getParameter("apiKey");
+    	if(!StringUtils.isEmpty(apiKey)) {
+    		Object clientObject = systemConfiguration.getObject("api","clients",apiKey);
+    		if(clientObject != null) {
+    			return true;
+    		}
+    		
+    	}
+    	return false;
+    }
     public boolean isGuestOwnerEditAllowed() {
         String oid = getOid(OID_PATTERN);
         try {
@@ -461,5 +472,7 @@ public class FascinatorWebSecurityExpressionRoot extends
         return new JsonSimple(digitalObject.getPayload("workflow.metadata")
                 .open());
     }
+    
+    
 
 }
