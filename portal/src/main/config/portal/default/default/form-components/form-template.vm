@@ -147,6 +147,7 @@
 	}
 	
 	function validationFail(fieldId, testsFailed) {
+		window.scrollTo(0, 0); // force page scroll to top as this is the case
     	$(".errorbox").show();
     	var validation = validationFieldMap[fieldId];
     	for(var i =0; i < testsFailed.length; i++) {
@@ -155,7 +156,6 @@
     		
         	$("[id='"+fieldId+"-errorButton']").click(function() { $("[id='"+validation["focusId"]+"']").focus();});
         }
-    	window.location.hash = '#errorbox-list';
 	}
     
     function matchesPrefix(field,prefixes) {
