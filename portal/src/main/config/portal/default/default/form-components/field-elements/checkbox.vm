@@ -1,20 +1,44 @@
 #if($box-for)<span #if( $multiline )style="display:block;" #end>#displayMessage($box-for)</span>#end
 
-#if ($boxes.size() > 1)
-    #set($checkbox_id = 1)
-    #foreach( $box in $boxes )
-        <label #if( $multiline )style="display:block;" #end
-         #if ($additional-class) class="$additional-class" #end>
-          <input  type="checkbox"  class="jaffa-field" name="$field-name" id="${field-name}.${checkbox_id}"
+#if($sourceUrl)
+### create checkboxes from JSON inside the place holder div
+<div id="data-source-checkbox-$field-name"></div>
+
+<script>
+$(document).ready(function() {
+	jQuery.getJSON("$portalPath/$sourceUrl", function( data ) {
+		var s = jQuery("[id='data-source-checkbox-$field-name']");
+		for(var val in data) {
+			var item = data[val];
+			var n = parseInt(val) + 1;
+			var id = '${field-name}.'+ n;
+			var box = $('<input />', { type: 'checkbox', id: id, value: item.value, name: '$field-name', class: 'jaffa-field' });
+			if (item.checked) { box.attr("checked", "checked"); }
+			box.appendTo(s);
+			$('<label />', { 'for': id, text: item.label, style:"display:inline-block" #if($additional-classes) ,class:"$additional-classes" #end }).appendTo(s);
+			#if( $multiline ) $('<br>').appendTo(s); #end
+			jaffa.form.addField(id);
+		}
+	});
+});
+</script>
+#else
+    #if ($boxes.size() > 1)
+        #set($checkbox_id = 1)
+        #foreach( $box in $boxes )
+            <label #if( $multiline )style="display:block;" #end
+             #if ($additional-class) class="$additional-class" #end>
+              <input  type="checkbox"  class="jaffa-field" name="$field-name" id="${field-name}.${checkbox_id}"
+              #if( $box.checked ) checked="checked" #end 
+             value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
+            #set($checkbox_id = $checkbox_id + 1)
+        #end
+    #else
+    	#set($box=$boxes.get(0))
+        <label 
+         #if ($additional-class) class="$additional-class" #else style="display:block;" #end>
+          <input  type="checkbox"  class="jaffa-field" name="$field-name" id="${field-name}"
           #if( $box.checked ) checked="checked" #end 
          value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
-        #set($checkbox_id = $checkbox_id + 1)
     #end
-#else
-	#set($box=$boxes.get(0))
-    <label 
-     #if ($additional-class) class="$additional-class" #else style="display:block;" #end>
-      <input  type="checkbox"  class="jaffa-field" name="$field-name" id="${field-name}"
-      #if( $box.checked ) checked="checked" #end 
-     value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
 #end
