@@ -95,3 +95,22 @@
 	#end
 #end
 
+##
+## Display a set of labels filtered by a list
+## This is mainly used for display checkboxes use their prefLabels not raw values
+##
+## $labels : labels to be displayed
+## $filters : values for filtering, e.g. values of checkbox
+## both should have the same size
+##
+#macro(displayULFiltered $labels $filters)
+    #set($n = 0)
+    #set($filtered = [])
+    #foreach( $v in $filters )
+	#if ($v && $v != 'null' && $!v != "") 
+	    #set($silent = $filtered.add($labels.get($n)))
+	#end
+	#set($n = $n + 1)
+    #end
+    #displayUL($filtered)
+#end

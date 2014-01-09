@@ -15,9 +15,14 @@ $(document).ready(function() {
 			var box = $('<input />', { type: 'checkbox', id: id, value: item.value, name: '$field-name', class: 'jaffa-field' });
 			if (item.checked) { box.attr("checked", "checked"); }
 			box.appendTo(s);
-			$('<label />', { 'for': id, text: item.label, style:"display:inline-block" #if($additional-classes) ,class:"$additional-classes" #end }).appendTo(s);
-			#if( $multiline ) $('<br>').appendTo(s); #end
 			jaffa.form.addField(id);
+			$('<label />', { 'for': id, text: item.label, style:"display:inline-block" #if($additional-classes) ,class:"$additional-classes" #end }).appendTo(s);
+		#if($saveLabel)
+			id = '${field-name}:prefLabel.' + n;;
+			$('<input />', { type: 'hidden', id: id, value: item.label, name: id, class: 'jaffa-field' }).appendTo(s);
+			jaffa.form.addField(id);
+		#end			
+			#if( $multiline ) $('<br>').appendTo(s); #end
 		}
 	});
 });
