@@ -11,7 +11,9 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-public class SimpleWorkflowPageCache extends ConcurrentHashMap<AbstractMap.SimpleEntry<String,String>, String> implements SimpleWorkflowPageCacheMXBean {
+import org.apache.velocity.Template;
+
+public class SimpleWorkflowPageCache extends ConcurrentHashMap<SimpleWorkflowPageCacheKey, Template> implements SimpleWorkflowPageCacheMXBean {
 
 	private static final long serialVersionUID = 1L;
 	

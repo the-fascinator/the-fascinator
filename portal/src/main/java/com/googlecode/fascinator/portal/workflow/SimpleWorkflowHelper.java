@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -20,7 +21,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.internal.KeyValue;
+import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.RuntimeServices;
+import org.apache.velocity.runtime.RuntimeSingleton;
+import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.json.simple.JSONArray;
 
 import com.googlecode.fascinator.api.storage.DigitalObject;
@@ -52,13 +60,15 @@ public class SimpleWorkflowHelper {
     private JsonSimple systemConfiguration = null;
     private String portalId = null;
     private VelocityContext parentVelocityContext = null;
+    private VelocityContext baseVelocityContext = new VelocityContext();
     private MessagingServices messagingServices = null;
-    private ConcurrentHashMap<AbstractMap.SimpleEntry<String, String>, String> cachedPages;
+    private SimpleWorkflowPageCache cachedPages;
+    
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SimpleWorkflowHelper() throws MessagingException {
         messagingServices = MessagingServices.getInstance();
-        cachedPages = (ConcurrentHashMap) ApplicationContextProvider
+        cachedPages = (SimpleWorkflowPageCache) ApplicationContextProvider
                 .getApplicationContext().getBean("simpleWorkflowPageCache");
     }
 
@@ -239,21 +249,30 @@ public class SimpleWorkflowHelper {
         JsonSimple formConfiguration = getFormConfiguration(workflowConfiguration);
 
         String step = workflowMetadata.getString(null, "step");
-        AbstractMap.SimpleEntry<String, String> key = new AbstractMap.SimpleEntry<String, String>(
+        SimpleWorkflowPageCacheKey key = new SimpleWorkflowPageCacheKey(portalId,
                 workflowId, step);
-        if (cachedPages.containsKey(key)) {
-            return cachedPages.get(key);
+        
+        buildBaseVelocityContext();
+        HtmlForm form = new HtmlForm();
+        JsonObject stepObject = formConfiguration.getObject("stages", step);
+        JSONArray formJsonArray;
+        if (stepObject.get("config-file") != null) {
+            stepObject = getJsonObject((String) stepObject
+                    .get("config-file"));
+            formJsonArray = (JSONArray) stepObject.get("divs");
         } else {
-            HtmlForm form = new HtmlForm();
-            JsonObject stepObject = formConfiguration.getObject("stages", step);
-            JSONArray formJsonArray;
-            if (stepObject.get("config-file") != null) {
-                stepObject = getJsonObject((String) stepObject
-                        .get("config-file"));
-                formJsonArray = (JSONArray) stepObject.get("divs");
-            } else {
-                formJsonArray = (JSONArray) stepObject.get("divs");
-            }
+            formJsonArray = (JSONArray) stepObject.get("divs");
+        }
+        String htmlFooter = (String) stepObject.get("form-footer");
+        if (htmlFooter != null) {
+            form.setHtmlFooter(htmlFooter);
+        }
+        if (cachedPages.containsKey(key)) {
+            return renderPageTemplate(cachedPages.get(key),form);
+        } else {
+            
+         
+            
             for (int i = 0; i < formJsonArray.size(); i++) {
                 JsonObject htmlDivJson = (JsonObject) formJsonArray.get(i);
                 if (htmlDivJson.get("config-file") != null) {
@@ -269,10 +288,7 @@ public class SimpleWorkflowHelper {
                         .get(i)));
             }
 
-            String htmlFooter = (String) stepObject.get("form-footer");
-            if (htmlFooter != null) {
-                form.setHtmlFooter(htmlFooter);
-            }
+            
 
             JsonObject validationFunction = (JsonObject) stepObject
                     .get("validation-function");
@@ -294,12 +310,42 @@ public class SimpleWorkflowHelper {
                 form.setHtmlFormLayout(getFormLayout(formLayout));
             }
             String output = renderFormHtml(form);
-//            cachedPages.put(key, output);
-            return output;
+            RuntimeServices runtimeServices = RuntimeSingleton.getRuntimeServices();            
+            StringReader reader = new StringReader(output);
+            SimpleNode node = runtimeServices.parse(reader, "template");
+            Template template = new Template();
+            template.setRuntimeServices(runtimeServices);
+            template.setData(node);
+            template.initDocument();            
+            cachedPages.put(key, template);
+            
+            return renderPageTemplate(template,form);
         }
     }
 
-    private JsonObject getJsonObject(String jsonObjectPath) throws IOException {
+    private void buildBaseVelocityContext() {
+		for(Object key : parentVelocityContext.getKeys()) {
+			if(!key.equals("formData") && !key.equals("velocityContext")) {
+				baseVelocityContext.put((String)key, parentVelocityContext.get((String)key));
+			}
+		}
+		
+	}
+
+	private String renderPageTemplate(Template template, HtmlForm form) throws Exception {
+		VelocityContext vc = new VelocityContext(baseVelocityContext);
+		FormData formData = (FormData)parentVelocityContext.get("formData");
+		for (String field : formData.getFormFields()) {
+			vc.put(field,formData.get(field));
+		}
+		String formFooterHtml = renderFormFooterHtml(form.getHtmlFooter());
+        vc.put("formFooterHtml", formFooterHtml);
+    	StringWriter writer = new StringWriter();
+		template.merge(vc,writer);
+		return writer.toString();
+	}
+
+	private JsonObject getJsonObject(String jsonObjectPath) throws IOException {
         File workflowConfigFile = FascinatorHome.getPathFile(jsonObjectPath);
         return new JsonSimple(workflowConfigFile).getJsonObject();
     }
@@ -354,6 +400,7 @@ public class SimpleWorkflowHelper {
 
         String validationFunction = renderValidationFunction(form
                 .getValidationFunction());
+        
         String formLayout = StringUtils.EMPTY;
         if (form.getHtmlFormLayout() != null) {
             formLayout = renderFormLayoutCode(form.getHtmlFormLayout());
@@ -362,15 +409,14 @@ public class SimpleWorkflowHelper {
         String validatorFunctions = renderValidatorFunctions(form
                 .getCustomValidators());
 
-        String formFooterHtml = renderFormFooterHtml(form.getHtmlFooter());
+        
 
         // Now that we have generated the elements we need for the html form.
         // Wrap it in the general form template
-        VelocityContext vc = parentVelocityContext;
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
         vc.put("fieldElementsHtml", fieldElementsHtml);
         vc.put("buttonElementsHtml", buttonElementsHtml);
         vc.put("divElementsHtml", divElementsHtml);
-        vc.put("formFooterHtml", formFooterHtml);
         vc.put("formLayoutCode", formLayout);
         vc.put("validationFunction", validationFunction);
         vc.put("validatorFunctions", validatorFunctions);
@@ -384,7 +430,7 @@ public class SimpleWorkflowHelper {
 
     private String renderValidatorFunctions(List<String> customValidators)
             throws Exception {
-        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
 
         String portalHome = systemConfiguration.getString(
                 PortalManager.DEFAULT_PORTAL_HOME, "portal", "home");
@@ -419,7 +465,7 @@ public class SimpleWorkflowHelper {
 
     private String renderFormLayoutCode(HtmlFormLayout htmlFormLayout)
             throws Exception {
-        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
 
         if (velocityService.resourceExists(
                 portalId,
@@ -446,7 +492,7 @@ public class SimpleWorkflowHelper {
 
     private String renderValidationFunction(
             HtmlValidationFunction validationFunction) throws Exception {
-        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
         String validationFunctionTemplate = validationFunction
                 .getComponentTemplateName();
         if (velocityService.resourceExists(portalId,
@@ -475,7 +521,7 @@ public class SimpleWorkflowHelper {
 
     private String renderFormFooterHtml(String htmlFooterTemplate)
             throws Exception {
-        VelocityContext vc = (VelocityContext) parentVelocityContext.clone();
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
         if (velocityService.resourceExists(portalId, "form-components/"
                 + htmlFooterTemplate + ".vm") != null) {
             // Render the component's velocity template as a String
@@ -500,13 +546,8 @@ public class SimpleWorkflowHelper {
                 String fieldElementsHtml = renderFieldElementsHtml(htmlDiv
                         .getHtmlFieldElements());
 
-                VelocityContext vc = new VelocityContext();
+                VelocityContext vc = new VelocityContext(baseVelocityContext);
 
-                Object[] parentKeys = parentVelocityContext.getKeys();
-                for (Object key : parentKeys) {
-                    vc.put((String) key,
-                            parentVelocityContext.get((String) key));
-                }
                 vc.put("divorder", divorder++);
                 vc.put("fieldElementsHtml", fieldElementsHtml);
 
@@ -534,13 +575,7 @@ public class SimpleWorkflowHelper {
             String pageName = "form-components/button-elements/"
                     + htmlButton.getComponentTemplateName();
             if (velocityService.resourceExists(portalId, pageName + ".vm") != null) {
-                VelocityContext vc = new VelocityContext();
-
-                Object[] parentKeys = parentVelocityContext.getKeys();
-                for (Object key : parentKeys) {
-                    vc.put((String) key,
-                            parentVelocityContext.get((String) key));
-                }
+                VelocityContext vc = new VelocityContext(baseVelocityContext);
 
                 Map<String, Object> parameterMap = htmlButton.getParameterMap();
                 Set<String> keySet = parameterMap.keySet();
@@ -556,11 +591,8 @@ public class SimpleWorkflowHelper {
                 buttonElementsHtml += pageContentWriter.toString();
             }
         }
-        VelocityContext vc = new VelocityContext();
-        Object[] parentKeys = parentVelocityContext.getKeys();
-        for (Object key : parentKeys) {
-            vc.put((String) key, parentVelocityContext.get((String) key));
-        }
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
+        
 
         // Inject this buttonELementsHtml for use in the button-wrapper
         // template
@@ -606,12 +638,7 @@ public class SimpleWorkflowHelper {
 
     private String renderHtmlFieldElement(HtmlFieldElement htmlFieldElement,
             String fieldElementName) throws Exception {
-        VelocityContext vc = new VelocityContext();
-
-        Object[] parentKeys = parentVelocityContext.getKeys();
-        for (Object key : parentKeys) {
-            vc.put((String) key, parentVelocityContext.get((String) key));
-        }
+        VelocityContext vc = new VelocityContext(baseVelocityContext);
 
         Map<String, Object> parameterMap = htmlFieldElement.getParameterMap();
         Set<String> keySet = parameterMap.keySet();
@@ -664,8 +691,7 @@ public class SimpleWorkflowHelper {
         StringWriter pageContentWriter = new StringWriter();
         if (velocityService.resourceExists(portalId,
                 "form-components/field-elements/" + groupTemplate + ".vm") != null) {
-            VelocityContext vc = (VelocityContext) parentVelocityContext
-                    .clone();
+            VelocityContext vc = new VelocityContext(baseVelocityContext);
             vc.put("fieldElementsHtml", fieldElementsHtml);
             Set<String> keys = htmlFieldElement.getParameterMap().keySet();
             for (String key : keys) {
