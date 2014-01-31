@@ -257,8 +257,8 @@ public class SimpleWorkflowHelper {
         JsonObject stepObject = formConfiguration.getObject("stages", step);
         JSONArray formJsonArray;
         if (stepObject.get("config-file") != null) {
-            stepObject = getJsonObject((String) stepObject
-                    .get("config-file"));
+        	stepObject = getJsonObject((String) stepObject
+        			.get("config-file"));
             formJsonArray = (JSONArray) stepObject.get("divs");
         } else {
             formJsonArray = (JSONArray) stepObject.get("divs");
@@ -521,7 +521,7 @@ public class SimpleWorkflowHelper {
 
     private String renderFormFooterHtml(String htmlFooterTemplate)
             throws Exception {
-        VelocityContext vc = new VelocityContext(baseVelocityContext);
+        VelocityContext vc = new VelocityContext(parentVelocityContext);
         if (velocityService.resourceExists(portalId, "form-components/"
                 + htmlFooterTemplate + ".vm") != null) {
             // Render the component's velocity template as a String
