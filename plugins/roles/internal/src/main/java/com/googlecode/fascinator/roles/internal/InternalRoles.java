@@ -63,6 +63,14 @@ import org.slf4j.LoggerFactory;
  * <td>${user.home}/.fascinator/roles.properties</td>
  * </tr>
  * 
+ * <tr>
+ * <td>internal/defaultRoles</td>
+ * <td>A list of roles to apply to a user when there is no role configuration applied</td>
+ * <td><b>No</b></td>
+ * <td>[]</td>
+ * </tr>
+
+ * 
  * </table>
  * 
  * <h3>Examples</h3>
@@ -74,7 +82,8 @@ import org.slf4j.LoggerFactory;
  *      "roles": {
  *          "type": "internal",
  *          "internal": {
- *              "path": "${user.home}/.fascinator/roles.properties"
+ *              "path": "${user.home}/.fascinator/roles.properties",
+ *              "defaultRoles": ["librarian"]
  *      }
  * </pre>
  * 
