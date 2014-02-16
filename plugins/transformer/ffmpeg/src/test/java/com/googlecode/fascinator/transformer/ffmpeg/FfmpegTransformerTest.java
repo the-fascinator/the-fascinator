@@ -837,7 +837,7 @@ public class FfmpegTransformerTest {
 
         // FFmpeg
         if (execLevel.equals(Ffmpeg.DEFAULT_BIN_TRANSCODE)) {
-            Assert.assertEquals(metadata.getString(null, "duration"), "8");
+            Assert.assertEquals(metadata.getString(null, "duration"), "4");
         }
 
         // FFprobe
@@ -845,7 +845,7 @@ public class FfmpegTransformerTest {
             Assert.assertEquals(metadata.getString(null,
                     "format", "simple"),      "avi");
             Assert.assertEquals(metadata.getString(null,
-                    "duration"),              "8");
+                    "duration"),              "4");
         }
     }
 }

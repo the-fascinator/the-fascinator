@@ -39,16 +39,6 @@
 		</property>
 	</bean>
 
-	<bean id="sequenceDao"
-		class="com.googlecode.fascinator.dao.impl.GenericDaoHibernateImpl">
-		<constructor-arg>
-			<value>com.googlecode.fascinator.model.Sequence</value>
-		</constructor-arg>
-		<property name="sessionFactory">
-			<ref bean="sessionFactory" />
-		</property>
-	</bean>
-
 	<tx:annotation-driven />
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">

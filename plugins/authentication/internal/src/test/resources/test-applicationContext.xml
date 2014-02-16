@@ -28,7 +28,7 @@
 		<constructor-arg type="java.lang.String" value="${jdbc.databaseurl}" />
 	</bean>
 	
-	<import resource="file:src/main/config/home/applicationContext-*.xml" />
+	
 	<import resource="file:src/test/config/home/applicationContext-*.xml" />
 	
 	<context:component-scan base-package="com.googlecode.fascinator" />
