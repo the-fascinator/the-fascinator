@@ -9,11 +9,11 @@
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>fascinator-plugins</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
-    	<fascinator.version>1.2-SNAPSHOT</fascinator.version>
+    	<fascinator.version>1.2</fascinator.version>
     </properties>
     <dependencies>
         <dependency>
