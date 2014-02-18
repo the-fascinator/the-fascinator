@@ -35,6 +35,12 @@
 			<version>3.6.3.Final</version>
 			<scope>provided</scope>
 		</dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
