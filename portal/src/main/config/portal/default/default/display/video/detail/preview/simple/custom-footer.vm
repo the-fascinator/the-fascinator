@@ -1,6 +1,0 @@
-## Need to include jquery as the standard scripts are not included in preview mode
-## But don't put anything in packages... we'll use an iframe there
-#if(!$parent.inPackage())
-<script type="text/javascript" src="$portalPath/js/jquery-1.4.4.min.js"></script>
-#parseDisplayTemplate("detail/player.vm")
-#end

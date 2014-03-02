@@ -1,6 +1,0 @@
-<div class="box#if($menuClass) $!menuClass#end"#if($menuId) id="$!menuId"#end>
-    #if($menuTitle)<h2>$!menuTitle</h2>#end
-## Reset parameters
-#set($menuId = $NULL)
-#set($menuClass = $NULL)
-#set($menuTitle = $NULL)

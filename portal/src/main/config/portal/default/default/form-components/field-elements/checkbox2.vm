@@ -1,8 +1,0 @@
-<span>#displayMessage($box-for)</span>
-#if( $multiline ) <br> #end
-#foreach( $box in $boxes )
-    <label><input name="$box.field-name" id="$box.checkbox-id" class="jaffa-field $box.additional-classes"
-    #if( $box.checked ) checked="checked" #end 
-    type="checkbox" value= #if( $box.value ) "$box.value" #else "$box.label" #end >#displayMessage($box.label)</label>
-    #if( $multiline ) <br> #end
-#end

@@ -1,9 +1,0 @@
-#set($thumbnail = $self.getFirst("thumbnail"))
-#if("$!description" != "")
-    <div>
-        <strong>Description</strong>
-        <p class="item-description condense">$description</p>
-    </div>
-#end
-$self.getAudioSummary()
-<div class="clear"></div>

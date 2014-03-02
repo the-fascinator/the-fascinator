@@ -1,9 +1,0 @@
-<script src="$portalPath/js/wizard.js"></script>
-<script type='text/javascript'>
-$(document).ready(function() {
-	jaffa.ui.changeToTabLayout($('#simpleworkflow-form'), 'h1.tab-heading', "h1.heading-selector", "$tabHeaderIdentifier");
-	wizardTabIdentifier = "$tabHeaderIdentifier";
-	jQuery.getJSON("$portalPath/$wizardDefPath", function(data) {	wizard_def = data; setFirstWizardStep()}).fail(function() { alert("Wizard definition could not be found");  });
-	
-});
-</script>
