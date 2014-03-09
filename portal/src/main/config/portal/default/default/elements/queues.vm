@@ -1,4 +1,0 @@
-#set ($qData = $page.getQueueStats())
-#if ($page.authentication.is_admin() && $qData.size() != 0)
-  <li><a href="$portalPath/queues">Queues</a></li>
-#end

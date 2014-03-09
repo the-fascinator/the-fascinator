@@ -1,7 +1,0 @@
-<script type="text/javascript">
-<!--
-    $(function() {
-        jQuery.ajaxSettings.traditional = true;
-    });
--->
-</script>

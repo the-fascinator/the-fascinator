@@ -1,9 +1,0 @@
-{
-    "harvester": {
-        "type": "oai-pmh",
-        "oai-pmh": {
-            "url": "http://localhost:10001/",
-            "recordID": "oai:localhost:4"
-        }
-    }
-}

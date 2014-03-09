@@ -1,5 +1,0 @@
-#if ($parent.hasPid())
-    #parseDisplayTemplate("detail/preview/video.vm")
-#else
-    #parseDisplayTemplate("detail/preview/index.vm")
-#end

@@ -1,5 +1,0 @@
-<script type='text/javascript'>
-$(document).ready(function() {
-	jaffa.ui.changeToTabLayout($('#simpleworkflow-form'), 'h1.tab-heading', "h1.heading-selector", "$tabHeaderIdentifier");
-});
-</script>

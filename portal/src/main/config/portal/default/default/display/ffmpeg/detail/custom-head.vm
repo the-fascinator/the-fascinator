@@ -1,3 +1,0 @@
-#if ($parent.hasPid())
-    #parseDisplayTemplate("detail/player.vm")
-#end

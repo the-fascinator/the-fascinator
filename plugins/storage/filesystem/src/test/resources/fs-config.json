@@ -1,9 +1,0 @@
-{
-	"email" : "test@usq.edu.au",
-    "storage": {
-        "type": "file-system",
-        "file-system": {
-            "home": "${java.io.tmpdir}/_fs_test"
-        }
-    }
-}

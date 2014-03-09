@@ -1,7 +1,0 @@
-#if($button-for)<div>#displayMessage($button-for)</div>#end
-#foreach( $button in $buttons )
-    <label #if( $multiline )style="display:block;" #end #if ($additional-class) class="$additional-class" #end><input name="$field-name" class="jaffa-field"
-    #if( $button.action ) onclick="$button.action" #end
-    #if( $button.checked ) checked="checked" #end 
-    type="radio" value="$button.value">$button.label</label>
-#end
