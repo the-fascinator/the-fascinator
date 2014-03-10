@@ -26,7 +26,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -478,9 +480,24 @@ public class JsonSimpleConfig extends JsonSimple {
                             + "', merging all files in '"
                             + getString(null, INCLUDE_DIR_KEY)
                             + "' ending with: {}", extList);
-            Collection<File> configFiles = FileUtils.listFiles(new File(
-                    getString(null, INCLUDE_DIR_KEY)), extList
-                    .toArray(new String[extList.size()]), true);
+            List<File> configFiles = new ArrayList(FileUtils.listFiles(
+                    new File(getString(null, INCLUDE_DIR_KEY)),
+                    extList.toArray(new String[extList.size()]), true));
+
+            final Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
+                public int compare(File file1, File file2) {
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(
+                            file1.getAbsolutePath(), file2.getAbsolutePath());
+                    if (res == 0) {
+                        res = file1.getAbsolutePath().compareTo(
+                                file2.getAbsolutePath());
+                    }
+                    return res;
+                }
+            };
+
+            Collections.sort(configFiles, ALPHABETICAL_ORDER);
+
             for (File configFile : configFiles) {
                 try {
                     log.debug("Merging included config file: {}", configFile);
