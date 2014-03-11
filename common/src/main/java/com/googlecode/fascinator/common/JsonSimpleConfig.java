@@ -471,46 +471,60 @@ public class JsonSimpleConfig extends JsonSimple {
      * For details, please look at JsonSimpleConfigTest.
      * 
      */
-    @SuppressWarnings(value = { "unchecked" })
     private void loadIncludeDir() {
-        if (getJsonObject().containsKey(INCLUDE_DIR_KEY)) {
-            List<String> extList = this.getStringList(INCLUDE_DIR_KEY_EXT);
-            log.debug(
-                    "Inclusion directory found:'" + INCLUDE_DIR_KEY
-                            + "', merging all files in '"
-                            + getString(null, INCLUDE_DIR_KEY)
-                            + "' ending with: {}", extList);
-            List<File> configFiles = new ArrayList(FileUtils.listFiles(
-                    new File(getString(null, INCLUDE_DIR_KEY)),
-                    extList.toArray(new String[extList.size()]), true));
-
-            final Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
-                public int compare(File file1, File file2) {
-                    int res = String.CASE_INSENSITIVE_ORDER.compare(
-                            file1.getAbsolutePath(), file2.getAbsolutePath());
-                    if (res == 0) {
-                        res = file1.getAbsolutePath().compareTo(
-                                file2.getAbsolutePath());
-                    }
-                    return res;
-                }
-            };
-
-            Collections.sort(configFiles, ALPHABETICAL_ORDER);
-
-            for (File configFile : configFiles) {
-                try {
-                    log.debug("Merging included config file: {}", configFile);
-                    JsonSimple jsonConfig = new JsonSimple(configFile);
-                    mergeConfig(getJsonObject(), jsonConfig.getJsonObject());
-                } catch (IOException e) {
-                    log.error("Failed to load file: {}", configFile);
-                    e.printStackTrace();
-                }
-            }
+        boolean hasIncludedDir = getJsonObject().containsKey(INCLUDE_DIR_KEY);
+        boolean systemHasIncludedDir = systemConfig.getJsonObject()
+                .containsKey(INCLUDE_DIR_KEY);
+        if (hasIncludedDir) {
+            log.debug("Loading main included dir...");
+            loadIncludedDir(this);
         } else {
-            log.debug("Inclusion directory config key not found:'"
-                    + INCLUDE_DIR_KEY + "', moving on...");
+            log.debug("Main config has no included dir, trying system config...");
+        }
+        if (systemHasIncludedDir) {
+            log.debug("Loading system config included dir...");
+            loadIncludedDir(systemConfig);
+        } else {
+            log.debug("System config has no included dir, moving on...");
+        }
+    }
+
+    @SuppressWarnings(value = { "unchecked" })
+    private void loadIncludedDir(JsonSimple config) {
+        List<String> extList = config.getStringList(INCLUDE_DIR_KEY_EXT);
+        log.debug(
+                "Inclusion directory found:'" + INCLUDE_DIR_KEY
+                        + "', merging all files in '"
+                        + config.getString(null, INCLUDE_DIR_KEY)
+                        + "' ending with: {}", extList);
+        List<File> configFiles = new ArrayList(FileUtils.listFiles(new File(
+                config.getString(null, INCLUDE_DIR_KEY)), extList
+                .toArray(new String[extList.size()]), true));
+
+        final Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
+            public int compare(File file1, File file2) {
+                int res = String.CASE_INSENSITIVE_ORDER.compare(
+                        file1.getAbsolutePath(), file2.getAbsolutePath());
+                if (res == 0) {
+                    res = file1.getAbsolutePath().compareTo(
+                            file2.getAbsolutePath());
+                }
+                return res;
+            }
+        };
+
+        Collections.sort(configFiles, ALPHABETICAL_ORDER);
+
+        for (File configFile : configFiles) {
+            try {
+                // log.debug("Merging included config file: {}",
+                // configFile);
+                JsonSimple jsonConfig = new JsonSimple(configFile);
+                mergeConfig(config.getJsonObject(), jsonConfig.getJsonObject());
+            } catch (IOException e) {
+                log.error("Failed to load file: {}", configFile);
+                e.printStackTrace();
+            }
         }
     }
 
