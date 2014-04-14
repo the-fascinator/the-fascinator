@@ -476,23 +476,23 @@ public class JsonSimpleConfig extends JsonSimple {
         boolean systemHasIncludedDir = systemConfig.getJsonObject()
                 .containsKey(INCLUDE_DIR_KEY);
         if (hasIncludedDir) {
-            log.debug("Loading main included dir...");
+            log.trace("Loading main included dir...");
             loadIncludedDir(this);
         } else {
-            log.debug("Main config has no included dir, trying system config...");
+            log.trace("Main config has no included dir, trying system config...");
         }
         if (systemHasIncludedDir) {
-            log.debug("Loading system config included dir...");
+            log.trace("Loading system config included dir...");
             loadIncludedDir(systemConfig);
         } else {
-            log.debug("System config has no included dir, moving on...");
+            log.trace("System config has no included dir, moving on...");
         }
     }
 
     @SuppressWarnings(value = { "unchecked" })
     private void loadIncludedDir(JsonSimple config) {
         List<String> extList = config.getStringList(INCLUDE_DIR_KEY_EXT);
-        log.debug(
+        log.trace(
                 "Inclusion directory found:'" + INCLUDE_DIR_KEY
                         + "', merging all files in '"
                         + config.getString(null, INCLUDE_DIR_KEY)
