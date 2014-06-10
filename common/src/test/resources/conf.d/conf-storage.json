@@ -1,0 +1,20 @@
+{
+	"storage": {
+        "type": "fedora3",
+         "config": {
+             "uri": "http://localhost:8080/fedora",
+             "username": "fedoraAdmin",
+             "password": "fedoraAdmin"
+        }
+    },
+    "entry1" : {
+    	"field1":"value1",
+    	"field2":"value2"
+    },
+    "entry3":["test1", "test2"],
+    "entry4":"gonner",
+    "entry5" : [
+    	{"field1":"value1"},
+    	{"field2":"value2"}
+    ]
+}

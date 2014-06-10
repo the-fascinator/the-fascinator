@@ -1,0 +1,12 @@
+{
+	"indexer": {
+        "type": "solr",
+        "config": {
+            "uri": "http://localhost:8080/solr",
+            "username": "solrAdmin",
+            "password": "${solr.password}",
+            "autocommit": true
+        }
+    },
+    "test":"testing2"
+}

@@ -1,0 +1,6 @@
+{
+    "includeConfigDir": "src/test/resources/conf.d/",
+    "includeConfigExt" : ["json"]           
+    "test": "testing",    
+  	"nullNode": null
+}

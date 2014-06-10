@@ -64,7 +64,7 @@ public class HibernateUserAttribute {
         return keyStr;
     }
 
-    @Column
+    @Column(length = 1024)
     public String getValStr() {
         return valStr;
     }
