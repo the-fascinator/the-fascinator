@@ -43,6 +43,8 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="getAllFromUser" value="FROM HibernateUserAttribute WHERE user = :user"/>
 				<entry key="getUserAttributeByKeyAndValue" value="FROM HibernateUserAttribute WHERE keyStr=:key AND valStr=:value"/>
+				<entry key="getUserAttributeByKeyAndValueDistinct" value="select distinct(hua.user), hua.keyStr, hua.valStr FROM HibernateUserAttribute hua WHERE hua.keyStr=:key AND hua.valStr=:value"/>
+				<entry key="getUserAttributeList" value="select DISTINCT(keyStr) from HibernateUserAttribute"/>
 			</map>
 		</property>				
 	</bean>
