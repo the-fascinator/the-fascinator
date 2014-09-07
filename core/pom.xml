@@ -159,7 +159,7 @@
 				</dependency>
 				<dependency>
 					<groupId>com.googlecode.the-fascinator.plugins</groupId>
-					<artifactId>plugin-access-derby</artifactId>
+					<artifactId>plugin-access-db</artifactId>
 				</dependency>
 				<dependency>
 					<groupId>com.googlecode.the-fascinator.plugins</groupId>
