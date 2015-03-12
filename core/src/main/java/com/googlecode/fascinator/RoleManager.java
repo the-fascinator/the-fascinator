@@ -44,10 +44,10 @@ import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * Search and management of roles.
- * 
+ *
  * This object manages one or more Roles plugins based on configuration. The
  * portal doesn't need to know the details of talking to each data source.
- * 
+ *
  * @author Greg Pendlebury
  */
 @Component(value = "fascinatorRoleManager")
@@ -80,7 +80,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Gets a PluginDescription object relating to this plugin.
-     * 
+     *
      * @return a PluginDescription
      */
     @Override
@@ -123,7 +123,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Set default setting
-     * 
+     *
      * @param config JSON configuration
      * @throws RolesException if plugin initialisation fail
      */
@@ -170,7 +170,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Find and return all roles this user has.
-     * 
+     *
      * @param username The username of the user.
      * @return An array of role names (String).
      */
@@ -196,7 +196,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Returns a list of users who have a particular role.
-     * 
+     *
      * @param role The role to search for.
      * @return An array of usernames (String) that have that role.
      */
@@ -223,7 +223,7 @@ public class RoleManager implements RolesManager {
     /**
      * Method for testing if the implementing plugin allows the creation,
      * deletion and modification of roles.
-     * 
+     *
      * @return <code>true</code> if support role management, <code>false</code>
      *         otherwise
      */
@@ -244,21 +244,22 @@ public class RoleManager implements RolesManager {
 
     /**
      * Assign a role to a user.
-     * 
+     *
      * @param username The username of the user.
      * @param newrole The new role to assign the user.
      * @throws RolesException if there was an error during assignment.
      */
     @Override
     public void setRole(String username, String newrole) throws RolesException {
-    	
-    	RoleManager springRoleManager =(RoleManager)ApplicationContextProvider.getApplicationContext().getBean("fascinatorRoleManager");
-    	//TODO: Remove this once we remove the Tapestry DI
-    	// Check if we are the Spring Role Manager
-    	if(this != springRoleManager) {
-    		springRoleManager.setRole(username, newrole);	
-    	}
-    	
+
+        RoleManager springRoleManager = (RoleManager) ApplicationContextProvider
+                .getApplicationContext().getBean("fascinatorRoleManager");
+        // TODO: Remove this once we remove the Tapestry DI
+        // Check if we are the Spring Role Manager
+        if (this != springRoleManager) {
+            springRoleManager.setRole(username, newrole);
+        }
+
         // Try the active plugin first
         try {
             plugins.get(active).setRole(username, newrole);
@@ -292,7 +293,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Remove a role from a user.
-     * 
+     *
      * @param username The username of the user.
      * @param oldrole The role to remove from the user.
      * @throws RolesException if there was an error during removal.
@@ -300,6 +301,15 @@ public class RoleManager implements RolesManager {
     @Override
     public void removeRole(String username, String oldrole)
             throws RolesException {
+
+        RoleManager springRoleManager = (RoleManager) ApplicationContextProvider
+                .getApplicationContext().getBean("fascinatorRoleManager");
+        // TODO: Remove this once we remove the Tapestry DI
+        // Check if we are the Spring Role Manager
+        if (this != springRoleManager) {
+            springRoleManager.removeRole(username, oldrole);
+        }
+
         // Try the active plugin first
         try {
             plugins.get(active).removeRole(username, oldrole);
@@ -333,7 +343,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Create a role.
-     * 
+     *
      * @param rolename The name of the new role.
      * @throws RolesException if there was an error creating the role.
      */
@@ -349,7 +359,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Delete a role.
-     * 
+     *
      * @param rolename The name of the role to delete.
      * @throws RolesException if there was an error during deletion.
      */
@@ -366,7 +376,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Rename a role.
-     * 
+     *
      * @param oldrole The name role currently has.
      * @param newrole The name role is changing to.
      * @throws RolesException if there was an error during rename.
@@ -406,7 +416,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Returns a list of roles matching the search.
-     * 
+     *
      * @param search The search string to execute.
      * @return An array of role names that match the search.
      * @throws RolesException if there was an error searching.
@@ -445,7 +455,7 @@ public class RoleManager implements RolesManager {
     /**
      * Specifies which plugin the authentication manager should use when
      * managing users. This won't effect reading of data, just writing.
-     * 
+     *
      * @param pluginId The id of the plugin.
      */
     @Override
@@ -462,7 +472,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Return the current active plugin.
-     * 
+     *
      * @return The currently active plugin.
      */
     @Override
@@ -472,7 +482,7 @@ public class RoleManager implements RolesManager {
 
     /**
      * Return the list of plugins being managed.
-     * 
+     *
      * @return A list of plugins.
      */
     @Override
