@@ -1,17 +1,17 @@
-/* 
+/*
  * The Fascinator - Common Library
  * Copyright (C) 2008 University of Southern Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -41,7 +41,7 @@ import com.googlecode.fascinator.api.storage.StorageException;
 
 /**
  * Generic DigitalObject implementation
- * 
+ *
  * @author Oliver Lucido
  */
 public class GenericDigitalObject implements DigitalObject {
@@ -49,7 +49,7 @@ public class GenericDigitalObject implements DigitalObject {
     /** Logging */
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory
-            .getLogger(GenericDigitalObject.class);
+    .getLogger(GenericDigitalObject.class);
 
     /** Default metadata label */
     private static String METADATA_LABEL = "The Fascinator Indexer Metadata";
@@ -74,7 +74,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Creates a DigitalObject with the specified identifier and no metadata
-     * 
+     *
      * @param id unique identifier
      */
     public GenericDigitalObject(String id) {
@@ -84,7 +84,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Get the manifest of the DigitalObject
-     * 
+     *
      * @return Manifest Map
      */
     public Map<String, Payload> getManifest() {
@@ -93,7 +93,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Gets the unique identifier for this object
-     * 
+     *
      * @return an identifier
      */
     @Override
@@ -103,7 +103,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Sets the unique identifier for this object
-     * 
+     *
      * @param a String identifier
      */
     @Override
@@ -115,7 +115,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Gets the Source related to this object
-     * 
+     *
      * @return a payload id
      */
     @Override
@@ -125,7 +125,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Sets the Source related to this object
-     * 
+     *
      * @param a payload id
      */
     @Override
@@ -135,7 +135,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Instantiates a properties object from the object's metadata payload.
-     * 
+     *
      * @return A properties object
      */
     @Override
@@ -143,7 +143,21 @@ public class GenericDigitalObject implements DigitalObject {
         if (metadata == null) {
             Map<String, Payload> man = getManifest();
             // log.debug("Generic Manifest : " + man);
+            boolean hasMetadataPayload = true;
             if (!man.containsKey(METADATA_PAYLOAD)) {
+                // May have been created since object was loaded, try a
+                // different method to find it
+                hasMetadataPayload = false;
+                Set<String> payloadIdList = getPayloadIdList();
+                for (String string : payloadIdList) {
+                    if (METADATA_PAYLOAD.equals(string)) {
+                        hasMetadataPayload = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasMetadataPayload) {
                 Payload payload = createStoredPayload(METADATA_PAYLOAD,
                         IOUtils.toInputStream("# Object Metadata"));
                 if (METADATA_PAYLOAD.equals(getSourceId())) {
@@ -171,7 +185,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Gets the payloads related to this object
-     * 
+     *
      * @return list of payload ids
      */
     @Override
@@ -181,7 +195,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Creates a new stored payload on the object
-     * 
+     *
      * @param pid A string identifier
      * @param in An inputStream to the new payload's contents
      * @return a payload
@@ -198,7 +212,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Creates a new linked payload on the object
-     * 
+     *
      * @param pid A string identifier
      * @param linkPath A string showing the path to the linked file
      * @return a payload
@@ -220,7 +234,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Create payload for the object
-     * 
+     *
      * @param pid a String identifier
      * @param linked A state showing if the payload is linked or stored
      * @return a payload
@@ -249,7 +263,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Gets the payload with the specified identifier
-     * 
+     *
      * @param pid payload identifier
      * @return a payload
      * @throws StorageException if there was an error instantiating the payload
@@ -267,7 +281,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Remove a payload from the object
-     * 
+     *
      * @param a payload identifier
      * @throws StorageException if there was an error removing the payload
      */
@@ -286,7 +300,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Updates a payload's contents
-     * 
+     *
      * @param pid A string identifier
      * @param in An InputStream to the new contetnts
      * @return the updated payload
@@ -303,7 +317,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Close the object
-     * 
+     *
      * @throws StorageException if there was an error closing the object
      */
     @Override
@@ -339,7 +353,7 @@ public class GenericDigitalObject implements DigitalObject {
 
     /**
      * Get the id of the DigitalObject
-     * 
+     *
      * @return id of the DigitalObject
      */
     @Override
