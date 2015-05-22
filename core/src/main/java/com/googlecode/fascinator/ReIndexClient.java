@@ -1,35 +1,22 @@
-/* 
+/*
  * The Fascinator - Core - Re-Index Client
  * Copyright (C) 2011 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package com.googlecode.fascinator;
-
-import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
-import com.googlecode.fascinator.api.PluginException;
-import com.googlecode.fascinator.api.PluginManager;
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,12 +35,29 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.fascinator.api.PluginException;
+import com.googlecode.fascinator.api.PluginManager;
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
+import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
+
 /**
- * <p>ReIndexClient class to rebuild a system's Solr index from a
- * backed up Storage layer.</p>
- * 
- * <p>Code loosely based on the HarvestClient.</p>
- * 
+ * <p>
+ * ReIndexClient class to rebuild a system's Solr index from a backed up Storage
+ * layer.
+ * </p>
+ *
+ * <p>
+ * Code loosely based on the HarvestClient.
+ * </p>
+ *
  * @author Greg Pendlebury
  */
 public class ReIndexClient {
@@ -64,8 +68,7 @@ public class ReIndexClient {
     private static String SCRIPT_ACTIVATE_METHOD = "__activate__";
 
     /** Default tool chain queue */
-    private static final String DEFAULT_TOOL_CHAIN_QUEUE =
-            HarvestQueueConsumer.HARVEST_QUEUE;
+    private static final String DEFAULT_TOOL_CHAIN_QUEUE = HarvestQueueConsumer.HARVEST_QUEUE;
 
     /** Logging */
     private static Logger log = LoggerFactory.getLogger(ReIndexClient.class);
@@ -96,7 +99,7 @@ public class ReIndexClient {
 
     /**
      * ReIndex Client Constructor
-     * 
+     *
      */
     public ReIndexClient() {
         harvestConfigs = new HashMap<String, JsonSimple>();
@@ -123,8 +126,7 @@ public class ReIndexClient {
         }
         storage = PluginManager.getStorage(storageType);
         if (storage == null) {
-            log.error("Storage Plugin '{}' failed to instantiate!",
-                    storageType);
+            log.error("Storage Plugin '{}' failed to instantiate!", storageType);
             return;
         }
         try {
@@ -145,24 +147,23 @@ public class ReIndexClient {
         }
 
         // How are we handling harvest files?
-        harvestRemap = systemConfig.getBoolean(false,
-                "restoreTool", "harvestRemap", "enabled");
-        oldHarvestFiles = systemConfig.getBoolean(false,
-                "restoreTool", "harvestRemap", "allowOlder");
-        failOnMissing = systemConfig.getBoolean(true,
-                "restoreTool", "harvestRemap", "failOnMissing");
+        harvestRemap = systemConfig.getBoolean(false, "restoreTool",
+                "harvestRemap", "enabled");
+        oldHarvestFiles = systemConfig.getBoolean(false, "restoreTool",
+                "harvestRemap", "allowOlder");
+        failOnMissing = systemConfig.getBoolean(true, "restoreTool",
+                "harvestRemap", "failOnMissing");
         harvestUpdates = new HashMap<String, String>();
 
         // Migration Scripting?
-        String scriptString = systemConfig.getString(null,
-                "restoreTool", "migrationScript");
+        String scriptString = systemConfig.getString(null, "restoreTool",
+                "migrationScript");
         if (scriptString != null && !scriptString.equals("")) {
             migrationScript = evalScript(scriptString);
             if (migrationScript != null) {
 
                 // Make sure our activation method is available
-                if (migrationScript.__findattr__(SCRIPT_ACTIVATE_METHOD)
-                        == null) {
+                if (migrationScript.__findattr__(SCRIPT_ACTIVATE_METHOD) == null) {
                     log.error("Expected method '{}' not found in"
                             + " migration script!", SCRIPT_ACTIVATE_METHOD);
                     migrationScript = null;
@@ -180,12 +181,12 @@ public class ReIndexClient {
     }
 
     /**
-     * Evaluate the requested python script and return the resulting object
-     * for later user.
-     * 
+     * Evaluate the requested python script and return the resulting object for
+     * later user.
+     *
      * @param script The path to the script's location
      * @return PyObject An evaluated PyObject, null for errors
-     * 
+     *
      */
     private PyObject evalScript(String script) {
         // Find the script file
@@ -204,7 +205,7 @@ public class ReIndexClient {
             return null;
         }
 
-        // Run it though an interpreter 
+        // Run it though an interpreter
         PythonInterpreter python = null;
         try {
             python = PythonInterpreter.threadLocalStateInterpreter(null);
@@ -230,7 +231,7 @@ public class ReIndexClient {
 
     /**
      * Main logic loop of the process
-     * 
+     *
      */
     private void logicLoop() {
         log.info("Rebuild commencing...");
@@ -240,15 +241,19 @@ public class ReIndexClient {
             return;
         }
 
+        log.info("Performing first pass of object list to determine changes that need to be made.");
         firstPass(objectList);
+        log.info("First pass complete");
+        log.info("Performing second pass. Processing object list to make changes");
         processObjects(objectList);
+        log.info("Second pass complete");
         log.info("Rebuild complete...");
     }
 
     /**
      * First pass processing of objects. This stage is looking for changes that
      * need to be made regarding the mapping of harvest files.
-     * 
+     *
      * @param oids The set of OIDs to process
      */
     private void firstPass(Set<?> oids) {
@@ -266,16 +271,21 @@ public class ReIndexClient {
 
         // Look through storage and populate them
         for (Object object : oids) {
+
             if (object instanceof String) {
-                assessObject((String) object, harvestFiles, usedHarvestFiles);
+                String oid = (String) object;
+                log.info("First pass processing oid: " + oid);
+                assessObject(oid, harvestFiles, usedHarvestFiles);
             } else {
                 log.error("Unexpected: Non-String OID! '{}'", object);
             }
         }
 
         // Now sort out how we need to alter things
+        log.info("Checking list of harvest files to see if we have newer versions");
         for (String key : usedHarvestFiles.keySet()) {
             String pid = usedHarvestFiles.get(key);
+            log.info("Processing oid: " + key + " pid: " + pid);
             if (pid != null) {
                 // Find the version we know was in use
                 Payload oldP = getPayload(key, pid);
@@ -289,16 +299,17 @@ public class ReIndexClient {
                             // Check it's date
                             if (newP.lastModified() >= oldP.lastModified()) {
                                 harvestUpdates.put(key, newOid);
-                                //log.debug("'{}' > '{}' ({})", new Object[] {key, newOid, pid});
+                                // log.debug("'{}' > '{}' ({})", new Object[]
+                                // {key, newOid, pid});
                             } else {
                                 // Do we allow older harvest files?
                                 if (oldHarvestFiles) {
                                     harvestUpdates.put(key, newOid);
-                                // Rejected base on age
+                                    // Rejected base on age
                                 } else {
                                     log.error("Found an older harvest file,"
-                                            + " ignoring: '{}' > '{}'",
-                                            newOid, pid);
+                                            + " ignoring: '{}' > '{}'", newOid,
+                                            pid);
                                 }
                             }
                         }
@@ -309,18 +320,22 @@ public class ReIndexClient {
                         + " harvest file '{}'. PID should not be null!", key);
             }
         }
+        log.info("Completed checking list of harvest files to see if we have newer versions");
     }
 
     /**
      * A basic loop for the handling of second stage processing.
-     * 
+     *
      * @param oids The set of OIDs to process
      */
     private void processObjects(Set<?> oids) {
         int i = 0;
         for (Object object : oids) {
             if (object instanceof String) {
-                processObject((String) object);
+                String oid = (String) object;
+                log.info("Second pass processing oid: " + oid);
+                processObject(oid);
+                log.info("Second pass processing oid: " + oid + " completed");
                 i++;
                 if (i % 50 == 0) {
                     log.info("{} objects rebuilt...", i);
@@ -330,12 +345,13 @@ public class ReIndexClient {
     }
 
     /**
-     * Assess the provided object OID. We are looking for whether or not it is
-     * a harvest file, or if not what harvest file it is using.
-     * 
+     * Assess the provided object OID. We are looking for whether or not it is a
+     * harvest file, or if not what harvest file it is using.
+     *
      * @param oid The Object ID to process.
      * @param harvestFiles A List in which to store any found harvest files
-     * @param usedHarvestFiles A Map in which to store observed instances of a harvest file in use
+     * @param usedHarvestFiles A Map in which to store observed instances of a
+     *            harvest file in use
      */
     private void assessObject(String oid, List<String> harvestFiles,
             Map<String, String> usedHarvestFiles) {
@@ -346,13 +362,14 @@ public class ReIndexClient {
         if (configOid == null) {
             // This is a harvest file
             harvestFiles.add(oid);
-            //log.debug("Harvest File: '{}'", oid);
+            // log.debug("Harvest File: '{}'", oid);
         } else {
             // This is a standard object
             if (!usedHarvestFiles.containsKey(configOid)) {
                 String configPid = metadata.getProperty("jsonConfigPid");
                 usedHarvestFiles.put(configOid, configPid);
-                //log.debug("New Harvest Config File: '{}' > '{}'", configOid, configPid);
+                // log.debug("New Harvest Config File: '{}' > '{}'", configOid,
+                // configPid);
             }
         }
 
@@ -363,17 +380,18 @@ public class ReIndexClient {
             if (!usedHarvestFiles.containsKey(rulesOid)) {
                 String rulesPid = metadata.getProperty("rulesPid");
                 usedHarvestFiles.put(rulesOid, rulesPid);
-                //log.debug("New Harvest Rules File: '{}' > '{}'", rulesOid, rulesPid);
+                // log.debug("New Harvest Rules File: '{}' > '{}'", rulesOid,
+                // rulesPid);
             }
         }
     }
 
     /**
      * Process the provided object OID.
-     * 
-     * This method will retrieve the object from storage, find its config
-     * file and then arrange for it to be re-indexed.
-     * 
+     *
+     * This method will retrieve the object from storage, find its config file
+     * and then arrange for it to be re-indexed.
+     *
      * @param oid The Object ID to process.
      */
     private void processObject(String oid) {
@@ -397,30 +415,32 @@ public class ReIndexClient {
 
         // Find which configuration file should be used
         String configOid = metadata.getProperty("jsonConfigOid");
+        log.info("Checking whether it has a configOid");
         if (configOid == null) {
             // Make sure it is not a harvest file... don't want to
-            //  fill our log with 'fake' errors. Harvest files are
-            //  missing the 'objectId' property.
+            // fill our log with 'fake' errors. Harvest files are
+            // missing the 'objectId' property.
             String objectIdProp = metadata.getProperty("objectId");
             if (objectIdProp != null) {
                 log.error("OID '{}' has no harvest configuration!", oid);
                 return;
             } else {
                 // Just a harvest file
+                log.info("It's a harvest file");
                 return;
             }
         }
-
+        log.info("It was a configOid: " + configOid);
         // Are we remapping this one?
         if (harvestRemap) {
             String rulesOid = metadata.getProperty("rulesOid");
             // We want a mapping for both files
-            if (harvestUpdates.containsKey(configOid) &&
-                    harvestUpdates.containsKey(rulesOid)) {
+            if (harvestUpdates.containsKey(configOid)
+                    && harvestUpdates.containsKey(rulesOid)) {
                 remapHarvestFile(metadata, "jsonConfigOid");
                 remapHarvestFile(metadata, "rulesOid");
 
-            // Is a missing harvest file a problem?
+                // Is a missing harvest file a problem?
             } else {
                 if (failOnMissing) {
                     log.error("Failed to process object '{}'."
@@ -441,6 +461,8 @@ public class ReIndexClient {
             }
             // And don't forget to update this variable
             configOid = metadata.getProperty("jsonConfigOid");
+        } else {
+            log.debug("We are not harvest remapping");
         }
 
         // Are we running a migration script?
@@ -453,6 +475,7 @@ public class ReIndexClient {
             bindings.put("log", log);
             bindings.put("auditMessages", auditMessages);
 
+            log.info("Running migration script");
             // Execute
             try {
                 migrationScript.invoke(SCRIPT_ACTIVATE_METHOD,
@@ -462,20 +485,26 @@ public class ReIndexClient {
                         + " against object '{}'", oid, ex);
                 return;
             }
-
+            log.info("finished running migration script");
             // Make sure audit entries are sent
+            log.info("Sending audit log messages");
             for (String msg : auditMessages) {
                 auditLog(oid, msg);
             }
+            log.info("Finished sending audit log messages");
 
             // Sometimes the migration script will alter object contents
             try {
                 digitalObject.close();
+                log.info("Digital object closed");
             } catch (StorageException ex) {
                 log.warn("There is most likely an open File handle"
                         + " left over in the migration script");
                 log.error("Error closing object '{}'", oid, ex);
             }
+
+        } else {
+            log.info("Not running migration script");
         }
 
         // Get our configuration
@@ -490,25 +519,31 @@ public class ReIndexClient {
     }
 
     /**
-     * Remap a harvest file OID stored in the provided properties using
-     * the provided key.
-     * 
+     * Remap a harvest file OID stored in the provided properties using the
+     * provided key.
+     *
      * @param metadata The Properties Object to fix
      * @param key The key storing the harvest file OID
      */
     private void remapHarvestFile(Properties metadata, String key) {
         String oldOid = metadata.getProperty(key);
-        if (oldOid == null) return;
-        if (!harvestUpdates.containsKey(oldOid)) return;
+        if (oldOid == null) {
+            return;
+        }
+        if (!harvestUpdates.containsKey(oldOid)) {
+            return;
+        }
 
         String newOid = harvestUpdates.get(oldOid);
-        if (newOid == null) return;
+        if (newOid == null) {
+            return;
+        }
         metadata.setProperty(key, newOid);
     }
 
     /**
      * Retrieve the metadata properties from storage for the request OID.
-     * 
+     *
      * @param oid The Object ID of the object in storage
      * @return Properties An instantiated Properties Object, or null for errors
      */
@@ -533,7 +568,7 @@ public class ReIndexClient {
 
     /**
      * Retrieve a Payload from storage
-     * 
+     *
      * @param oid The Object ID of the object in storage
      * @param pid The Payload ID in the object
      * @return Payload An instantiated Payload Object, or null for errors
@@ -559,7 +594,7 @@ public class ReIndexClient {
     /**
      * Get the requested configuration from storage and parse into a JSON
      * object. Will cache results to lower I/O performance hit.
-     * 
+     *
      * @param oid The Object ID of the configuration file to retrieve.
      */
     private JsonSimple getConfiguration(String oid) {
@@ -608,23 +643,22 @@ public class ReIndexClient {
             harvestConfigs.put(oid, config);
             return config;
 
-        // Parse error
+            // Parse error
         } catch (IOException ex) {
-            log.error("Failed to parse JSON payload '{}' > '{}'",
-                    oid, pid);
+            log.error("Failed to parse JSON payload '{}' > '{}'", oid, pid);
             log.error("Error stacktrace: ", ex);
             harvestConfigs.put(oid, null);
             return null;
 
-        // Access error
+            // Access error
         } catch (StorageException ex) {
-            log.error("Failed to open payload '{}' > '{}' from storage",
-                    oid, pid);
+            log.error("Failed to open payload '{}' > '{}' from storage", oid,
+                    pid);
             log.error("Error stacktrace: ", ex);
             harvestConfigs.put(oid, null);
             return null;
 
-        // Make sure we remember to close the inputstream
+            // Make sure we remember to close the inputstream
         } finally {
             try {
                 if (in != null) {
@@ -639,30 +673,37 @@ public class ReIndexClient {
     /**
      * Send AMQ Message to schedule indicated object is ready for transformation
      * and indexing.
-     * 
+     *
      * @param oid The Object ID to send.
      * @param config Item configuration for this object.
      */
     private void queueHarvest(String oid, JsonSimple config) {
         // NOTE: The oid is being updated in memory here
-        //       (including in the cache)
+        // (including in the cache)
         // This OK so long as this process remains single threaded
-        //  and only keys that are overwritten EVERY time are used;
-        //  like 'oid'.
-        JsonObject json = config.getJsonObject();
+        // and only keys that are overwritten EVERY time are used;
+        // like 'oid'.
+        log.info("Sending oid: " + oid + " to the harvest queue");
+        JsonObject json;
+        try {
+            json = new JsonSimple(config.toString(false)).getJsonObject();
+        } catch (IOException e) {
+            json = config.getJsonObject();
+        }
         json.put("oid", oid);
         try {
             messaging.queueMessage(toolChainEntry, json.toString());
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             log.error("Failed sending OID '{}' to the harvest message queue!",
                     oid);
             log.error("Error stacktrace: ", ex);
         }
+        log.info("Finished sending oid: " + oid + " to the harvest queue");
     }
 
     /**
      * Send events to subscriber queue for audit logging
-     * 
+     *
      * @param oid Object id
      * @param message Message to send to the log
      * @param context where the event happened
@@ -683,7 +724,7 @@ public class ReIndexClient {
 
     /**
      * Shutdown ReIndex Client.
-     * 
+     *
      */
     public void shutdown() {
         if (storage != null) {
@@ -700,7 +741,7 @@ public class ReIndexClient {
 
     /**
      * Main method for ReIndex Client
-     * 
+     *
      * @param args Argument list
      */
     public static void main(String[] args) {
