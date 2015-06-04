@@ -32,6 +32,8 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -277,7 +279,7 @@ public class StorageDataUtil {
                     }
                 }
 
-                if (value.length() == 1) {
+                if (value != null && value.length() == 1) {
                     value = String.valueOf(value.charAt(0));
                 }
 

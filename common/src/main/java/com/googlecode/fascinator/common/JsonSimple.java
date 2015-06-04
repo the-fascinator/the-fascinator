@@ -408,6 +408,19 @@ public class JsonSimple {
             response = Boolean.toString((Boolean) object);
         }
 
+        if (object instanceof JSONArray) {
+            jsonArray = (JSONArray)object;
+            if (jsonArray.size() == 1) {
+                Object value = jsonArray.get(0);
+                if (value instanceof String) {
+                    response = (String)value;
+                }
+            }
+            if (! (response instanceof String)) {
+                log.warn("Unable to convert JSONArray: " + object + " to string.");
+            }
+        }
+
         // Are we substituting system properites?
         if (substitueProperties) {
             response = StrSubstitutor.replaceSystemProperties(response);
