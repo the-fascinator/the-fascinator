@@ -19,11 +19,7 @@
 			<groupId>com.googlecode.the-fascinator</groupId>
 			<artifactId>fascinator-plugin-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.googlecode.the-fascinator.plugins</groupId>
-			<artifactId>plugin-storage-filesystem</artifactId>
-			<scope>test</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
