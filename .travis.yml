@@ -7,7 +7,7 @@ services:
 
 before_install:
 - docker pull qcifengineering/redbox-builder
-- docker run -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git"
+- docker run -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
 
 script:
 - mvn test
