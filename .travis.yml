@@ -10,3 +10,5 @@ before_install:
 - docker run -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
 
 install: true
+
+script: true
