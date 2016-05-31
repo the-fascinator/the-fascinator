@@ -7,8 +7,8 @@ before_install:
 - docker run -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
 install: true
 script: true
-after_install:
-- docker run -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder cd build;mvn deploy --settings ../m2_repo/travis-settings.xml -DskipTests=true
+after_success:
+- docker run -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder cd build;mvn deploy --settings ../m2_repo/  travis-settings.xml -DskipTests=true
 env:
   global:
   - secure: Rv9pIhSzwZxuasFP2L0thNinefyAWWc1XvA7CL99ArfUf+7Y6iFPWeOzrDk/oX1njtmBPKwX7oirpD0GBhePwBwAp8Tl8jPxx+yxnzIpuj3ZIBJ/7caxcnf/T8VASARZdG3V2ZreWGfanvPiZVv/WSKPyd4PSzBZGh2QyWPI9CE=
