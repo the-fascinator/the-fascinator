@@ -1,14 +1,15 @@
 sudo: required
-
 language: java
-
 services:
-  - docker
-
+- docker
 before_install:
 - docker pull qcifengineering/redbox-builder
 - docker run -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
-
 install: true
-
 script: true
+after_install:
+- docker run -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder cd build;mvn deploy --settings travis-settings.xml -DskipTests=true
+env:
+  global:
+  - secure: Rv9pIhSzwZxuasFP2L0thNinefyAWWc1XvA7CL99ArfUf+7Y6iFPWeOzrDk/oX1njtmBPKwX7oirpD0GBhePwBwAp8Tl8jPxx+yxnzIpuj3ZIBJ/7caxcnf/T8VASARZdG3V2ZreWGfanvPiZVv/WSKPyd4PSzBZGh2QyWPI9CE=
+  - secure: VUNE0GLCKilH3IP+8KgqgCnLP2URjLTg+vlzI6HFDurNkLc7h9mD8xCDNkgO+UvfBKLqCXl2aoTeg3h7wBjCBrZ2GNVXIe0zfFWFWdsiaI3Z73oeHJdQyw8UOWQz+dteu6Tr2eb1kPtROaQ0bo/xP7VY3AMH/ygrEXYrwcmrCrA=
