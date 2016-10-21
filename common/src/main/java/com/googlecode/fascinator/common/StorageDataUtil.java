@@ -19,6 +19,7 @@
 
 package com.googlecode.fascinator.common;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,10 @@ import java.util.TreeMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,31 +50,34 @@ import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
  * Utility class for stored data in JSON format
- * 
+ *
  * @author Linda Octalina
  * @author Andrew Brazzatti
  * @author Jianfeng Li
- * 
  */
 public class StorageDataUtil {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     static Logger log = LoggerFactory.getLogger(StorageDataUtil.class);
 
     /**
      * Get a playload in JsonSimple format in the specified Storage instance by
      * its object ID and the name of payload. Useful for loading payloads which
      * are in JSON format
-     * 
-     * @param storage : Storage object
-     * @param oid : object ID
+     *
+     * @param storage     : Storage object
+     * @param oid         : object ID
      * @param payloadName : name of palyload
      * @return JsonSimple or null
      */
     public JsonSimple getPayloadJsonSimple(Storage storage, String oid,
-            String payloadName) {
+                                           String payloadName) {
         if (storage == null) {
             return null;
         }
@@ -86,7 +94,7 @@ public class StorageDataUtil {
 
     /**
      * Get a playload in JsonSimple format from the payload instance
-     * 
+     *
      * @param payload : Payload object
      * @return JsonSimple or null
      */
@@ -106,13 +114,13 @@ public class StorageDataUtil {
 
     /**
      * Getlist method to get the values of key from the sourceMap
-     * 
+     *
      * @param sourceMap Map container
-     * @param baseKey field to searchclass
+     * @param baseKey   field to searchclass
      * @return list of value based on baseKey
      */
     public Map<String, Object> getList(Map<String, Object> sourceMap,
-            String baseKey) {
+                                       String baseKey) {
         SortedMap<String, Object> valueMap = new TreeMap<String, Object>();
         Map<String, Object> data;
 
@@ -165,9 +173,9 @@ public class StorageDataUtil {
 
     /**
      * Getlist method to get the values of key from the sourceMap
-     * 
+     *
      * @param sourceMap Map container
-     * @param baseKey field to search
+     * @param baseKey   field to search
      * @return list of value based on baseKey
      */
     public Map<String, Object> getList(JsonSimple json, String baseKey) {
@@ -230,8 +238,8 @@ public class StorageDataUtil {
     /**
      * getJavaList method to reconstruct an list of JSONObjects of a key from a
      * JsonSimple object
-     * 
-     * @param json: JsonSimple object of source
+     *
+     * @param json:    JsonSimple object of source
      * @param baseKey: field to search
      * @return List: a list of JsonObject based on baseKey
      */
@@ -258,15 +266,15 @@ public class StorageDataUtil {
                 String field = baseKey;
 
                 if (key.length() >= baseKey.length()) { // It is an pseudo-JSON
-                                                        // array
+                    // array
                     field = key.substring(baseKey.length(), key.length());
                 }
 
                 String indexString = field;
                 String suffix = "value"; // Default JSON key in returned
-                                         // JsonObject if it is a simple string
+                // JsonObject if it is a simple string
                 if (field.indexOf(".") > 0) { // This is not a simple string,
-                                              // get the key of it
+                    // get the key of it
                     indexString = field.substring(0, field.indexOf("."));
                     suffix = field.substring(field.indexOf(".") + 1,
                             field.length());
@@ -292,8 +300,8 @@ public class StorageDataUtil {
     /**
      * getStringList method to reconstruct an list of String of a key from a
      * JsonSimple object
-     * 
-     * @param json: JsonSimple object of source
+     *
+     * @param json:    JsonSimple object of source
      * @param baseKey: field to search
      * @return List: a List of JsonObject based on baseKey
      */
@@ -317,8 +325,8 @@ public class StorageDataUtil {
     /**
      * Trivial wrapper for call into JSON Library. Removes the difficulty of
      * dealing with a null argument and a vararg from Velocity.
-     * 
-     * @param json: The JSON object to get from
+     *
+     * @param json:  The JSON object to get from
      * @param field: The field in the JSON object to get
      * @return String: The data in the field, possibly NULL
      */
@@ -333,8 +341,8 @@ public class StorageDataUtil {
 
     /**
      * Similar to get Method but return empty string instead of null
-     * 
-     * @param json: The JSON object to get from
+     *
+     * @param json:  The JSON object to get from
      * @param field: The field in the JSON object to get
      * @return String: The data in the field, possibly NULL
      */
@@ -345,91 +353,63 @@ public class StorageDataUtil {
     /**
      * Similar to get Method but return a string supplied by caller if cannot
      * get the field
-     * 
-     * @param json: The JSON object to get from
+     *
+     * @param json:         The JSON object to get from
      * @param defaultValue: The default value of the field
-     * @param field: The field in the JSON object to get
+     * @param field:        The field in the JSON object to get
      * @return String: The data in the field, possibly NULL
      */
     public String getDefaultValueIfNull(JsonSimple json, String defaultValue,
-            Object... field) {
+                                        Object... field) {
         String value = get(json, field);
         return value == null ? defaultValue : value;
     }
 
     /**
      * Cleanup the supplied datetime value into a W3C format.
-     * 
-     * @param dateTime Datetime to clean
+     *
+     * @param dateTimeText Datetime text to clean
      * @return String The cleaned value
-     * @throws ParseException if and incorrect input is supplied
      */
-    public String getW3CDateTime(String dateTime) throws ParseException {
-        return getDateTime(dateTime, "yyyy-MM-dd'T'HH:mm:ssZ");
+    public String getW3CDateTime(String dateTimeInput) {
+        String dateTimeOutput = StringUtils.EMPTY;
+        if (StringUtils.isNotBlank(dateTimeInput)) {
+            dateTimeOutput = new DateTime(dateTimeInput).toString();
+            log.debug("date text was: " + dateTimeInput);
+            log.debug("w3c(ISO8601) date time text is: " + dateTimeOutput);
+        }
+        return dateTimeOutput;
     }
 
     /**
      * Cleanup the supplied datetime value into a W3C format.
-     * 
-     * @param dateTime Datetime to clean
+     *
+     * @param dateTimeInput Datetime to clean
      * @return String The cleaned value
-     * @throws ParseException if and incorrect input is supplied
      */
-    public String getDateTime(String dateTime, String format)
-            throws ParseException {
-        if (dateTime != null && !"".equals(dateTime)) {
-            if (dateTime.indexOf("-") == -1) {
-                dateTime = dateTime + "-01-01";
+    public String getDateTime(String dateTimeInput, String outputFormat) {
+        String formattedDateTimeOutput = StringUtils.EMPTY;
+        if (StringUtils.isNotBlank(dateTimeInput)) {
+            DateTime dateTime = new DateTime(dateTimeInput);
+            if (StringUtils.isNotBlank(outputFormat)) {
+                formattedDateTimeOutput = dateTime.toString(outputFormat);
             } else {
-                String[] part = dateTime.trim().split("-");
-                if (part.length == 2) {
-                    dateTime = dateTime + "-01";
-                }
+                formattedDateTimeOutput = dateTime.toString();
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat odf = new SimpleDateFormat(format);
-
-            Date date = sdf.parse(dateTime);
-            // log.info("ISO8601 Date:  {}", formatDate(date));
-            // log.info("W3C Date:  {}", odf.format(date));
-            return odf.format(date);
+            log.debug("date text was: " + dateTimeInput);
+            log.debug("date time output format is: " + outputFormat);
+            log.debug("Returning date time: " + formattedDateTimeOutput);
         }
-        return "";
-    }
-
-    // ISO8601 Dates. Lifted from this example:
-    // http://www.dpawson.co.uk/relaxng/schema/datetime.html
-    @SuppressWarnings("unused")
-    private String formatDate(Date input) {
-        // Base time
-        SimpleDateFormat ISO8601Local = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss");
-        TimeZone timeZone = TimeZone.getDefault();
-        ISO8601Local.setTimeZone(timeZone);
-        DecimalFormat twoDigits = new DecimalFormat("00");
-
-        // Work out timezone offset
-        int offset = ISO8601Local.getTimeZone().getOffset(input.getTime());
-        String sign = "+";
-        if (offset < 0) {
-            offset = -offset;
-            sign = "-";
-        }
-        int hours = offset / 3600000;
-        int minutes = (offset - hours * 3600000) / 60000;
-
-        // Put it all together
-        return ISO8601Local.format(input) + sign + twoDigits.format(hours)
-                + ":" + twoDigits.format(minutes);
+        return formattedDateTimeOutput;
     }
 
     /**
      * Utility method for accessing object properties. Since null testing is
      * awkward in velocity, an unset property is changed to en empty string ie.
      * ("").
-     * 
+     *
      * @param object: The object to extract the property from
-     * @param field: The field name of the property
+     * @param field:  The field name of the property
      * @return String: The value of the property, or and empty string.
      */
     public String getMetadata(DigitalObject object, String field) {
@@ -454,7 +434,7 @@ public class StorageDataUtil {
 
     /**
      * Safely escape the supplied string for use in XML.
-     * 
+     *
      * @param value: The string to escape
      * @return String: The escaped string
      */
@@ -464,7 +444,7 @@ public class StorageDataUtil {
 
     /**
      * Safely escape the supplied string for use in JSON.
-     * 
+     *
      * @param value: The string to escape
      * @return String: The escaped string
      */
