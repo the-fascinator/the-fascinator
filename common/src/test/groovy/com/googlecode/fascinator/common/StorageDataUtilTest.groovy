@@ -44,15 +44,10 @@ public class StorageDataUtilTest extends Specification {
         when:
         def result = storageDataUtil.getW3CDateTime(dateText)
         then:
+        DateTimeZone.setDefault(DateTimeZone.forID("Australia/Brisbane"))
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
-        if (currentZone.toString() == "Australia/Brisbane") {
-            assert expected == result
-        } else {
-            def rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString()
-            log.info("rezoned expected datetime is: " + rezonedExpected)
-            assert rezonedExpected == result
-        }
+        assert expected == result
         noExceptionThrown()
         where:
         dateText                    | expected
@@ -83,7 +78,7 @@ public class StorageDataUtilTest extends Specification {
     }
 
     @Unroll
-    def "W3C dates method with non-date-time format throws an exception"() throws Exception{
+    def "W3C dates method with non-date-time format throws an exception"() throws Exception {
         when:
         def result = storageDataUtil.getW3CDateTime(dateText)
         then:
@@ -100,30 +95,20 @@ public class StorageDataUtilTest extends Specification {
         when:
         def result = storageDataUtil.getDateTime(dateText, format)
         then:
+        DateTimeZone.setDefault(DateTimeZone.forID("Australia/Brisbane"))
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
-        if (currentZone.toString() == "Australia/Brisbane") {
-            assert expected == result
-        } else {
-            def rezonedExpected = null
-            if (StringUtils.isNotBlank(format)) {
-                rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString(format)
-            } else {
-                rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString()
-            }
-            log.info("rezoned expected datetime is: " + rezonedExpected)
-            assert rezonedExpected == result
-        }
+        assert expected == result
         noExceptionThrown()
         where:
-            dateText            | format                            | expected
-            "2004"              | "yyyy"                            | "2004"
-            "2004"              | "yyyy-MM"                         | "2004-01"
-            "2004"              | "yyyy-MM-DD"                      | "2004-01-01"
-            "2004-04-02T18:06"  | "YYYY-MM-dd'T'hh:mm:ss.ss"        | "2004-04-02T06:06:00.00"
-            "2004-01-01"        | ""                                | "2004-01-01T00:00:00.000+10:00"
-            "2004-01"           | " "                               | "2004-01-01T00:00:00.000+10:00"
-            "2004-01"           | null                              | "2004-01-01T00:00:00.000+10:00"
+        dateText           | format                     | expected
+        "2004"             | "yyyy"                     | "2004"
+        "2004"             | "yyyy-MM"                  | "2004-01"
+        "2004"             | "yyyy-MM-DD"               | "2004-01-01"
+        "2004-04-02T18:06" | "YYYY-MM-dd'T'hh:mm:ss.ss" | "2004-04-02T06:06:00.00"
+        "2004-01-01"       | ""                         | "2004-01-01T00:00:00.000+10:00"
+        "2004-01"          | " "                        | "2004-01-01T00:00:00.000+10:00"
+        "2004-01"          | null                       | "2004-01-01T00:00:00.000+10:00"
     }
 
     @Unroll
@@ -134,21 +119,21 @@ public class StorageDataUtilTest extends Specification {
         result == expected
         noExceptionThrown()
         where:
-        dateText            | format                        | expected
-        ""                  | "YYYY-MM-dd'T'hh:mm:ss.ss"    | ""
-        " "                 | "YYYY-MM-dd"                  | ""
-        null                | "YYYY"                        | ""
-        ""                  | ""                            | ""
-        ""                  | null                          | ""
-        ""                  | " "                           | ""
-        " "                 | null                          | ""
-        " "                 | " "                           | ""
-        " "                 | ""                            | ""
+        dateText | format                     | expected
+        ""       | "YYYY-MM-dd'T'hh:mm:ss.ss" | ""
+        " "      | "YYYY-MM-dd"               | ""
+        null     | "YYYY"                     | ""
+        ""       | ""                         | ""
+        ""       | null                       | ""
+        ""       | " "                        | ""
+        " "      | null                       | ""
+        " "      | " "                        | ""
+        " "      | ""                         | ""
 
     }
 
     @Unroll
-    def "W3C dates method with specified format throws an exception"() throws Exception{
+    def "W3C dates method with specified format throws an exception"() throws Exception {
         when:
         def result = storageDataUtil.getDateTime(dateText, format)
         then:
@@ -156,7 +141,7 @@ public class StorageDataUtilTest extends Specification {
         e.getClass() == expected
         log.debug("Method threw an expected exception: " + e.getMessage())
         where:
-        dateText            | format                            | expected
-        "2004-04-0218:06"   | "YYYY-MM-dd'T'hh:mm:ss.ss"        | IllegalArgumentException
+        dateText          | format                     | expected
+        "2004-04-0218:06" | "YYYY-MM-dd'T'hh:mm:ss.ss" | IllegalArgumentException
     }
 }
