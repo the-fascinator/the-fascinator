@@ -46,9 +46,13 @@ public class StorageDataUtilTest extends Specification {
         //run through method again to get correct timezone
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
-        def rezonedExpected = new DateTime(expected).withZone(DateTimeZone.getDefault()).toString();
-        log.info("rezoned expected datetime is: " + rezonedExpected)
-        assert rezonedExpected == result
+        if (currentZone.toString() == "Australia/Brisbane") {
+            assert expected == result
+        } else {
+            def rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString()
+            log.info("rezoned expected datetime is: " + rezonedExpected)
+            assert rezonedExpected == result
+        }
         noExceptionThrown()
         where:
         dateText                    | expected
