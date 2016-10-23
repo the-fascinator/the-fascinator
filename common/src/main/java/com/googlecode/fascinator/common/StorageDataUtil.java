@@ -368,7 +368,7 @@ public class StorageDataUtil {
     /**
      * Cleanup the supplied datetime value into a W3C format.
      *
-     * @param dateTimeText Datetime text to clean
+     * @param dateTimeInput Datetime text to clean
      * @return String The cleaned value
      */
     public String getW3CDateTime(String dateTimeInput) {
@@ -382,7 +382,7 @@ public class StorageDataUtil {
     }
 
     /**
-     * Cleanup the supplied datetime value into a W3C format.
+     * Reformat the date to the format supplied.
      *
      * @param dateTimeInput Datetime to clean
      * @return String The cleaned value
