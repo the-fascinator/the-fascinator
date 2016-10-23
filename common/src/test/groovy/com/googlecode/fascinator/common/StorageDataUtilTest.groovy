@@ -20,6 +20,7 @@
 package com.googlecode.fascinator.common
 
 import groovy.util.logging.Slf4j
+import org.joda.time.DateTimeZone
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -41,7 +42,8 @@ public class StorageDataUtilTest extends Specification {
         when:
         def result = storageDataUtil.getW3CDateTime(dateText)
         then:
-        assert expected == result
+        //run through method again to get correct timezone
+        assert storageDataUtil.getW3CDateTime(expected) == result
         noExceptionThrown()
         where:
         dateText                    | expected
