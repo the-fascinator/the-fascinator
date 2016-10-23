@@ -43,7 +43,6 @@ public class StorageDataUtilTest extends Specification {
         when:
         def result = storageDataUtil.getW3CDateTime(dateText)
         then:
-        //run through method again to get correct timezone
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
         if (currentZone.toString() == "Australia/Brisbane") {
@@ -100,6 +99,15 @@ public class StorageDataUtilTest extends Specification {
         when:
         def result = storageDataUtil.getDateTime(dateText, format)
         then:
+        def currentZone = DateTimeZone.getDefault()
+        log.info("current zone is: " + currentZone)
+        if (currentZone.toString() == "Australia/Brisbane") {
+            assert expected == result
+        } else {
+            def rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString(format)
+            log.info("rezoned expected datetime is: " + rezonedExpected)
+            assert rezonedExpected == result
+        }
         assert expected == result
         noExceptionThrown()
         where:
