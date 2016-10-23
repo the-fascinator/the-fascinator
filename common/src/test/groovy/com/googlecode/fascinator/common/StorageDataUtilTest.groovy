@@ -20,6 +20,7 @@
 package com.googlecode.fascinator.common
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang.StringUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
@@ -104,7 +105,12 @@ public class StorageDataUtilTest extends Specification {
         if (currentZone.toString() == "Australia/Brisbane") {
             assert expected == result
         } else {
-            def rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString(format)
+            def rezonedExpected = null
+            if (StringUtils.isNotBlank(format)) {
+                rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString(format)
+            } else {
+                rezonedExpected = new DateTime(dateText).withZone(DateTimeZone.getDefault()).toString()
+            }
             log.info("rezoned expected datetime is: " + rezonedExpected)
             assert rezonedExpected == result
         }
