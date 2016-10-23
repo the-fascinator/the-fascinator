@@ -114,7 +114,6 @@ public class StorageDataUtilTest extends Specification {
             log.info("rezoned expected datetime is: " + rezonedExpected)
             assert rezonedExpected == result
         }
-        assert expected == result
         noExceptionThrown()
         where:
             dateText            | format                            | expected
