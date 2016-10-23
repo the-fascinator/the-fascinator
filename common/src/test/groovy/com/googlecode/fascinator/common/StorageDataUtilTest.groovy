@@ -41,12 +41,13 @@ public class StorageDataUtilTest extends Specification {
 
     @Unroll
     def "W3C dates method return full ISO8601 datetimes"() throws Exception {
-        when:
-        def result = storageDataUtil.getW3CDateTime(dateText)
-        then:
+        given:
         DateTimeZone.setDefault(DateTimeZone.forID("Australia/Brisbane"))
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
+        when:
+        def result = storageDataUtil.getW3CDateTime(dateText)
+        then:
         assert expected == result
         noExceptionThrown()
         where:
@@ -92,12 +93,13 @@ public class StorageDataUtilTest extends Specification {
 
     @Unroll
     def "W3C dates method return datetimes in specified format"() throws Exception {
-        when:
-        def result = storageDataUtil.getDateTime(dateText, format)
-        then:
+        given:
         DateTimeZone.setDefault(DateTimeZone.forID("Australia/Brisbane"))
         def currentZone = DateTimeZone.getDefault()
         log.info("current zone is: " + currentZone)
+        when:
+        def result = storageDataUtil.getDateTime(dateText, format)
+        then:
         assert expected == result
         noExceptionThrown()
         where:
