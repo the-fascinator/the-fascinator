@@ -19,38 +19,19 @@
 
 package com.googlecode.fascinator.common;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.TimeZone;
-import java.util.TreeMap;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.googlecode.fascinator.api.storage.DigitalObject;
 import com.googlecode.fascinator.api.storage.Payload;
 import com.googlecode.fascinator.api.storage.Storage;
 import com.googlecode.fascinator.api.storage.StorageException;
 import com.googlecode.fascinator.common.storage.StorageUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.*;
 
 /**
  * Utility class for stored data in JSON format
