@@ -30,7 +30,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.googlecode.fascinator.common.StorageDataUtil;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -333,9 +335,7 @@ public class GenericDigitalObject implements DigitalObject {
             }
             String date_created = (String) metadata.get(DATE_CREATED);
             if (date_created == null) {
-                SimpleDateFormat formatter = new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH':'mm':'ss'Z'");
-                date_created = formatter.format(new Date());
+                date_created = new DateTime().toString();
                 metadata.put(DATE_CREATED, date_created);
             }
             try {
