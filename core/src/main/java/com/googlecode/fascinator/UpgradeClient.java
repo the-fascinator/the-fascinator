@@ -78,7 +78,7 @@ public class UpgradeClient {
             System.out.print(suggestion + " ");
             Scanner scanner = new Scanner(System.in);
             String line = scanner.next(responsePattern);
-            scanner.close();
+
             return line;
         } catch (InputMismatchException e) {
             promptUserInput(question, suggestion, responsePattern);
