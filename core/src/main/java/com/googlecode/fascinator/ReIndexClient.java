@@ -47,6 +47,7 @@ import com.googlecode.fascinator.common.JsonSimpleConfig;
 import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  * <p>
@@ -101,6 +102,82 @@ public class ReIndexClient {
      * ReIndex Client Constructor
      *
      */
+    public ReIndexClient(String scriptMigration, boolean harvestRemap,
+            boolean oldHarvestFiles, boolean failOnMissing,
+            JsonSimpleConfig config) {
+        init(scriptMigration, harvestRemap, oldHarvestFiles, failOnMissing,
+                systemConfig);
+    }
+
+    public void init(String scriptMigration, boolean harvestRemap,
+            boolean oldHarvestFiles, boolean failOnMissing,
+            JsonSimpleConfig config) {
+        harvestConfigs = new HashMap<String, JsonSimple>();
+
+        // Access Configuration
+        try {
+            if (config == null) {
+                systemConfig = new JsonSimpleConfig();
+            } else {
+                systemConfig = config;
+            }
+        } catch (IOException ex) {
+            log.error("Error accessing System Configuration: ", ex);
+            return;
+        }
+
+        // Where are we going to send our messages?
+        toolChainEntry = systemConfig.getString(DEFAULT_TOOL_CHAIN_QUEUE,
+                "messaging", "toolChainQueue");
+
+        storage = (Storage) ApplicationContextProvider.getApplicationContext()
+                .getBean("fascinatorStorage");
+
+        // Establish a messaging session
+        try {
+            messaging = MessagingServices.getInstance();
+        } catch (com.googlecode.fascinator.common.messaging.MessagingException ex) {
+            log.error("Error connecting to messaging broker: ", ex);
+            return;
+        }
+
+        // How are we handling harvest files?
+        this.harvestRemap = harvestRemap;
+        this.oldHarvestFiles = oldHarvestFiles;
+        this.failOnMissing = failOnMissing;
+        harvestUpdates = new HashMap<String, String>();
+
+        // Migration Scripting?
+        String scriptString = scriptMigration;
+        if (scriptString != null && !scriptString.equals("")) {
+            migrationScript = evalScript(scriptString);
+            if (migrationScript != null) {
+
+                // Make sure our activation method is available
+                if (migrationScript
+                        .__findattr__(SCRIPT_ACTIVATE_METHOD) == null) {
+                    log.error(
+                            "Expected method '{}' not found in"
+                                    + " migration script!",
+                            SCRIPT_ACTIVATE_METHOD);
+                    migrationScript = null;
+                }
+
+            } else {
+                log.error("A migration script has been configured, but there"
+                        + " were errors preparing, aborting rebuild!");
+                return;
+            }
+        }
+
+        // Go do all the work we require
+        logicLoop();
+    }
+
+    /**
+     * ReIndex Client Constructor
+     *
+     */
     public ReIndexClient() {
         harvestConfigs = new HashMap<String, JsonSimple>();
 
@@ -114,10 +191,6 @@ public class ReIndexClient {
             return;
         }
 
-        // Where are we going to send our messages?
-        toolChainEntry = systemConfig.getString(DEFAULT_TOOL_CHAIN_QUEUE,
-                "messaging", "toolChainQueue");
-
         // Find and boot our storage layer
         String storageType = systemConfig.getString(null, "storage", "type");
         if (storageType == null) {
@@ -126,7 +199,8 @@ public class ReIndexClient {
         }
         storage = PluginManager.getStorage(storageType);
         if (storage == null) {
-            log.error("Storage Plugin '{}' failed to instantiate!", storageType);
+            log.error("Storage Plugin '{}' failed to instantiate!",
+                    storageType);
             return;
         }
         try {
@@ -135,14 +209,6 @@ public class ReIndexClient {
         } catch (PluginException ex) {
             log.error("Error initialising Storage Plugin '{}': ",
                     storage.getName(), ex);
-            return;
-        }
-
-        // Establish a messaging session
-        try {
-            messaging = MessagingServices.getInstance();
-        } catch (MessagingException ex) {
-            log.error("Error connecting to messaging broker: ", ex);
             return;
         }
 
@@ -158,26 +224,8 @@ public class ReIndexClient {
         // Migration Scripting?
         String scriptString = systemConfig.getString(null, "restoreTool",
                 "migrationScript");
-        if (scriptString != null && !scriptString.equals("")) {
-            migrationScript = evalScript(scriptString);
-            if (migrationScript != null) {
-
-                // Make sure our activation method is available
-                if (migrationScript.__findattr__(SCRIPT_ACTIVATE_METHOD) == null) {
-                    log.error("Expected method '{}' not found in"
-                            + " migration script!", SCRIPT_ACTIVATE_METHOD);
-                    migrationScript = null;
-                }
-
-            } else {
-                log.error("A migration script has been configured, but there"
-                        + " were errors preparing, aborting rebuild!");
-                return;
-            }
-        }
-
-        // Go do all the work we require
-        logicLoop();
+        init(scriptString, harvestRemap, oldHarvestFiles, failOnMissing,
+                systemConfig);
     }
 
     /**
@@ -241,10 +289,12 @@ public class ReIndexClient {
             return;
         }
 
-        log.info("Performing first pass of object list to determine changes that need to be made.");
+        log.info(
+                "Performing first pass of object list to determine changes that need to be made.");
         firstPass(objectList);
         log.info("First pass complete");
-        log.info("Performing second pass. Processing object list to make changes");
+        log.info(
+                "Performing second pass. Processing object list to make changes");
         processObjects(objectList);
         log.info("Second pass complete");
         log.info("Rebuild complete...");
@@ -282,7 +332,8 @@ public class ReIndexClient {
         }
 
         // Now sort out how we need to alter things
-        log.info("Checking list of harvest files to see if we have newer versions");
+        log.info(
+                "Checking list of harvest files to see if we have newer versions");
         for (String key : usedHarvestFiles.keySet()) {
             String pid = usedHarvestFiles.get(key);
             log.info("Processing oid: " + key + " pid: " + pid);
@@ -307,20 +358,24 @@ public class ReIndexClient {
                                     harvestUpdates.put(key, newOid);
                                     // Rejected base on age
                                 } else {
-                                    log.error("Found an older harvest file,"
-                                            + " ignoring: '{}' > '{}'", newOid,
-                                            pid);
+                                    log.error(
+                                            "Found an older harvest file,"
+                                                    + " ignoring: '{}' > '{}'",
+                                            newOid, pid);
                                 }
                             }
                         }
                     }
                 }
             } else {
-                log.error("Errors observed in storage for object(s) using"
-                        + " harvest file '{}'. PID should not be null!", key);
+                log.error(
+                        "Errors observed in storage for object(s) using"
+                                + " harvest file '{}'. PID should not be null!",
+                        key);
             }
         }
-        log.info("Completed checking list of harvest files to see if we have newer versions");
+        log.info(
+                "Completed checking list of harvest files to see if we have newer versions");
     }
 
     /**
@@ -443,8 +498,10 @@ public class ReIndexClient {
                 // Is a missing harvest file a problem?
             } else {
                 if (failOnMissing) {
-                    log.error("Failed to process object '{}'."
-                            + " No mapping exists for harvest file!", oid);
+                    log.error(
+                            "Failed to process object '{}'."
+                                    + " No mapping exists for harvest file!",
+                            oid);
                     return;
                 }
                 // Otherwise try mapping each alone (they could even both fail)
@@ -455,8 +512,8 @@ public class ReIndexClient {
             try {
                 digitalObject.close();
             } catch (StorageException ex) {
-                log.error("Error saving the object '{}' back to storage: ",
-                        oid, ex);
+                log.error("Error saving the object '{}' back to storage: ", oid,
+                        ex);
                 return;
             }
             // And don't forget to update this variable
