@@ -74,12 +74,12 @@
 			<dependency>
        			 <groupId>org.springframework.security</groupId>
        			 <artifactId>spring-security</artifactId>
-        		 <version>3.0.7.RELEASE</version>
+        		 <version>3.2.10.RELEASE</version>
     	    </dependency>
 			<dependency>
        			 <groupId>org.springframework.security</groupId>
        			 <artifactId>spring-security-config</artifactId>
-        		 <version>3.0.7.RELEASE</version>
+        		 <version>3.2.10.RELEASE</version>
     	    </dependency>
 			<!-- Done with Spring versions -->
 			<!-- ************************* -->
