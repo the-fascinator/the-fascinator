@@ -48,6 +48,7 @@ import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 import com.googlecode.fascinator.spring.ApplicationContextProvider;
+import org.springframework.context.ApplicationContext;
 
 /**
  * <p>
@@ -130,15 +131,23 @@ public class ReIndexClient {
         toolChainEntry = systemConfig.getString(DEFAULT_TOOL_CHAIN_QUEUE,
                 "messaging", "toolChainQueue");
 
-        storage = (Storage) ApplicationContextProvider.getApplicationContext()
-                .getBean("fascinatorStorage");
-
         // Establish a messaging session
         try {
             messaging = MessagingServices.getInstance();
         } catch (com.googlecode.fascinator.common.messaging.MessagingException ex) {
             log.error("Error connecting to messaging broker: ", ex);
             return;
+        }
+
+
+        ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
+
+        if (applicationContext != null) {
+            log.debug("application context found. Presuming reindex triggered from web-app and storage is currently null. Initialising storage...");
+            storage = (Storage) ApplicationContextProvider.getApplicationContext()
+                    .getBean("fascinatorStorage");
+        } else {
+            log.debug("No application context found. Presuming reindex triggered from outside web-app and storage already initialised.");
         }
 
         // How are we handling harvest files?
