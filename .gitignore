@@ -3,7 +3,8 @@ target/
 /.idea
 *.iml
 .svn
-
+*.ipr
+*.iws
 plugins/harvester/filesystem/derby.log
 
 .DS_Store

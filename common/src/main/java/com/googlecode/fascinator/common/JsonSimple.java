@@ -169,7 +169,7 @@ public class JsonSimple {
         try {
             object = parser.parse(jsonString, containerFactory);
         } catch(ParseException pe) {
-            log.error("JSON Parse Error: ", pe);
+            log.error("JSON Parse Error: attempting to parse json string: {}: {}", jsonString, pe);
             throw new IOException(pe);
         }
 
