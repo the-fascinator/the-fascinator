@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.googlecode.the-fascinator</groupId>
         <artifactId>the-fascinator</artifactId>
-        <version>1.4.0.1-SNAPSHOT</version>
+        <version>1.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.googlecode.the-fascinator</groupId>
@@ -107,7 +107,7 @@
         </dependency>
     </dependencies>
     <description>
-        Provides a set of vocabulary items for managing RDF-based data. 
+        Provides a set of vocabulary items for managing RDF-based data.
         Please refer to the project URL for more doco.
     </description>
     <url>http://fascinator.usq.edu.au/trac/wiki/tf2/DeveloperNotes/vocabulary</url>

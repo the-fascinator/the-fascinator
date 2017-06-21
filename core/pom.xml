@@ -4,7 +4,7 @@
 	<groupId>com.googlecode.the-fascinator</groupId>
 	<artifactId>fascinator-core</artifactId>
 	<name>The Fascinator - Core</name>
-	<version>1.4.0.1-SNAPSHOT</version>
+	<version>1.5-SNAPSHOT</version>
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>the-fascinator</artifactId>
@@ -187,7 +187,7 @@
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.1.1</version>
-						<!-- <configuration> <mainClass>com.googlecode.fascinator.HarvestClient</mainClass> 
+						<!-- <configuration> <mainClass>com.googlecode.fascinator.HarvestClient</mainClass>
 							<arguments> <argument>${jsonFile}</argument> </arguments> </configuration> -->
 					</plugin>
 				</plugins>

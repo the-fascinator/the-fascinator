@@ -5,8 +5,8 @@
 	<artifactId>the-fascinator</artifactId>
 	<packaging>pom</packaging>
 	<name>The Fascinator</name>
-	<version>1.4.0.1-SNAPSHOT</version>
-	<parent>            
+	<version>1.5-SNAPSHOT</version>
+	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>organisation</artifactId>
 		<version>1.0.3</version>
@@ -269,9 +269,9 @@
 				<artifactId>jackson-mapper-lgpl</artifactId>
 				<version>1.1.0</version>
 			</dependency>
-			<!-- We want to use Logback as our SLF4j API Implementation. So we need 
-				the API and the implementation. We will rely on each POM building block to 
-				ensure that additional JARs to not end on the classpath, but this level will 
+			<!-- We want to use Logback as our SLF4j API Implementation. So we need
+				the API and the implementation. We will rely on each POM building block to
+				ensure that additional JARs to not end on the classpath, but this level will
 				provide versioned log chutes to replace them. (ie. jcl and log4j) -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -314,7 +314,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<systemPropertyVariables>
-						<!-- set fascinator.home to the current module's target directory during 
+						<!-- set fascinator.home to the current module's target directory during
 							unit testing -->
 						<fascinator.home>${basedir}/target/fascinator-home</fascinator.home>
 					</systemPropertyVariables>
