@@ -5,7 +5,7 @@ services:
 before_install:
 - mkdir /tmp/build
 - docker pull qcifengineering/redbox-builder
-- docker run -v /tmp/build:/build -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
+- docker run -v /tmp/build:/build -e "CLONEPATH=--branch=1.5 https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
 install: true
 script: true
 after_success:
