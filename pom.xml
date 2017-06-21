@@ -86,7 +86,7 @@
 			<dependency>
 				<groupId>com.googlecode.the-fascinator</groupId>
 				<artifactId>fascinator-core</artifactId>
-				<version>1.4.0.1-SNAPSHOT</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.googlecode.the-fascinator</groupId>

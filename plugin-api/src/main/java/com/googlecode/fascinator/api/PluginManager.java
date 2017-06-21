@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.googlecode.fascinator.api.access.AccessControl;
@@ -38,7 +41,6 @@ import com.googlecode.fascinator.api.transaction.TransactionException;
 import com.googlecode.fascinator.api.transaction.TransactionManager;
 import com.googlecode.fascinator.api.transformer.Transformer;
 import com.googlecode.fascinator.api.transformer.TransformerException;
-import com.googlecode.fascinator.common.FascinatorHome;
 
 import groovy.lang.GroovyClassLoader;
 
@@ -48,6 +50,14 @@ import groovy.lang.GroovyClassLoader;
  * @author Oliver Lucido
  */
 public class PluginManager {
+
+    /** System property key */
+    public static final String SYSTEM_KEY = "fascinator.home";
+
+    /** Default Fascinator home directory */
+    public static final String DEFAULT_PATH = StrSubstitutor
+            .replaceSystemProperties(FilenameUtils
+                    .separatorsToSystem("${user.home}/.fascinator"));
 
     public static Cache<Object, Object> cache = CacheBuilder.newBuilder()
             .concurrencyLevel(4).weakKeys().maximumSize(10000)
@@ -79,8 +89,8 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/accessControl/" + id + ".groovy");
+        File groovyFile = getPathFile(
+                "plugins/accessControl/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -140,8 +150,8 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/accessManager/" + id + ".groovy");
+        File groovyFile = getPathFile(
+                "plugins/accessManager/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -186,8 +196,8 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/authentication/" + id + ".groovy");
+        File groovyFile = getPathFile(
+                "plugins/authentication/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -248,8 +258,7 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/harvester/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/harvester/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -306,8 +315,7 @@ public class PluginManager {
                 return plugin;
             }
         }
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/indexer/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/indexer/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -363,8 +371,7 @@ public class PluginManager {
                 return plugin;
             }
         }
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/roles/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/roles/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -421,8 +428,7 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/storage/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/storage/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -481,8 +487,8 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/transactionManager/" + id + ".groovy");
+        File groovyFile = getPathFile(
+                "plugins/transactionManager/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -546,8 +552,7 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/transformer/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/transformer/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -607,8 +612,7 @@ public class PluginManager {
             }
         }
 
-        File groovyFile = FascinatorHome
-                .getPathFile("plugins/subscriber/" + id + ".groovy");
+        File groovyFile = getPathFile("plugins/subscriber/" + id + ".groovy");
         if (groovyFile.exists()) {
             GroovyClassLoader gcl = new GroovyClassLoader();
             try {
@@ -640,5 +644,18 @@ public class PluginManager {
             access_plugins.put(plugin.getId(), plugin);
         }
         return access_plugins;
+    }
+
+    private static File getPathFile(String subDir) {
+        String homePath = System.getenv("FASCINATOR_HOME");
+        if (homePath == null) {
+            homePath = DEFAULT_PATH;
+        }
+
+        String path = System.getProperty(SYSTEM_KEY, homePath);
+
+        String filePath = path + File.separator
+                + FilenameUtils.separatorsToSystem(subDir);
+        return new File(filePath);
     }
 }
