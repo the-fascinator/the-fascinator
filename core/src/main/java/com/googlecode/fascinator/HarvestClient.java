@@ -383,7 +383,7 @@ public class HarvestClient {
         }
     }
 
-    private void reharvest(String oid, DigitalObject configObj,
+    public void reharvest(String oid, DigitalObject configObj,
             boolean userPriority)
             throws IOException, PluginException, MessagingException {
         log.info("Reharvest '{}'...", oid);
