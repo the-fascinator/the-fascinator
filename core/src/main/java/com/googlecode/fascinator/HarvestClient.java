@@ -1,17 +1,17 @@
-/* 
+/*
  * The Fascinator - Core
  * Copyright (C) 2009-2011 University of Southern Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -53,9 +53,9 @@ import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
 
 /**
- * 
+ *
  * HarvestClient class to handle harvesting of objects to the storage
- * 
+ *
  * @author Oliver Lucido
  */
 public class HarvestClient {
@@ -117,7 +117,7 @@ public class HarvestClient {
 
     /**
      * Harvest Client Constructor
-     * 
+     *
      * @throws HarvesterException if fail to initialise
      */
     public HarvestClient() throws HarvesterException {
@@ -126,7 +126,7 @@ public class HarvestClient {
 
     /**
      * Harvest Client Constructor
-     * 
+     *
      * @param configFile configuration file
      * @throws HarvesterException if fail to initialise
      */
@@ -136,7 +136,7 @@ public class HarvestClient {
 
     /**
      * Harvest Client Constructor
-     * 
+     *
      * @param configFile Configuration file
      * @param uploadedFile Uploaded file
      * @param owner Owner of the file
@@ -158,8 +158,9 @@ public class HarvestClient {
                 rulesFile = new File(configFile.getParent(), rules);
             }
         } catch (IOException ioe) {
-            throw new HarvesterException("Failed to read configuration file: '"
-                    + configFile + "'", ioe);
+            throw new HarvesterException(
+                    "Failed to read configuration file: '" + configFile + "'",
+                    ioe);
         }
 
         // initialise storage system
@@ -177,8 +178,8 @@ public class HarvestClient {
             throw new HarvesterException("Failed to initialise storage", pe);
         }
 
-        toolChainEntry = config.getString(DEFAULT_TOOL_CHAIN_QUEUE,
-                "messaging", "toolChainQueue");
+        toolChainEntry = config.getString(DEFAULT_TOOL_CHAIN_QUEUE, "messaging",
+                "toolChainQueue");
 
         try {
             messaging = MessagingServices.getInstance();
@@ -189,7 +190,7 @@ public class HarvestClient {
 
     /**
      * Update the harvest file in storage if required
-     * 
+     *
      * @param file The harvest file to store
      * @return DigitalObject The storage object with the file
      * @throws StorageException If storage failed
@@ -220,7 +221,7 @@ public class HarvestClient {
 
     /**
      * Start Harvesting Digital objects
-     * 
+     *
      * @throws PluginException If harvest plugin not found
      */
     public void start() throws PluginException {
@@ -315,29 +316,29 @@ public class HarvestClient {
     /**
      * Reharvest Digital Object when there's a request to reharvest from the
      * portal.
-     * 
+     *
      * @param oid Object Id
      * @throws IOException If necessary files not found
      * @throws PluginException If the harvester plugin not found
      * @throws MessagingException If the object could not be queue'd
      */
-    public void reharvest(String oid) throws IOException, PluginException,
-            MessagingException {
+    public void reharvest(String oid)
+            throws IOException, PluginException, MessagingException {
         reharvest(oid, false);
     }
 
     /**
      * Reharvest Digital Object when there's a request to reharvest from the
      * portal. The portal can flag items for priority rendering.
-     * 
+     *
      * @param oid Object Id
      * @param userPriority Set flag to have high priority render
      * @throws IOException If necessary files not found
      * @throws PluginException If the harvester plugin not found
      * @throws MessagingException If the object could not be queue'd
      */
-    public void reharvest(String oid, boolean userPriority) throws IOException,
-            PluginException, MessagingException {
+    public void reharvest(String oid, boolean userPriority)
+            throws IOException, PluginException, MessagingException {
         log.info("Reharvest '{}'...", oid);
 
         // get the object from storage
@@ -382,6 +383,46 @@ public class HarvestClient {
         }
     }
 
+    private void reharvest(String oid, DigitalObject configObj,
+            boolean userPriority)
+            throws IOException, PluginException, MessagingException {
+        log.info("Reharvest '{}'...", oid);
+
+        // get the object from storage
+        DigitalObject object = storage.getObject(oid);
+
+        // Get/set properties
+        Properties props = object.getMetadata();
+        props.setProperty("render-pending", "true");
+        String configOid = props.getProperty("jsonConfigOid");
+        if (userPriority) {
+            props.setProperty("userPriority", "true");
+        } else {
+            props.remove("userPriority");
+        }
+        object.close();
+
+        // get its harvest config
+
+        log.info("Using config from '{}'", configOid);
+
+        Payload payload = configObj.getPayload(configObj.getSourceId());
+        configFile = File.createTempFile("reharvest", ".json");
+        OutputStream out = new FileOutputStream(configFile);
+        IOUtils.copy(payload.open(), out);
+        out.close();
+        payload.close();
+        configObj.close();
+
+        // queue for rendering
+        queueHarvest(oid, configFile, true, toolChainEntry);
+        log.info("Object '{}' now queued for reindexing...", oid);
+
+        // cleanup
+        configFile.delete();
+
+    }
+
     /**
      * Shutdown Harvester Client. Including: Storage, Message Producer, Session
      * and Connection
@@ -401,20 +442,20 @@ public class HarvestClient {
 
     /**
      * Process each objects
-     * 
+     *
      * @param oid Object Id
      * @throws StorageException If storage is not found
      * @throws TransformerException If transformer fail to transform the object
      * @throws MessagingException If the object could not be queue'd
      */
-    private void processObject(String oid) throws TransformerException,
-            StorageException, MessagingException {
+    private void processObject(String oid)
+            throws TransformerException, StorageException, MessagingException {
         processObject(oid, false);
     }
 
     /**
      * Process each objects
-     * 
+     *
      * @param oid Object Id
      * @param commit Flag to commit after indexing
      * @throws StorageException If storage is not found
@@ -481,7 +522,7 @@ public class HarvestClient {
 
     /**
      * To queue object to be processed
-     * 
+     *
      * @param oid Object id
      * @param jsonFile Configuration file
      * @param commit To commit each request to Queue (true) or not (false)
@@ -494,7 +535,7 @@ public class HarvestClient {
 
     /**
      * To queue object to be processed
-     * 
+     *
      * @param oid Object id
      * @param jsonFile Configuration file
      * @param commit To commit each request to Queue (true) or not (false)
@@ -518,7 +559,7 @@ public class HarvestClient {
 
     /**
      * To delete object processing from queue
-     * 
+     *
      * @param oid Object id
      * @param jsonFile Configuration file
      * @throws MessagingException if the message could not be sent
@@ -538,7 +579,7 @@ public class HarvestClient {
 
     /*
      * Useful only for uploaded files.
-     * 
+     *
      * @return The object ID the uploaded file was given by harvester.
      */
     public String getUploadOid() {
@@ -551,7 +592,7 @@ public class HarvestClient {
 
     /**
      * To put events to subscriber queue
-     * 
+     *
      * @param oid Object id
      * @param eventType type of events happened
      * @param context where the event happened
@@ -575,7 +616,7 @@ public class HarvestClient {
 
     /**
      * Main method for Harvest Client
-     * 
+     *
      * @param args Argument list
      */
     public static void main(String[] args) {
