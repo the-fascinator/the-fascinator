@@ -1,29 +1,22 @@
-/* 
+/*
  * The Fascinator - Core
  * Copyright (C) 2009-2011 University of Southern Queensland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 package com.googlecode.fascinator.messaging;
-
-import com.googlecode.fascinator.common.messaging.GenericListener;
-import com.googlecode.fascinator.common.JsonObject;
-import com.googlecode.fascinator.common.JsonSimple;
-import com.googlecode.fascinator.common.JsonSimpleConfig;
-import com.googlecode.fascinator.common.messaging.MessagingException;
-import com.googlecode.fascinator.common.messaging.MessagingServices;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -42,14 +35,22 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.googlecode.fascinator.common.JsonObject;
+import com.googlecode.fascinator.common.JsonSimple;
+import com.googlecode.fascinator.common.JsonSimpleConfig;
+import com.googlecode.fascinator.common.messaging.GenericListener;
+import com.googlecode.fascinator.common.messaging.MessagingException;
+import com.googlecode.fascinator.common.messaging.MessagingServices;
+
 /**
  * Consumer for sending email notifications.
- * 
+ *
  * @author Oliver Lucido
  */
 public class EmailNotificationConsumer implements GenericListener {
@@ -108,7 +109,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Constructor required by ServiceLoader. Be sure to use init()
-     * 
+     *
      */
     public EmailNotificationConsumer() {
         thread = new Thread(this, LISTENER_ID);
@@ -116,7 +117,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Start thread running
-     * 
+     *
      */
     @Override
     public void run() {
@@ -127,8 +128,8 @@ public class EmailNotificationConsumer implements GenericListener {
             String brokerUrl = globalConfig.getString(
                     ActiveMQConnectionFactory.DEFAULT_BROKER_BIND_URL,
                     "messaging", "url");
-            ActiveMQConnectionFactory connectionFactory =
-                    new ActiveMQConnectionFactory(brokerUrl);
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                    brokerUrl);
             connection = connectionFactory.createConnection();
 
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -148,7 +149,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Initialization method
-     * 
+     *
      * @param config Configuration to use
      * @throws IOException if the configuration file not found
      */
@@ -171,14 +172,14 @@ public class EmailNotificationConsumer implements GenericListener {
             smtpUsername = config.getString(null, "config", "smtp", "username");
             smtpPassword = config.getString(null, "config", "smtp", "password");
 
-            defaultSubject = config.getString("Notification",
-                    "config", "defaults", "subject");
+            defaultSubject = config.getString("Notification", "config",
+                    "defaults", "subject");
             defaultBody = config.getString("nt", "config", "defaults", "body");
 
-            fromAddress = config.getString("fascinator@usq.edu.au",
-                    "config", "from", "email");
-            fromName = config.getString("The Fascinator",
-                    "config", "from", "name");
+            fromAddress = config.getString("fascinator@usq.edu.au", "config",
+                    "from", "email");
+            fromName = config.getString("The Fascinator", "config", "from",
+                    "name");
 
         } catch (IOException ioe) {
             log.error("Failed to read configuration: {}", ioe.getMessage());
@@ -194,7 +195,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Return the ID string for this listener
-     * 
+     *
      */
     @Override
     public String getId() {
@@ -203,7 +204,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Start the queue based on the name identifier
-     * 
+     *
      * @throws JMSException if an error occurred starting the JMS connections
      */
     @Override
@@ -251,7 +252,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Callback function for incoming messages.
-     * 
+     *
      * @param message The incoming message
      */
     @Override
@@ -273,17 +274,26 @@ public class EmailNotificationConsumer implements GenericListener {
             // Addresses
             List<String> toList = config.getStringList("to");
             List<String> ccList = config.getStringList("cc");
+            String fromAddress = config.getString(this.fromAddress, "from",
+                    "address");
+            boolean isHtml = config.getString("plain", "format").equals("html")
+                    ? true : false;
 
+            String fromName = config.getString(this.fromName, "from", "name");
             String subject = config.getString(defaultSubject, "subject");
             String body = config.getString(defaultBody, "body");
-            sendEmails(toList, ccList, subject, body);
 
-            // Log event
-            sentMessage(oid, "notify");
+            sendEmails(toList, ccList, subject, body, fromAddress, fromName,
+                    isHtml);
 
-            // Finish up
-            sendNotification(oid, "emailSent", "(" + name
-                    + ") Email notification sent : '" + oid + "'");
+            if (oid != null) {
+                // Log event
+                sentMessage(oid, "notify");
+
+                // Finish up
+                sendNotification(oid, "emailSent", "(" + name
+                        + ") Email notification sent : '" + oid + "'");
+            }
 
         } catch (JMSException jmse) {
             log.error("Failed to send/receive message: {}", jmse);
@@ -297,8 +307,16 @@ public class EmailNotificationConsumer implements GenericListener {
     }
 
     private void sendEmails(List<String> toList, List<String> ccList,
-            String subject, String body) throws EmailException {
-        Email email = new SimpleEmail();
+            String subject, String body, String fromAddress, String fromName,
+            boolean isHtml) throws EmailException {
+        Email email = null;
+        if (isHtml) {
+            email = new HtmlEmail();
+            ((HtmlEmail) email).setHtmlMsg(body);
+        } else {
+            email = new SimpleEmail();
+            email.setMsg(body);
+        }
         email.setDebug(debug);
         email.setHostName(smtpHost);
         if (smtpUsername != null || smtpPassword != null) {
@@ -309,7 +327,7 @@ public class EmailNotificationConsumer implements GenericListener {
         email.setSSL(smtpSsl);
         email.setTLS(smtpTls);
         email.setSubject(subject);
-        email.setMsg(body);
+
         for (String to : toList) {
             email.addTo(to);
         }
@@ -324,7 +342,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Send the notification out on the broadcast topic
-     * 
+     *
      * @param oid Object id
      * @param status Status of the object
      * @param message Message to be sent
@@ -343,7 +361,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * To put events to subscriber queue
-     * 
+     *
      * @param oid Object id
      * @param eventType type of events happened
      * @param context where the event happened
@@ -364,7 +382,7 @@ public class EmailNotificationConsumer implements GenericListener {
 
     /**
      * Sets the priority level for the thread. Used by the OS.
-     * 
+     *
      * @param newPriority The priority level to set the thread at
      */
     @Override
