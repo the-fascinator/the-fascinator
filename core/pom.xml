@@ -4,11 +4,11 @@
 	<groupId>com.googlecode.the-fascinator</groupId>
 	<artifactId>fascinator-core</artifactId>
 	<name>The Fascinator - Core</name>
-	<version>1.4.0.1</version>
+	<version>1.4.0.2-SNAPSHOT</version>
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>the-fascinator</artifactId>
-		<version>1.4.0.1</version>
+		<version>1.4.0.2-SNAPSHOT</version>
 	</parent>
 	<dependencies>
 		<dependency>
