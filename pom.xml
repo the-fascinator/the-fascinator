@@ -5,7 +5,7 @@
 	<artifactId>the-fascinator</artifactId>
 	<packaging>pom</packaging>
 	<name>The Fascinator</name>
-	<version>1.4.0.1-SNAPSHOT</version>
+	<version>1.4.0.1</version>
 	<parent>            
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>organisation</artifactId>
@@ -86,7 +86,7 @@
 			<dependency>
 				<groupId>com.googlecode.the-fascinator</groupId>
 				<artifactId>fascinator-core</artifactId>
-				<version>1.4.0.1-SNAPSHOT</version>
+				<version>1.4.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.googlecode.the-fascinator</groupId>
