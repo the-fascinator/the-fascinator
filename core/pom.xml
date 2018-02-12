@@ -4,17 +4,17 @@
 	<groupId>com.googlecode.the-fascinator</groupId>
 	<artifactId>fascinator-core</artifactId>
 	<name>The Fascinator - Core</name>
-	<version>1.5-SNAPSHOT</version>
+	<version>1.5</version>
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>the-fascinator</artifactId>
-		<version>1.5-SNAPSHOT</version>
+		<version>1.5</version>
 	</parent>
 	<dependencies>
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
 			<artifactId>fascinator-common</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
 			<artifactId>fascinator-plugin-api</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.5</version>
 		</dependency>
 
 		<dependency>
