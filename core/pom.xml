@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
 			<artifactId>fascinator-vocabulary</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>1.4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.the-fascinator</groupId>
