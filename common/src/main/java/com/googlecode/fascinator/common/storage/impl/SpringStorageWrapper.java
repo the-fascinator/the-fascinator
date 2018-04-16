@@ -1,17 +1,17 @@
-/* 
+/*
  * The Fascinator - Portal - Security
  * Copyright (C) 2013 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -36,10 +36,10 @@ import com.googlecode.fascinator.common.JsonSimpleConfig;
 
 /**
  * Storage wrapper used in Spring.
- * 
+ *
  * @author Andrew Brazzatti
  * @author Jianfeng Li
- * 
+ *
  */
 @Component(value = "fascinatorStorage")
 public class SpringStorageWrapper implements Storage {
@@ -56,8 +56,8 @@ public class SpringStorageWrapper implements Storage {
             throw new RuntimeException(e);
         }
 
-        String storageType = systemConfiguration.getString(
-                DEFAULT_STORAGE_TYPE, "storage", "type");
+        String storageType = systemConfiguration.getString(DEFAULT_STORAGE_TYPE,
+                "storage", "type");
         storagePlugin = PluginManager.getStorage(storageType);
         if (storagePlugin == null) {
             throw new RuntimeException("Storage plugin '" + storageType
@@ -121,6 +121,10 @@ public class SpringStorageWrapper implements Storage {
     @Override
     public Set<String> getObjectIdList() {
         return storagePlugin.getObjectIdList();
+    }
+
+    public Storage getStoragePlugin() {
+        return storagePlugin;
     }
 
 }
