@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.googlecode.fascinator.api.PluginException;
 import com.googlecode.fascinator.api.PluginManager;
@@ -51,6 +52,7 @@ import com.googlecode.fascinator.common.messaging.MessagingException;
 import com.googlecode.fascinator.common.messaging.MessagingServices;
 import com.googlecode.fascinator.common.storage.StorageUtils;
 import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
+import com.googlecode.fascinator.spring.ApplicationContextProvider;
 
 /**
  *
@@ -58,6 +60,7 @@ import com.googlecode.fascinator.messaging.HarvestQueueConsumer;
  *
  * @author Oliver Lucido
  */
+@Component("harvestClient")
 public class HarvestClient {
 
     /** Date format */
@@ -150,7 +153,8 @@ public class HarvestClient {
 
         try {
             if (configFile == null) {
-                config = new JsonSimpleConfig();
+                config = (JsonSimpleConfig) ApplicationContextProvider
+                        .getApplicationContext().getBean("fascinatorConfig");
             } else {
                 config = new JsonSimpleConfig(configFile);
                 String rules = config.getString(null, "indexer", "script",
@@ -166,16 +170,11 @@ public class HarvestClient {
         // initialise storage system
         String storageType = config.getString(DEFAULT_STORAGE_TYPE, "storage",
                 "type");
-        storage = PluginManager.getStorage(storageType);
+        storage = (Storage) ApplicationContextProvider.getApplicationContext()
+                .getBean("fascinatorStorage");
         if (storage == null) {
             throw new HarvesterException("Storage plugin '" + storageType
                     + "'. Ensure it is in the classpath.");
-        }
-        try {
-            storage.init(config.toString());
-            log.info("Loaded {}", storage.getName());
-        } catch (PluginException pe) {
-            throw new HarvesterException("Failed to initialise storage", pe);
         }
 
         toolChainEntry = config.getString(DEFAULT_TOOL_CHAIN_QUEUE, "messaging",
@@ -357,6 +356,8 @@ public class HarvestClient {
 
         // get its harvest config
         boolean usingTempFile = false;
+        JsonSimple jsonSimple = null;
+
         if (configOid == null) {
             log.warn("No harvest config for '{}', using defaults...");
             configFile = JsonSimpleConfig.getSystemFile();
@@ -364,23 +365,20 @@ public class HarvestClient {
             log.info("Using config from '{}'", configOid);
             DigitalObject configObj = storage.getObject(configOid);
             Payload payload = configObj.getPayload(configObj.getSourceId());
-            configFile = File.createTempFile("reharvest", ".json");
-            OutputStream out = new FileOutputStream(configFile);
-            IOUtils.copy(payload.open(), out);
-            out.close();
-            payload.close();
-            configObj.close();
+            jsonSimple = new JsonSimple(payload.open());
             usingTempFile = true;
         }
 
-        // queue for rendering
-        queueHarvest(oid, configFile, true, toolChainEntry);
+        if (usingTempFile) {
+            queueHarvest(oid, jsonSimple, true, toolChainEntry);
+        } else {
+            // queue for rendering
+            queueHarvest(oid, configFile, true, toolChainEntry);
+        }
         log.info("Object '{}' now queued for reindexing...", oid);
 
         // cleanup
-        if (usingTempFile) {
-            configFile.delete();
-        }
+
     }
 
     public void reharvest(String oid, DigitalObject configObj,
@@ -545,16 +543,33 @@ public class HarvestClient {
     private void queueHarvest(String oid, File jsonFile, boolean commit,
             String queueName) throws MessagingException {
         try {
-            JsonObject json = new JsonSimple(jsonFile).getJsonObject();
-            json.put("oid", oid);
-            if (commit) {
-                json.put("commit", "true");
-            }
-            messaging.queueMessage(queueName, json.toString());
+            JsonSimple jsonSimple = new JsonSimple(jsonFile);
+            this.queueHarvest(oid, jsonSimple, commit, queueName);
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
             throw new MessagingException(ioe);
         }
+    }
+
+    /**
+     * To queue object to be processed
+     *
+     * @param oid Object id
+     * @param jsonFile Configuration file
+     * @param commit To commit each request to Queue (true) or not (false)
+     * @param queueName Name of the queue to route to
+     * @throws MessagingException if the message could not be sent
+     */
+    private void queueHarvest(String oid, JsonSimple jsonSimple, boolean commit,
+            String queueName) throws MessagingException {
+
+        JsonObject json = jsonSimple.getJsonObject();
+        json.put("oid", oid);
+        if (commit) {
+            json.put("commit", "true");
+        }
+        messaging.queueMessage(queueName, json.toString());
+
     }
 
     /**
