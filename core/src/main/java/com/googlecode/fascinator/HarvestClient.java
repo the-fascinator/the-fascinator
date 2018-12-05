@@ -118,6 +118,8 @@ public class HarvestClient {
 
     private String repoName;
 
+
+
     /**
      * Harvest Client Constructor
      *
@@ -205,7 +207,7 @@ public class HarvestClient {
             message.put("type", "harvest-update");
             message.put("oid", object.getId());
             try {
-                messaging.queueMessage("houseKeeping", message.toString());
+                getMessagingServices().queueMessage("houseKeeping", message.toString());
             } catch (MessagingException ex) {
                 log.error("Error sending message: ", ex);
             }
@@ -568,7 +570,7 @@ public class HarvestClient {
         if (commit) {
             json.put("commit", "true");
         }
-        messaging.queueMessage(queueName, json.toString());
+        getMessagingServices().queueMessage(queueName, json.toString());
 
     }
 
@@ -585,7 +587,7 @@ public class HarvestClient {
             JsonObject json = new JsonSimple(jsonFile).getJsonObject();
             json.put("oid", oid);
             json.put("deleted", "true");
-            messaging.queueMessage(toolChainEntry, json.toString());
+            getMessagingServices().queueMessage(toolChainEntry, json.toString());
         } catch (IOException ioe) {
             log.error("Failed to parse message: {}", ioe.getMessage());
             throw new MessagingException(ioe);
@@ -623,7 +625,7 @@ public class HarvestClient {
 
         param.putAll(optionalParams);
         try {
-            messaging.onEvent(param);
+            getMessagingServices().onEvent(param);
         } catch (MessagingException ex) {
             log.error("Unable to send message: ", ex);
         }
@@ -661,5 +663,12 @@ public class HarvestClient {
                 }
             }
         }
+    }
+
+    private MessagingServices getMessagingServices() throws MessagingException {
+        if(messaging == null) {
+                messaging = MessagingServices.getInstance();
+        }
+        return messaging;
     }
 }
