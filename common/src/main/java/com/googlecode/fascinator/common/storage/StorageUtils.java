@@ -19,25 +19,20 @@
  */
 package com.googlecode.fascinator.common.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Properties;
-
+import com.googlecode.fascinator.api.storage.DigitalObject;
+import com.googlecode.fascinator.api.storage.Payload;
+import com.googlecode.fascinator.api.storage.Storage;
+import com.googlecode.fascinator.api.storage.StorageException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.googlecode.fascinator.api.storage.DigitalObject;
-import com.googlecode.fascinator.api.storage.Payload;
-import com.googlecode.fascinator.api.storage.Storage;
-import com.googlecode.fascinator.api.storage.StorageException;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Properties;
 
 /**
  * Storage API utility methods.
@@ -154,6 +149,7 @@ public class StorageUtils {
                         payload = object.getPayload(pid);
                     }
                 } else {
+                    log.debug("Attempting to create or update payload...");
                     payload = createOrUpdatePayload(object, pid,
                             new FileInputStream(file));
                 }
@@ -225,6 +221,7 @@ public class StorageUtils {
      */
     public static DigitalObject checkHarvestFile(Storage storage, File file)
             throws StorageException {
+        log.debug("Checking for harvest file: {}", file.getAbsolutePath());
         String oid = generateOid(file);
         String lastMod = String.valueOf(file.lastModified());
         DigitalObject object;
@@ -233,6 +230,7 @@ public class StorageUtils {
         try {
             // Get the object from storage
             object = storage.getObject(oid);
+            log.debug("Got harvest file id: {}", oid);
             try {
                 // Check when it was last saved
                 metadata = object.getMetadata();
@@ -265,6 +263,7 @@ public class StorageUtils {
             }
 
         } catch (StorageException ex) {
+            log.error("There was problem finding a reference or file in storage.", ex);
             // It wasn't found in storage
             try {
                 // Store it
