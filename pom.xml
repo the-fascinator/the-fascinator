@@ -9,19 +9,13 @@
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>organisation</artifactId>
-		<version>1.0.4</version>
+		<version>1.0.6-SNAPSHOT</version>
 	</parent>
 	<description>
         The Fascinator platform is a set of components that can be
         remixed/mashed to meet a variety of repository-centric needs.
     </description>
 	<url>http://code.google.com/p/the-fascinator/</url>
-	<issueManagement>
-	</issueManagement>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>https://redbox-build.cqu.edu.au/jenkins/job/Fascinator%20SVN%20Build/</url>
-	</ciManagement>
 	<reporting>
 		<plugins>
 			<plugin>
@@ -335,7 +329,7 @@
 	<repositories>
 		<repository>
 			<id>fascinator-snapshots</id>
-			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/central-snapshots/</url>
+			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/sonatype-snapshots-3/</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
