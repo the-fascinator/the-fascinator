@@ -328,7 +328,8 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>fascinator-snapshots</id>
+			<!-- workaround until local nexus fixed -->
+			<id>redbox-remote-snapshots</id>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 			<releases>
 				<enabled>false</enabled>
@@ -336,10 +337,6 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
-		<repository>
-			<id>redbox-nexus</id>
-			<url>http://dev.redboxresearchdata.com.au/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 

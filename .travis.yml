@@ -5,19 +5,24 @@ services:
 before_install:
 - mkdir /tmp/build
 - docker pull qcifengineering/redbox-builder
-- docker run -v /tmp/build:/build -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git" qcifengineering/redbox-builder
+- docker run -v /tmp/build:/build -e "CLONEPATH=https://github.com/the-fascinator/the-fascinator.git"
+  qcifengineering/redbox-builder
 install: true
 script: true
 after_success:
-- docker run -v /tmp/build:/build -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD" qcifengineering/redbox-builder /bin/bash -c "cd build/src;mvn --settings /m2_repo/travis-settings.xml -Dmaven.repo.local=/m2_repo -DskipTests=true deploy"
+- docker run -v /tmp/build:/build -e "SONATYPE_USERNAME=$SONATYPE_USERNAME" -e "SONATYPE_PASSWORD=$SONATYPE_PASSWORD"
+  qcifengineering/redbox-builder /bin/bash -c "cd build/src;mvn --settings /m2_repo/travis-settings.xml
+  -Dmaven.repo.local=/m2_repo -DskipTests=true deploy"
 env:
   global:
   - secure: Rv9pIhSzwZxuasFP2L0thNinefyAWWc1XvA7CL99ArfUf+7Y6iFPWeOzrDk/oX1njtmBPKwX7oirpD0GBhePwBwAp8Tl8jPxx+yxnzIpuj3ZIBJ/7caxcnf/T8VASARZdG3V2ZreWGfanvPiZVv/WSKPyd4PSzBZGh2QyWPI9CE=
   - secure: VUNE0GLCKilH3IP+8KgqgCnLP2URjLTg+vlzI6HFDurNkLc7h9mD8xCDNkgO+UvfBKLqCXl2aoTeg3h7wBjCBrZ2GNVXIe0zfFWFWdsiaI3Z73oeHJdQyw8UOWQz+dteu6Tr2eb1kPtROaQ0bo/xP7VY3AMH/ygrEXYrwcmrCrA=
+  - secure: uZDso19GTxlkhfven3p+g9q5jgjJQX4mOelgO7FxX5Ty7R20ume0Q2wrgcpBxD+mn9fU171wlSqGN7PTV00iYlARBe+XGO+uCcd80uvbYhQG8Jh+TZTFWxyjVXzBkUgsUL1fZxmZn6lf8K7ufn+iUCkE9+QOhaGvFZ6n0UAvbac=
+  - secure: FYhdAp4bSFrqooOShYvuMObZqU6MDRwEiQQLll2gQ5gv9dOPwpiSh3y+tchLGzxKBfp3HPx3Tif7pCnfU7IKJUh6s76AyD65Z5s+pwNZ6Y0okp/Zv+Gukypp9mzJcDXpME4X81cX7B0wbuvBqs0Cui0lad4qaJBs5Dh3MvAe1yY=
 notifications:
   webhooks:
     urls:
-      - http://dev.redboxresearchdata.com.au/hooks/travis
+    - http://dev.redboxresearchdata.com.au/hooks/travis
     on_success: always
     on_failure: never
     on_start: never
