@@ -328,6 +328,9 @@
 	</build>
 	<repositories>
 		<repository>
+			<id>redbox-nexus</id>
+		</repository>
+		<repository>
 			<!-- workaround until local nexus fixed -->
 			<id>redbox-remote-snapshots</id>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
