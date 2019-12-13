@@ -24,9 +24,9 @@
 		</plugins>
 	</reporting>
   <scm>
-        <url>scm:git://github.com/the-fascinator/the-fascinator.git</url>
-        <connection>scm:git://github.com/the-fascinator/the-fascinator.git</connection>
-        <developerConnection>scm:git:https://github.com/the-fascinator/the-fascinator.git</developerConnection>
+        <url>https://github.com/the-fascinator/the-fascinator.git</url>
+        <connection>scm:git:git@github.com:the-fascinator/the-fascinator.git</connection>
+        <developerConnection>scm:git:git@github.com:the-fascinator/the-fascinator.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 	<modules>
