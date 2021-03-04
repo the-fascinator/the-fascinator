@@ -5,7 +5,7 @@
 	<artifactId>the-fascinator</artifactId>
 	<packaging>pom</packaging>
 	<name>The Fascinator</name>
-	<version>1.7-SNAPSHOT</version>
+	<version>1.6</version>
 	<parent>
 		<groupId>com.googlecode.the-fascinator</groupId>
 		<artifactId>organisation</artifactId>
@@ -336,7 +336,7 @@
 			<id>redbox-remote-snapshots</id>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 			<releases>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
