@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.googlecode.fascinator.api.PluginException;
@@ -169,15 +170,7 @@ public class HarvestClient {
                     ioe);
         }
 
-        // initialise storage system
-        String storageType = config.getString(DEFAULT_STORAGE_TYPE, "storage",
-                "type");
-        storage = (Storage) ApplicationContextProvider.getApplicationContext()
-                .getBean("fascinatorStorage");
-        if (storage == null) {
-            throw new HarvesterException("Storage plugin '" + storageType
-                    + "'. Ensure it is in the classpath.");
-        }
+        initStorage();
 
         toolChainEntry = config.getString(DEFAULT_TOOL_CHAIN_QUEUE, "messaging",
                 "toolChainQueue");
@@ -671,4 +664,30 @@ public class HarvestClient {
         }
         return messaging;
     }
+
+    private void initStorage() throws HarvesterException {
+        String storageType = config.getString(DEFAULT_STORAGE_TYPE, "storage",
+                "type");
+        ApplicationContext applicationContext = ApplicationContextProvider.getApplicationContext();
+        if (applicationContext == null) {
+            storage = PluginManager.getStorage(storageType);
+            reloadStorage();
+        } else {
+            storage = (Storage) applicationContext.getBean("fascinatorStorage");
+        }
+        if (storage == null) {
+            throw new HarvesterException("Storage plugin '" + storageType
+                    + "'. Ensure it is in the classpath.");
+        }
+    }
+
+    private void reloadStorage() throws HarvesterException {
+        try {
+            storage.init(config.toString());
+            log.info("Loaded {}", storage.getName());
+        } catch (PluginException pe) {
+            throw new HarvesterException("Failed to initialise non-application-context-aware storage", pe);
+        }
+    }
+
 }
